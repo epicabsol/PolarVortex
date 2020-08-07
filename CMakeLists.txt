@@ -7,4 +7,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(PolarVortex src/main.cpp)
+include_directories(include)
+
+add_executable(PolarVortex src/main.cpp src/memory/Memory.cpp src/memory/StackAllocator.cpp)
