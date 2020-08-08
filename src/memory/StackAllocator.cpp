@@ -13,8 +13,7 @@ void* StackAllocator::Allocate(size_t length) {
 }
 
 void StackAllocator::Free(void* allocation) {
-    // Stack allocators can't free individual allocations - record the top with GetTop() and then later use that pointer with Pop().
-    assert(false);
+    // Freeing individual allocations does nothing - use the `Pop()` method to deallocate allocated memory.
 }
 
 void StackAllocator::Pop(const void* newTop) {

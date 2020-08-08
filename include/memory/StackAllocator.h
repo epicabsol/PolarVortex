@@ -7,7 +7,7 @@
 /**
  * @brief Allocates memory linearly, and allows popping off the most recent allocations.
  *
- * Usage: Allocate like usual, but do not call `Free()`.
+ * Usage: Allocate like usual.
  * Store the top at some point using the `GetTop()` method, and then later deallocate everything since then by passing the result to `Pop()`.
  */
 class StackAllocator : public Allocator {

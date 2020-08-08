@@ -1,9 +1,25 @@
 #pragma once
 
+#include <assert.h>
 #include <stdint.h>
 
 class Allocator;
 class StackAllocator;
+template <typename T> class PoolAllocator;
+
+/**
+ * @brief Aligns the given unaligned value to the given alignment.
+ *
+ * @param unaligned The unaligned value to be aligned.
+ * @param alignment The alignment for the result. Must be a power of two.
+ * @return The aligned value.
+ */
+inline size_t Align(size_t unaligned, size_t alignment) {
+    // Thanks to https://stackoverflow.com/a/32309869
+    assert((alignment & 1) == 0);
+    assert(alignment > 1);
+    return (unaligned + (alignment - 1)) & ~(alignment - 1);
+}
 
 //
 // Override the default dynamic allocation system
@@ -21,6 +37,7 @@ void operator delete[](void* allocation);
 
 // Global allocators
 extern StackAllocator RootAllocator;
+extern PoolAllocator<size_t> TestPoolAllocator;
 extern const Allocator* const AllAllocators[];
 extern const size_t AllAllocatorsCount;
 

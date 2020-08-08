@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "memory/StackAllocator.h"
+#include "memory/PoolAllocator.h"
 
 // Disallow default unstance allocation
 void* operator new(size_t size) {
@@ -30,26 +31,32 @@ void operator delete[](void* allocation) {
 char RootAllocatorBuffer[ROOT_ALLOCATOR_SIZE];
 StackAllocator RootAllocator("Root Allocator", RootAllocatorBuffer, sizeof(RootAllocatorBuffer));
 
+// Test pool allocator
+#define TEST_POOL_ALLOCATOR_SIZE (sizeof(size_t) * 4)
+char TestPoolAllocatorBuffer[TEST_POOL_ALLOCATOR_SIZE];
+PoolAllocator<size_t> TestPoolAllocator("Test Pool Allocator", TestPoolAllocatorBuffer, sizeof(TestPoolAllocatorBuffer));
+
 // All allocators
 const Allocator* const AllAllocators[] = {
-    &RootAllocator
+    &RootAllocator,
+    &TestPoolAllocator
 };
 const size_t AllAllocatorsCount = sizeof(AllAllocators) / sizeof(AllAllocators[0]);
 
 void PrintFriendlySize(size_t size) {
     const size_t unit = 1024ull;
     if (size < unit) {
-        printf("%zu B", size);
+        printf("%4zu B  ", size);
         return;
     }
     else if (size < unit * unit) {
-        printf("%zu KiB", size / unit);
+        printf("%4zu KiB", size / unit);
     }
     else if (size < unit * unit * unit) {
-        printf("%zu MiB", size / (unit * unit));
+        printf("%4zu MiB", size / (unit * unit));
     }
     else {
-        printf("%zu GiB", size / (unit * unit * unit));
+        printf("%4zu GiB", size / (unit * unit * unit));
     }
 }
 
