@@ -6,14 +6,13 @@
 #include "memory/StackAllocator.h"
 #include "memory/PoolAllocator.h"
 
-// Disallow default unstance allocation
+// Redirect default new and delete to the frame allocator
 void* operator new(size_t size) {
-    assert(false);
-    return nullptr;
+    return FrameAllocator.Allocate(size);
 }
 
 void operator delete(void* allocation) {
-    assert(false);
+    FrameAllocator.Free(allocation);
 }
 
 // Disallow default array allocation
@@ -27,19 +26,25 @@ void operator delete[](void* allocation) {
 }
 
 // Root allocator
-#define ROOT_ALLOCATOR_SIZE (1024 * 4)
+#define ROOT_ALLOCATOR_SIZE (1024 * 1024 * 8)
 char RootAllocatorBuffer[ROOT_ALLOCATOR_SIZE];
 StackAllocator RootAllocator("Root Allocator", RootAllocatorBuffer, sizeof(RootAllocatorBuffer));
 
-// Test pool allocator
-#define TEST_POOL_ALLOCATOR_SIZE (sizeof(size_t) * 4)
-char TestPoolAllocatorBuffer[TEST_POOL_ALLOCATOR_SIZE];
-PoolAllocator<size_t> TestPoolAllocator("Test Pool Allocator", TestPoolAllocatorBuffer, sizeof(TestPoolAllocatorBuffer));
+// Assets allocator
+#define ASSETS_ALLOCATOR_SIZE (1024 * 1024 * 64)
+char AssetsAllocatorBuffer[ASSETS_ALLOCATOR_SIZE];
+StackAllocator AssetsAllocator("Assets Allocator", AssetsAllocatorBuffer, sizeof(AssetsAllocatorBuffer));
+
+// Frame allocator
+#define FRAME_ALLOCATOR_SIZE (1024 * 16)
+char FrameAllocatorBuffer[FRAME_ALLOCATOR_SIZE];
+StackAllocator FrameAllocator("Frame Allocator", FrameAllocatorBuffer, sizeof(FrameAllocatorBuffer));
 
 // All allocators
 const Allocator* const AllAllocators[] = {
     &RootAllocator,
-    &TestPoolAllocator
+    &AssetsAllocator,
+    &FrameAllocator
 };
 const size_t AllAllocatorsCount = sizeof(AllAllocators) / sizeof(AllAllocators[0]);
 
@@ -63,7 +68,7 @@ void PrintFriendlySize(size_t size) {
 void PrintAllocatorStats(const Allocator* allocator) {
     printf("  %20s: [", allocator->GetName());
 
-    const size_t totalWidth = 10;
+    const size_t totalWidth = 24;
 
     size_t width = allocator->GetFree() * totalWidth / allocator->GetCapacity();
     for (size_t i = 0; i < (totalWidth - width); i++) {
@@ -78,7 +83,7 @@ void PrintAllocatorStats(const Allocator* allocator) {
     PrintFriendlySize(allocator->GetFree());
     printf(" free of ");
     PrintFriendlySize(allocator->GetCapacity());
-    printf(" (%2.1f%%)\n", (float)allocator->GetFree() * 100.0f / (float)allocator->GetCapacity());
+    printf(" (%2.1f%% free)\n", (float)allocator->GetFree() * 100.0f / (float)allocator->GetCapacity());
 }
 
 void PrintMemoryStats() {

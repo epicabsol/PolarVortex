@@ -37,7 +37,8 @@ void operator delete[](void* allocation);
 
 // Global allocators
 extern StackAllocator RootAllocator;
-extern PoolAllocator<size_t> TestPoolAllocator;
+extern StackAllocator AssetsAllocator;
+extern StackAllocator FrameAllocator;
 extern const Allocator* const AllAllocators[];
 extern const size_t AllAllocatorsCount;
 
