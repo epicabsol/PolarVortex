@@ -1,8 +1,10 @@
 #include "game/Window.h"
 
+#include "memory/Memory.h"
 #include "render/glad.h"
 #include "render/glfw3.h"
 #include "render/GLRenderer.h"
+#include "render/GLTexture.h"
 
 Window* MainWindow = nullptr;
 
@@ -36,6 +38,7 @@ Window::~Window() {
 }
 
 void Window::Run() {
+    GLTexture* testTexture = RootAllocator.New<GLTexture>(STRINGHASH("assets/sprites/tile_dirt.png"));
     while (!glfwWindowShouldClose((GLFWwindow*)this->_Window)) {
         // TODO: Get input
 
@@ -45,7 +48,7 @@ void Window::Run() {
         glClearColor(0.2f, 0.5f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        Renderer->DrawSprite();
+        Renderer->DrawSprite(testTexture);
 
         glfwSwapBuffers((GLFWwindow*)this->_Window);
         glfwPollEvents();

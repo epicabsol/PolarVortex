@@ -14,4 +14,5 @@ public:
     ~GLShaderProgram();
 
     inline unsigned int GetProgramHandle() const { return this->_ProgramHandle; }
+    void SetTextureIndex(const char* samplerName, unsigned int textureIndex);
 };

@@ -64,3 +64,8 @@ GLShaderProgram::GLShaderProgram(Hash vertexShaderFilenameHash, Hash pixelShader
 GLShaderProgram::~GLShaderProgram() {
     glDeleteProgram(this->_ProgramHandle);
 }
+
+void GLShaderProgram::SetTextureIndex(const char* samplerName, unsigned int textureIndex) {
+    glUseProgram(this->_ProgramHandle);
+    glUniform1i(glGetUniformLocation(this->_ProgramHandle, samplerName), textureIndex);
+}
