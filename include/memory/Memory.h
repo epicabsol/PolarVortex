@@ -3,9 +3,8 @@
 #include <assert.h>
 #include <stdint.h>
 
-class Allocator;
-class StackAllocator;
-template <typename T> class PoolAllocator;
+#include "StackAllocator.h"
+#include "PoolAllocator.h"
 
 /**
  * @brief Aligns the given unaligned value to the given alignment.
@@ -34,6 +33,9 @@ void operator delete(void* allocation);
 // Array allocation
 void* operator new[](size_t size);
 void operator delete[](void* allocation);
+
+void* operator new(size_t size, Allocator& allocator);
+void operator delete(void* allocation, Allocator& allocator);
 
 // Global allocators
 extern StackAllocator RootAllocator;

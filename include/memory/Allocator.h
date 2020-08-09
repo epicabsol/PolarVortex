@@ -24,7 +24,7 @@ public:
      * @param buffer The buffer to allocate from.
      * @param bufferLength The length of `buffer`.
      */
-    Allocator(const char* name, void* buffer, size_t bufferLength) : _Name(name), _Buffer(buffer), _BufferLength(bufferLength) { }
+    inline Allocator(const char* name, void* buffer, size_t bufferLength) : _Name(name), _Buffer(buffer), _BufferLength(bufferLength) { }
 
     /**
      * @brief Gets the name that was assigned at construction.
@@ -38,7 +38,7 @@ public:
      *
      * @return The capacity of this Allocator.
      */
-    size_t GetCapacity() const { return this->_BufferLength; }
+    inline size_t GetCapacity() const { return this->_BufferLength; }
 
     /**
      * @brief Gets the number of remaining bytes that can be allocated from this Allocator, including any overhead.
@@ -56,9 +56,36 @@ public:
     virtual void* Allocate(size_t length) = 0;
 
     /**
+     * @brief Creates a new instance of type `T`.
+     *
+     * @tparam T The type to instantiate.
+     * @tparam TArgs The types of the arguments to pass to the instance's constructor.
+     * @param args The arguments to pass to the instance's constructor.
+     * @return The allocated and initialized instance.
+     */
+    template <typename T, typename ... TArgs>
+    inline T* New(TArgs ... args) {
+        T* result = (T*)this->Allocate(sizeof(T));
+        new (result) T(args...);
+        return result;
+    }
+
+    /**
      * @brief Frees the given allocation that was allocated from this Allocator.
      *
      * @param allocation The address of the bytes to deallocate.
      */
     virtual void Free(void* allocation) = 0;
+
+    /**
+     * @brief Deletes the given instance.
+     *
+     * @tparam T The type of the instance to delete.
+     * @param instance An instance that was allocated from this Allocator.
+     */
+    template <typename T>
+    inline void Delete(T* instance) {
+        instance->~T();
+        this->Free(instance);
+    }
 };

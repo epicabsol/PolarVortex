@@ -2,6 +2,7 @@
 
 #include "render/glad.h"
 #include "render/glfw3.h"
+#include "render/GLRenderer.h"
 
 Window* MainWindow = nullptr;
 
@@ -10,14 +11,14 @@ void WindowFramebufferSizeCallback(GLFWwindow* glfwWindow, int width, int height
     window->Resized(width, height);
 }
 
-Window::Window() : _Window(nullptr), _ClientWidth(800), _ClientHeight(600) {
+Window::Window(const char* title) : _Window(nullptr), _ClientWidth(800), _ClientHeight(600) {
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow((int)this->_ClientWidth, (int)this->_ClientHeight, "Polar Vortex", nullptr, nullptr); // TODO: Check for success
+    GLFWwindow* window = glfwCreateWindow((int)this->_ClientWidth, (int)this->_ClientHeight, title, nullptr, nullptr); // TODO: Check for success
     glfwMakeContextCurrent(window);
     glfwSetWindowUserPointer(window, this);
 
@@ -43,6 +44,8 @@ void Window::Run() {
         // TODO: Render
         glClearColor(0.2f, 0.5f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        Renderer->DrawSprite();
 
         glfwSwapBuffers((GLFWwindow*)this->_Window);
         glfwPollEvents();

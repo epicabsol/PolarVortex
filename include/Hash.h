@@ -38,19 +38,5 @@ inline constexpr uint64_t HashDataConst(const char* const str, const uint64_t va
     return (str[0] == '\0') ? value : HashDataConst(&str[1], (value ^ uint64_t(str[0])) * HashPrime, iter + 1);
 }
 
-/*class Hash {
-private:
-    const char* _StringData;
-    uint64_t _Hash;
-
-public:
-    Hash(uint64_t hash);
-    Hash(const char* stringData, uint32_t length);
-
-    bool operator==(const Hash& other) const;
-    bool operator==(const uint64_t& other) const;
-    bool operator!=(const Hash& other) const;
-};*/
-
 // STRINGHASH generates a Hash for a literal string, destroying all trace of the literal text.
 #define STRINGHASH(str) std::integral_constant<Hash, HashDataConst(str, HashInitialValue, 0)>::value

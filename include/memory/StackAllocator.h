@@ -22,14 +22,14 @@ public:
      * @param buffer The buffer to allocate from.
      * @param bufferLength The length of `buffer`.
      */
-    StackAllocator(const char* name, void* buffer, size_t bufferLength) : Allocator(name, buffer, bufferLength), _Top(buffer) { }
+    inline StackAllocator(const char* name, void* buffer, size_t bufferLength) : Allocator(name, buffer, bufferLength), _Top(buffer) { }
 
     /**
      * @brief Gets the address of the top of the stack, to be popped to later.
      *
      * @return The top of the allocation stack.
      */
-    const void* GetTop() const { return this->_Top; }
+    inline const void* GetTop() const { return this->_Top; }
 
     virtual size_t GetFree() const override { return this->_BufferLength - ((size_t)this->_Top - (size_t)this->_Buffer); }
 

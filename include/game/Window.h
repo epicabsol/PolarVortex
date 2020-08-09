@@ -7,7 +7,7 @@ private:
     size_t _ClientHeight;
 
 public:
-    Window();
+    Window(const char* title);
     ~Window();
 
     void Run();
