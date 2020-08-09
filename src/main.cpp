@@ -5,28 +5,26 @@
 #include "memory/Memory.h"
 #include "memory/StackAllocator.h"
 #include "memory/PoolAllocator.h"
+#include "game/Window.h"
 
 int main() {
-    const void* top = RootAllocator.GetTop();
 
+    // Load assets
     Assets = (AssetManager*)RootAllocator.Allocate(sizeof(AssetManager));
     new (Assets) AssetManager();
 
-    PrintMemoryStats();
-
-    // Print asset
-    Asset* vsAsset = Assets->GetAsset(STRINGHASH("assets/shaders/SpriteVertexShader.glsl"));
-    if (vsAsset == nullptr) {
-        printf("ERROR: Couldn't find VS asset!\n");
-    }
-    else {
-        printf("VS asset: '%.*s'\n", (int)vsAsset->GetDataLength(), (const char*)vsAsset->GetData());
-    }
-
-    RootAllocator.Pop(top);
+    // Create window
+    MainWindow = (Window*)RootAllocator.Allocate(sizeof(Window));
+    new (MainWindow) Window();
 
     PrintMemoryStats();
 
-    std::cout << "Hello World!";
-    return 5;
+    // Run game
+    MainWindow->Run();
+
+    // Destroy window
+    MainWindow->~Window();
+    MainWindow = nullptr;
+
+    return 0;
 }
