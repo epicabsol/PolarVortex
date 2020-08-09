@@ -7,6 +7,7 @@
 #include "render/glfw3.h"
 #include "render/GLTexture.h"
 #include "render/GLVertexAttribute.h"
+#include "render/Math.h"
 
 GLRenderer* Renderer = nullptr;
 
@@ -53,13 +54,17 @@ GLRenderer::~GLRenderer() {
 }
 
 void GLRenderer::DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const {
-    //glUseProgram(shader->GetProgramHandle());
+    glUseProgram(shader->GetProgramHandle());
     glBindVertexArray(mesh->GetVertexArrayHandle());
     glDrawElements(GL_TRIANGLES, (int)mesh->GetIndexCount(), (int)mesh->GetIndexFormat(), nullptr);
 }
 
-void GLRenderer::DrawSprite(GLTexture* texture) const {
-    glUseProgram(this->_SpriteShader->GetProgramHandle());
+void GLRenderer::DrawSprite(GLTexture* texture, float x, float y, float z, float width, float height) const {
+    //glUseProgram(this->_SpriteShader->GetProgramHandle());
+
+    hmm_mat4 transform = Math_Translate(Math_Vec3(x, y, z)) * Math_Scale(Math_Vec3(width, height, 1.0f));
+    unsigned int transformUniform = glGetUniformLocation(this->_SpriteShader->GetProgramHandle(), "Transform");
+    glUniformMatrix4fv(transformUniform, 1, GL_FALSE, &transform.Elements[0][0]);
 
     if (texture == nullptr) {
         texture = this->_DefaultTexture;

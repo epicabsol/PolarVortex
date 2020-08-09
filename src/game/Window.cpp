@@ -48,7 +48,7 @@ void Window::Run() {
         glClearColor(0.2f, 0.5f, 0.8f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        Renderer->DrawSprite(testTexture);
+        Renderer->DrawSprite(testTexture, 0, 0, 0, 0.5, 1);
 
         glfwSwapBuffers((GLFWwindow*)this->_Window);
         glfwPollEvents();
