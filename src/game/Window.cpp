@@ -1,5 +1,6 @@
 #include "game/Window.h"
 
+#include "game/Screen.h"
 #include "memory/Memory.h"
 #include "render/glad.h"
 #include "render/glfw3.h"
@@ -28,8 +29,6 @@ Window::Window(const char* title) : _Window(nullptr), _ClientWidth(800), _Client
 
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); // TODO: Check for success
 
-    glViewport(0, 0, (int)this->_ClientWidth, (int)this->_ClientHeight);
-
     glfwSetFramebufferSizeCallback(window, WindowFramebufferSizeCallback);
 }
 
@@ -38,17 +37,15 @@ Window::~Window() {
 }
 
 void Window::Run() {
-    GLTexture* testTexture = RootAllocator.New<GLTexture>(STRINGHASH("assets/sprites/tile_dirt.png"));
     while (!glfwWindowShouldClose((GLFWwindow*)this->_Window)) {
         // TODO: Get input
 
         // TODO: Update
 
-        // TODO: Render
-        glClearColor(0.2f, 0.5f, 0.8f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        Renderer->DrawSprite(testTexture, 0, 0, 0, 0.5, 1);
+        // Render
+        if (CurrentScreen != nullptr) {
+            CurrentScreen->Render();
+        }
 
         glfwSwapBuffers((GLFWwindow*)this->_Window);
         glfwPollEvents();
@@ -59,5 +56,7 @@ void Window::Resized(size_t width, size_t height) {
     this->_ClientWidth = width;
     this->_ClientHeight = height;
 
-    glViewport(0, 0, (int)this->_ClientWidth, (int)this->_ClientHeight);
+    if (CurrentScreen != nullptr) {
+        CurrentScreen->Resize(width, height);
+    }
 }

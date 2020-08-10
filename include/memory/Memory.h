@@ -40,6 +40,7 @@ void operator delete(void* allocation, Allocator& allocator);
 // Global allocators
 extern StackAllocator RootAllocator;
 extern StackAllocator AssetsAllocator;
+extern StackAllocator ScreenAllocator;
 extern StackAllocator FrameAllocator;
 extern const Allocator* const AllAllocators[];
 extern const size_t AllAllocatorsCount;

@@ -28,22 +28,28 @@ void operator delete[](void* allocation) {
 // Root allocator
 #define ROOT_ALLOCATOR_SIZE (1024 * 1024 * 8)
 char RootAllocatorBuffer[ROOT_ALLOCATOR_SIZE];
-StackAllocator RootAllocator("Root Allocator", RootAllocatorBuffer, sizeof(RootAllocatorBuffer));
+StackAllocator RootAllocator("Root", RootAllocatorBuffer, sizeof(RootAllocatorBuffer));
 
 // Assets allocator
 #define ASSETS_ALLOCATOR_SIZE (1024 * 1024 * 64)
 char AssetsAllocatorBuffer[ASSETS_ALLOCATOR_SIZE];
-StackAllocator AssetsAllocator("Assets Allocator", AssetsAllocatorBuffer, sizeof(AssetsAllocatorBuffer));
+StackAllocator AssetsAllocator("Assets", AssetsAllocatorBuffer, sizeof(AssetsAllocatorBuffer));
+
+// Screen allocator
+#define SCREEN_ALLOCATOR_SIZE (1024 * 1024 * 16)
+char ScreenAllocatorBuffer[SCREEN_ALLOCATOR_SIZE];
+StackAllocator ScreenAllocator("Screen", ScreenAllocatorBuffer, sizeof(ScreenAllocatorBuffer));
 
 // Frame allocator
 #define FRAME_ALLOCATOR_SIZE (1024 * 16)
 char FrameAllocatorBuffer[FRAME_ALLOCATOR_SIZE];
-StackAllocator FrameAllocator("Frame Allocator", FrameAllocatorBuffer, sizeof(FrameAllocatorBuffer));
+StackAllocator FrameAllocator("Frame", FrameAllocatorBuffer, sizeof(FrameAllocatorBuffer));
 
 // All allocators
 const Allocator* const AllAllocators[] = {
     &RootAllocator,
     &AssetsAllocator,
+    &ScreenAllocator,
     &FrameAllocator
 };
 const size_t AllAllocatorsCount = sizeof(AllAllocators) / sizeof(AllAllocators[0]);

@@ -7,6 +7,7 @@
 #include "memory/StackAllocator.h"
 #include "memory/PoolAllocator.h"
 #include "render/GLRenderer.h"
+#include "screens/MainMenuScreen.h"
 
 int main() {
 
@@ -19,10 +20,19 @@ int main() {
     // Create renderer
     Renderer = RootAllocator.New<GLRenderer>();
 
+    // Create main menu
+    MainMenuScreen* mainMenu = ScreenAllocator.New<MainMenuScreen>();
+    CurrentScreen = mainMenu;
+
     PrintMemoryStats();
 
     // Run game
     MainWindow->Run();
+
+    // Destroy last screen
+    if (CurrentScreen != nullptr) {
+        ScreenAllocator.Delete(CurrentScreen);
+    }
 
     // Destroy renderer
     RootAllocator.Delete(Renderer);

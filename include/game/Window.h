@@ -10,6 +10,9 @@ public:
     Window(const char* title);
     ~Window();
 
+    inline size_t GetClientWidth() const { return this->_ClientWidth; }
+    inline size_t GetClientHeight() const { return this->_ClientHeight; }
+
     void Run();
     void Resized(size_t width, size_t height);
 };

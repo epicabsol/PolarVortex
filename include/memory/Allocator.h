@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <assert.h>
 
 /**
  * @brief Defines an abstract base class for memory allocators.
@@ -65,8 +66,9 @@ public:
      */
     template <typename T, typename ... TArgs>
     inline T* New(TArgs ... args) {
-        T* result = (T*)this->Allocate(sizeof(T));
-        new (result) T(args...);
+        T* address = (T*)this->Allocate(sizeof(T));
+        T* result = new (address) T(args...);
+        assert(address == result); // Can't have implementations returning weird address in placement new!
         return result;
     }
 
@@ -81,7 +83,7 @@ public:
      * @brief Deletes the given instance.
      *
      * @tparam T The type of the instance to delete.
-     * @param instance An instance that was allocated from this Allocator.
+     * @param instance An instance of type `T` that was allocated from this Allocator.
      */
     template <typename T>
     inline void Delete(T* instance) {

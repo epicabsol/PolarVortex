@@ -2,6 +2,8 @@
 
 #include "assets/AssetManager.h"
 #include "game/Window.h"
+#include "game/Viewport.h"
+#include "game/Camera.h"
 #include "memory/Memory.h"
 #include "render/glad.h"
 #include "render/glfw3.h"
@@ -45,12 +47,24 @@ GLRenderer::GLRenderer() {
     this->_SpriteShader = RootAllocator.New<GLShaderProgram>(STRINGHASH("assets/shaders/SpriteVertexShader.glsl"), STRINGHASH("assets/shaders/SpritePixelShader.glsl"));
     this->_SpriteShader->SetTextureIndex("Texture", 0);
     this->_DefaultTexture = RootAllocator.New<GLTexture>(DefaultTextureWidth, DefaultTextureHeight, DefaultTextureData);
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 GLRenderer::~GLRenderer() {
     RootAllocator.Delete(this->_DefaultTexture);
     RootAllocator.Delete(this->_SpriteShader);
     RootAllocator.Delete(this->_SquareMesh);
+}
+
+void GLRenderer::BeginViewport(Viewport* viewport) {
+    glViewport(viewport->GetX(), viewport->GetY(), viewport->GetWidth(), viewport->GetHeight());
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    Camera* camera = viewport->GetCamera();
+    if (camera != nullptr) {
+        this->_Projection = Math_Orthographic(camera->GetX() - camera->GetWidth() * 0.5f, camera->GetX() + camera->GetWidth() * 0.5f, camera->GetY() - camera->GetHeight() * 0.5f, camera->GetY() + camera->GetHeight() * 0.5f, -100.0f, 100.0f);
+    }
 }
 
 void GLRenderer::DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const {
@@ -65,6 +79,8 @@ void GLRenderer::DrawSprite(GLTexture* texture, float x, float y, float z, float
     hmm_mat4 transform = Math_Translate(Math_Vec3(x, y, z)) * Math_Scale(Math_Vec3(width, height, 1.0f));
     unsigned int transformUniform = glGetUniformLocation(this->_SpriteShader->GetProgramHandle(), "Transform");
     glUniformMatrix4fv(transformUniform, 1, GL_FALSE, &transform.Elements[0][0]);
+    unsigned int projectionUniform = glGetUniformLocation(this->_SpriteShader->GetProgramHandle(), "Projection");
+    glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, &this->_Projection.Elements[0][0]);
 
     if (texture == nullptr) {
         texture = this->_DefaultTexture;
