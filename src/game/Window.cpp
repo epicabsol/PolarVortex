@@ -7,7 +7,7 @@
 #include "render/GLRenderer.h"
 #include "render/GLTexture.h"
 
-Window* MainWindow = nullptr;
+#include "game/PolarVortexGame.h"
 
 void WindowFramebufferSizeCallback(GLFWwindow* glfwWindow, int width, int height) {
     Window* window = (Window*)glfwGetWindowUserPointer(glfwWindow);
@@ -38,14 +38,7 @@ Window::~Window() {
 
 void Window::Run() {
     while (!glfwWindowShouldClose((GLFWwindow*)this->_Window)) {
-        // TODO: Get input
-
-        // TODO: Update
-
-        // Render
-        if (CurrentScreen != nullptr) {
-            CurrentScreen->Render();
-        }
+        Game->Tick();
 
         glfwSwapBuffers((GLFWwindow*)this->_Window);
         glfwPollEvents();
@@ -56,7 +49,8 @@ void Window::Resized(size_t width, size_t height) {
     this->_ClientWidth = width;
     this->_ClientHeight = height;
 
-    if (CurrentScreen != nullptr) {
-        CurrentScreen->Resize(width, height);
+    Screen* currentScreen = Game->GetCurrentScreen();
+    if (currentScreen != nullptr) {
+        currentScreen->Resize(width, height);
     }
 }

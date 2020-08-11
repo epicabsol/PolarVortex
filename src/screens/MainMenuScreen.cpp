@@ -5,12 +5,13 @@
 #include "memory/Memory.h"
 #include "render/GLRenderer.h"
 #include "render/GLTexture.h"
+#include "game/PolarVortexGame.h"
 
 void MainMenuScreen::RenderViewportContents(size_t index) {
     Screen::RenderViewportContents(index);
-    Renderer->DrawSprite(this->_TestTexture, 0, 0, 0, 1, 1);
-    Renderer->DrawSprite(this->_TestTexture, 0, 5, 0, 1, 1);
-    Renderer->DrawSprite(this->_TestTexture, 5, 0, 0, 1, 1);
+    Game->GetRenderer().DrawSprite(this->_TestTexture, 0, 0, 0, 1, 1);
+    Game->GetRenderer().DrawSprite(this->_TestTexture, 0, 5, 0, 1, 1);
+    Game->GetRenderer().DrawSprite(this->_TestTexture, 5, 0, 0, 1, 1);
 }
 
 MainMenuScreen::MainMenuScreen() {
@@ -19,7 +20,7 @@ MainMenuScreen::MainMenuScreen() {
     this->_MainCamera = ScreenAllocator.New<Camera>(0.0f, 0.0f, 0.0f, 10.0f);
 
     this->_Viewports[0].SetCamera(this->_MainCamera);
-    this->_Viewports[0].SetLayout(0, 0, (int)MainWindow->GetClientWidth(), (int)MainWindow->GetClientHeight());
+    this->_Viewports[0].SetLayout(0, 0, (int)Game->GetMainWindow().GetClientWidth(), (int)Game->GetMainWindow().GetClientHeight());
 }
 
 MainMenuScreen::~MainMenuScreen() {

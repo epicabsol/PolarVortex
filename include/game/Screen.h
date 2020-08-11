@@ -18,5 +18,3 @@ public:
     void Render();
     virtual void Resize(size_t width, size_t height) = 0;
 };
-
-extern Screen* CurrentScreen;

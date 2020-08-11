@@ -16,5 +16,3 @@ public:
     void Run();
     void Resized(size_t width, size_t height);
 };
-
-extern Window* MainWindow;

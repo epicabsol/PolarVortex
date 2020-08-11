@@ -5,6 +5,7 @@
 #include "assets/Asset.h"
 #include "assets/AssetManager.h"
 #include "render/glad.h"
+#include "game/PolarVortexGame.h"
 
 void CheckShaderStatus(unsigned int shaderHandle) {
     int success;
@@ -56,8 +57,8 @@ GLShaderProgram::GLShaderProgram(const char* vertexShaderSource, int vertexShade
 }
 
 GLShaderProgram::GLShaderProgram(Hash vertexShaderFilenameHash, Hash pixelShaderFilenameHash) {
-    Asset* vertexShaderAsset = Assets->GetAsset(vertexShaderFilenameHash);
-    Asset* pixelShaderAsset = Assets->GetAsset(pixelShaderFilenameHash);
+    Asset* vertexShaderAsset = Game->GetAssetManager().GetAsset(vertexShaderFilenameHash);
+    Asset* pixelShaderAsset = Game->GetAssetManager().GetAsset(pixelShaderFilenameHash);
     this->LoadSource((const char*)vertexShaderAsset->GetData(), (int)vertexShaderAsset->GetDataLength(), (const char*)pixelShaderAsset->GetData(), (int)pixelShaderAsset->GetDataLength());
 }
 

@@ -15,5 +15,3 @@ public:
 
     Asset* GetAsset(const Hash nameHash) const;
 };
-
-extern AssetManager* Assets;

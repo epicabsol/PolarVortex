@@ -10,8 +10,6 @@
 #define DATA_ALLOCATOR_SIZE (1024 * 1024 * 32)
 #define ASSET_DIRECTORY "assets"
 
-AssetManager* Assets = nullptr;
-
 AssetManager::AssetManager() : _Assets((Asset*)RootAllocator.Allocate(sizeof(Asset) * ASSET_MAX_COUNT)), _AssetCount(0) {
 
     using namespace std::filesystem;

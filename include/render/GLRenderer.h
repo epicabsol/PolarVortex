@@ -22,5 +22,3 @@ public:
     void DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const;
     void DrawSprite(GLTexture* texture, float x, float y, float z, float width, float height) const;
 };
-
-extern GLRenderer* Renderer;

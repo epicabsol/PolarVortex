@@ -1,11 +1,10 @@
 #include "game/Screen.h"
 
 #include "render/GLRenderer.h"
-
-Screen* CurrentScreen = nullptr;
+#include "game/PolarVortexGame.h"
 
 void Screen::RenderViewportContents(size_t index) {
-    Renderer->BeginViewport(&this->_Viewports[index]);
+    Game->GetRenderer().BeginViewport(&this->_Viewports[index]);
 }
 
 void Screen::Render() {

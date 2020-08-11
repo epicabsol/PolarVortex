@@ -1,9 +1,9 @@
 #include "render/GLTexture.h"
 
 #include "assets/Asset.h"
-#include "assets/AssetManager.h"
 #include "render/glad.h"
 #include "render/stb_image.h"
+#include "game/PolarVortexGame.h"
 
 void GLTexture::LoadData(const void* data) {
     glGenTextures(1, &this->_Handle);
@@ -18,7 +18,7 @@ GLTexture::GLTexture(unsigned int width, unsigned int height, const void* data) 
 }
 
 GLTexture::GLTexture(Hash filenameHash) : _Handle(0), _Width(0), _Height(0) {
-    Asset* textureAsset = Assets->GetAsset(filenameHash);
+    Asset* textureAsset = Game->GetAssetManager().GetAsset(filenameHash);
     int width;
     int height;
     int channelsInFile;
