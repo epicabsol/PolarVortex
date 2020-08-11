@@ -76,7 +76,7 @@ void GLRenderer::DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const {
 void GLRenderer::DrawSprite(GLTexture* texture, float x, float y, float z, float width, float height) const {
     //glUseProgram(this->_SpriteShader->GetProgramHandle());
 
-    hmm_mat4 transform = Math_Translate(Math_Vec3(x, y, z)) * Math_Scale(Math_Vec3(width, height, 1.0f));
+    Matrix transform = Math_Translate(Math_Vec3(x, y, z)) * Math_Scale(Math_Vec3(width, height, 1.0f));
     unsigned int transformUniform = glGetUniformLocation(this->_SpriteShader->GetProgramHandle(), "Transform");
     glUniformMatrix4fv(transformUniform, 1, GL_FALSE, &transform.Elements[0][0]);
     unsigned int projectionUniform = glGetUniformLocation(this->_SpriteShader->GetProgramHandle(), "Projection");

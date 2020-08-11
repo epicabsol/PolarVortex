@@ -12,7 +12,7 @@ private:
     GLMesh* _SquareMesh;
     GLShaderProgram* _SpriteShader;
     GLTexture* _DefaultTexture;
-    hmm_mat4 _Projection;
+    Matrix _Projection;
 
 public:
     GLRenderer();
