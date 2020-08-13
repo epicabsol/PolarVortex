@@ -208,6 +208,7 @@
 
 #define HMM_PI32 3.14159265359f
 #define HMM_PI 3.14159265358979323846
+#define HMM_EPSILON 0.00001f
 
 #define HMM_MIN(a, b) (a) > (b) ? (b) : (a)
 #define HMM_MAX(a, b) (a) < (b) ? (b) : (a)

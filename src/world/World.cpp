@@ -21,6 +21,34 @@ inline Vector2 BiasedReflect2D(const Vector2& direction, const Vector2& normal, 
     return direction * bias.X - Math_Dot(direction, normal) * normal * (bias.X + bias.Y);
 }
 
+float World::StepDynamic(DynamicCollider& dynamic, float timestep) {
+    Intersection closestIntersection;
+    Collider* closestStatic = nullptr;
+
+    Vector2 goalPosition = dynamic._Bounds.Position + dynamic._Velocity * timestep;
+    closestIntersection.Time = 1.0f;
+    closestIntersection.EndPosition = goalPosition;
+    closestIntersection.Overlap = Vector2();
+
+    for (Collider& collider : this->_ColliderPool) {
+        Intersection intersection;
+        if (SweptBoundingBoxIntersectsBoundingBox(dynamic._Bounds, goalPosition, collider.GetBounds(), intersection)) {
+            if (intersection.Time < closestIntersection.Time) {
+                closestStatic = &collider;
+                closestIntersection = intersection;
+            }
+        }
+    }
+
+    dynamic._Bounds.Position = closestIntersection.EndPosition - closestIntersection.Overlap;
+    if (closestStatic != nullptr) {
+        Vector2 bias = Vector2(1.0f / (1.0f + dynamic.GetFriction() * closestStatic->GetFriction()), dynamic.GetRestitution() * closestStatic->GetRestitution());
+        dynamic._Velocity = BiasedReflect2D(dynamic._Velocity, closestIntersection.Normal, bias);
+    }
+
+    return (1.0f - closestIntersection.Time) * timestep;
+}
+
 World::World() : _Gravity(0.0f, -0.98f), _ColliderPool("World Collider Pool", this->_ColliderPoolBuffer, sizeof(Collider) * MAX_COLLIDERS), _DynamicColliderPool("World Dynamic Collider Pool", this->_DynamicColliderPoolBuffer, sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS), _DirtTexture(nullptr) {
 
     // TEMP: Add some test colliders.
@@ -30,7 +58,8 @@ World::World() : _Gravity(0.0f, -0.98f), _ColliderPool("World Collider Pool", th
     for (float f = -4.0f; f <= 2.5f; f += 1.0f) {
         DynamicCollider* dynamic = this->AddDynamicCollider(Vector2(f, 2.0f), Vector2(0.25f, 0.25f), 0.125f);
         dynamic->_Velocity = Vector2(-2.5f, 0.0f);
-        dynamic->_Restitution = 0.5f;
+        dynamic->_Restitution = 0.0f;
+        dynamic->_Friction = 0.0f;
     }
 
     this->_DirtTexture = ScreenAllocator.New<GLTexture>(STRINGHASH("assets/sprites/tile_dirt.png"));
@@ -54,39 +83,21 @@ void World::RemoveDynamicCollider(DynamicCollider* collider) {
 
 void World::Update(float timestep) {
     // Physics Step
-    // 1. Apply forces
-    for (DynamicCollider& dynamic : this->_DynamicColliderPool) {
-        dynamic._StepForce = this->_Gravity;
-    }
-    // 2. Update dynamic bodies
+    // 1. Update dynamic bodies
     for (DynamicCollider& dynamic : this->_DynamicColliderPool) {
         Vector2 acceleration = dynamic._StepForce / dynamic._Mass;
         dynamic._Velocity += acceleration * timestep;
     }
-    // 3. Detect collisions & solve constraints
+    // 2. Detect collisions & solve constraints
     for (DynamicCollider& dynamic : this->_DynamicColliderPool) {
-        Intersection closestIntersection;
-        Collider* closestStatic = nullptr;
-
-        Vector2 goalPosition = dynamic._Bounds.Position + dynamic._Velocity * timestep;
-        closestIntersection.Time = 1.0f;
-        closestIntersection.EndPosition = goalPosition;
-        closestIntersection.Overlap = Vector2();
-
-        for (Collider& collider : this->_ColliderPool) {
-            Intersection intersection;
-            if (SweptBoundingBoxIntersectsBoundingBox(dynamic._Bounds, goalPosition, collider.GetBounds(), intersection)) {
-                if (intersection.Time < closestIntersection.Time) {
-                    closestStatic = &collider;
-                    closestIntersection = intersection;
-                }
-            }
+        float time = timestep;
+        while (time > HMM_EPSILON) {
+            time = this->StepDynamic(dynamic, time);
         }
-
-        dynamic._Bounds.Position = closestIntersection.EndPosition - closestIntersection.Overlap;
-        if (closestStatic != nullptr) {
-            dynamic._Velocity = BiasedReflect2D(dynamic._Velocity, closestIntersection.Normal, Vector2(1.0f / (1.0f + dynamic.GetFriction() * closestStatic->GetFriction()), dynamic.GetRestitution() * closestStatic->GetRestitution()));
-        }
+    }
+    // 3. Reset forces
+    for (DynamicCollider& dynamic : this->_DynamicColliderPool) {
+        dynamic._StepForce = this->_Gravity;
     }
 }
 

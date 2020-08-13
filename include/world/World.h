@@ -20,6 +20,15 @@ private:
     char _ColliderPoolBuffer[sizeof(Collider) * MAX_COLLIDERS];
     char _DynamicColliderPoolBuffer[sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS];
 
+    /**
+     * @brief Moves the given dynamic collider according to its velocity for up to the given amount of time, or until it collides.
+     *
+     * @param dynamic The dynamic collider to simulate.
+     * @param timestep The maximum amount of time to simulate.
+     * @return float The amount of time remaining after a collision was found, if any.
+     */
+    float StepDynamic(DynamicCollider& dynamic, float timestep);
+
 public:
     World();
 
