@@ -95,8 +95,9 @@ bool BoundingBoxIntersectsBoundingBox(const BoundingBox& bounds1, const Bounding
     return true;
 }
 
-bool SweptBoundingBoxIntersectsBoundingBox(const BoundingBox& bounds1, const Vector2& start, const Vector2& end, const BoundingBox& bounds2, Intersection& intersection) {
+bool SweptBoundingBoxIntersectsBoundingBox(const BoundingBox& bounds1, const Vector2& end, const BoundingBox& bounds2, Intersection& intersection) {
     // If the sweep segment starts and ends at the same point, it's just a simple AABB vs AABB check
+    const Vector2& start = bounds1.Position;
     if (start == end) {
         if (BoundingBoxIntersectsBoundingBox(bounds1, bounds2, intersection)) {
             intersection.Time = 0.0f;

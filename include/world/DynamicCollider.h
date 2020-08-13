@@ -12,5 +12,5 @@ private:
     float _Mass;
 
 public:
-    inline DynamicCollider(BoundingBox bounds, float mass) : Collider(bounds), _Mass(mass) { }
+    inline DynamicCollider(BoundingBox bounds, float mass) : Collider(bounds), _Velocity(0.0f, 0.0f), _StepForce(0.0f, 0.0f), _Mass(mass) { }
 };

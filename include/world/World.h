@@ -8,12 +8,14 @@
 #include "../memory/IterablePoolAllocator.h"
 
 class Camera;
+class GLTexture;
 
 class World {
 private:
     Vector2 _Gravity;
     IterablePoolAllocator<Collider> _ColliderPool;
     IterablePoolAllocator<DynamicCollider> _DynamicColliderPool;
+    GLTexture* _DirtTexture;
 
     char _ColliderPoolBuffer[sizeof(Collider) * MAX_COLLIDERS];
     char _DynamicColliderPoolBuffer[sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS];
