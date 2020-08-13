@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <assert.h>
+#include <stdio.h>
 
 /**
  * @brief Defines an abstract base class for memory allocators.
@@ -67,8 +68,15 @@ public:
     template <typename T, typename ... TArgs>
     inline T* New(TArgs ... args) {
         T* address = (T*)this->Allocate(sizeof(T));
-        T* result = new (address) T(args...);
-        assert(address == result); // Can't have implementations returning weird address in placement new!
+        T* result = address;
+        if (address != nullptr) {
+            result = new (address) T(args...);
+            assert(address == result); // Can't have implementations returning weird address in placement new!
+        }
+        else {
+            printf("ERROR: Couldn't allocator memory from allocator %s!\n", this->_Name);
+        }
+
         return result;
     }
 

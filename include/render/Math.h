@@ -161,11 +161,6 @@
 #define HMM_DEPRECATED(msg)
 #endif
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #define HMM_INLINE static inline
 #define HMM_EXTERN extern
 
@@ -217,6 +212,8 @@ extern "C"
 #define HMM_MIN(a, b) (a) > (b) ? (b) : (a)
 #define HMM_MAX(a, b) (a) < (b) ? (b) : (a)
 #define HMM_ABS(a) ((a) > 0 ? (a) : -(a))
+#define HMM_SIGN(a) ((a) >= 0 ? 1.0f : -1.0f)
+#define HMM_CLAMP(a, min, max) ((a) > (max) ? (max) : ((a) < (min) ? (min) : (a)))
 #define HMM_MOD(a, m) ((a) % (m)) >= 0 ? ((a) % (m)) : (((a) % (m)) + (m))
 #define HMM_SQUARE(x) ((x) * (x))
 
@@ -249,6 +246,9 @@ typedef union Vector2
     float Elements[2];
 
 #ifdef __cplusplus
+    inline Vector2() : X(0.0f), Y(0.0f) { }
+    inline Vector2(float x, float y) : X(x), Y(y) { }
+
     inline float &operator[](const int &Index)
     {
         return Elements[Index];
@@ -300,6 +300,9 @@ typedef union Vector3
     float Elements[3];
 
 #ifdef __cplusplus
+    inline Vector3() : X(0.0f), Y(0.0f), Z(0.0f) { }
+    inline Vector3(float x, float y, float z) : X(x), Y(y), Z(z) { }
+
     inline float &operator[](const int &Index)
     {
         return Elements[Index];
@@ -364,6 +367,9 @@ typedef union Vector4
 #endif
 
 #ifdef __cplusplus
+    inline Vector4() : X(0.0f), Y(0.0f), Z(0.0f), W(0.0f) { }
+    inline Vector4(float x, float y, float z, float w) : X(x), Y(y), Z(z), W(w) { }
+
     inline float &operator[](const int &Index)
     {
         return Elements[Index];
@@ -418,6 +424,11 @@ typedef union Quaternion
 
 #ifdef HANDMADE_MATH__USE_SSE
     __m128 InternalElementsSSE;
+#endif
+
+#ifdef __cplusplus
+    inline Quaternion() : X(0.0f), Y(0.0f), Z(0.0f), W(0.0f) { }
+    inline Quaternion(float x, float y, float z, float w) : X(x), Y(y), Z(z), W(w) { }
 #endif
 } Quaternion;
 
@@ -1160,7 +1171,7 @@ HMM_INLINE Vector2 HMM_PREFIX(NormalizeVec2)(Vector2 A)
 {
     ASSERT_COVERED(HMM_NormalizeVec2);
 
-    Vector2 Result = {0};
+    Vector2 Result;
 
     float VectorLength = HMM_PREFIX(LengthVec2)(A);
 
@@ -1181,7 +1192,7 @@ HMM_INLINE Vector3 HMM_PREFIX(NormalizeVec3)(Vector3 A)
 {
     ASSERT_COVERED(HMM_NormalizeVec3);
 
-    Vector3 Result = {0};
+    Vector3 Result;
 
     float VectorLength = HMM_PREFIX(LengthVec3)(A);
 
@@ -1203,7 +1214,7 @@ HMM_INLINE Vector4 HMM_PREFIX(NormalizeVec4)(Vector4 A)
 {
     ASSERT_COVERED(HMM_NormalizeVec4);
 
-    Vector4 Result = {0};
+    Vector4 Result;
 
     float VectorLength = HMM_PREFIX(LengthVec4)(A);
 
@@ -1698,10 +1709,6 @@ HMM_EXTERN Quaternion HMM_PREFIX(Slerp)(Quaternion Left, float Time, Quaternion 
 HMM_EXTERN Matrix HMM_PREFIX(QuaternionToMat4)(Quaternion Left);
 HMM_EXTERN Quaternion HMM_PREFIX(Mat4ToQuaternion)(Matrix Left);
 HMM_EXTERN Quaternion HMM_PREFIX(QuaternionFromAxisAngle)(Vector3 Axis, float AngleOfRotation);
-
-#ifdef __cplusplus
-}
-#endif
 
 #ifdef __cplusplus
 

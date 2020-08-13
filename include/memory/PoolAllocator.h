@@ -13,7 +13,7 @@
  */
 template <typename T>
 class PoolAllocator : public Allocator {
-private:
+protected:
     union Element {
         T Occupied;
         struct {
