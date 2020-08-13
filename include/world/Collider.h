@@ -12,7 +12,7 @@ protected:
     float _Friction;
 
 public:
-    inline Collider(const BoundingBox& bounds) : _Bounds(bounds), _Restitution(1.0f), _Friction(1.0f) { }
+    inline Collider(const BoundingBox& bounds) : _Bounds(bounds), _Restitution(0.3f), _Friction(0.1f) { }
 
     inline const BoundingBox& GetBounds() const { return this->_Bounds; }
     inline BoundingBox& GetBounds() { return this->_Bounds; }

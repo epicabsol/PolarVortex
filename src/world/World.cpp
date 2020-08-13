@@ -58,8 +58,8 @@ World::World() : _Gravity(0.0f, -0.98f), _ColliderPool("World Collider Pool", th
     for (float f = -4.0f; f <= 2.5f; f += 1.0f) {
         DynamicCollider* dynamic = this->AddDynamicCollider(Vector2(f, 2.0f), Vector2(0.25f, 0.25f), 0.125f);
         dynamic->_Velocity = Vector2(-2.5f, 0.0f);
-        dynamic->_Restitution = 0.0f;
-        dynamic->_Friction = 0.0f;
+        dynamic->_Restitution = 0.1f;
+        dynamic->_Friction = 0.1f;
     }
 
     this->_DirtTexture = ScreenAllocator.New<GLTexture>(STRINGHASH("assets/sprites/tile_dirt.png"));
