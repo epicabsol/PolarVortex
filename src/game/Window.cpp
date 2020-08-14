@@ -10,17 +10,24 @@
 
 #include "game/PolarVortexGame.h"
 
-void WindowFramebufferSizeCallback(GLFWwindow* glfwWindow, int width, int height) {
+static void WindowFramebufferSizeCallback(GLFWwindow* glfwWindow, int width, int height) {
     Window* window = (Window*)glfwGetWindowUserPointer(glfwWindow);
     window->Resized(width, height);
 }
 
+static void GLFWErrorCallback(int code, const char* message) {
+    printf("[ERROR]: GLFW error %d (%s)\n", code, message);
+}
+
 Window::Window(const char* title) : _Window(nullptr), _ClientWidth(800), _ClientHeight(600) {
+    glfwSetErrorCallback(GLFWErrorCallback);
+
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     GLFWwindow* window = glfwCreateWindow((int)this->_ClientWidth, (int)this->_ClientHeight, title, nullptr, nullptr); // TODO: Check for success
     glfwMakeContextCurrent(window);

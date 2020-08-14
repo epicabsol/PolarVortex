@@ -14,7 +14,7 @@ class IterablePoolAllocator : public PoolAllocator<T> {
 private:
     uint8_t* _OccupiedBuffer;
 
-    typedef Element PoolElement;
+    typedef typename PoolAllocator<T>::Element PoolElement;
     inline char* GetElements() { return this->_Elements; }
     inline size_t FindNextOccupied(size_t startIndex) {
         while (startIndex < this->_Capacity) {
@@ -61,7 +61,7 @@ public:
         using iterator_category = std::input_iterator_tag;
     };
 
-    IterablePoolAllocator(const char* name, void* buffer, size_t bufferLength, size_t alignment = alignof(T)) : PoolAllocator(name, buffer, bufferLength - ((bufferLength / Align(sizeof(Element), alignment)) / (sizeof(uint8_t) * 8) + 1), alignment), _OccupiedBuffer((uint8_t*)buffer + this->_BufferLength) {
+    IterablePoolAllocator(const char* name, void* buffer, size_t bufferLength, size_t alignment = alignof(T)) : PoolAllocator<T>(name, buffer, bufferLength - ((bufferLength / Align(sizeof(PoolElement), alignment)) / (sizeof(uint8_t) * 8) + 1), alignment), _OccupiedBuffer((uint8_t*)buffer + this->_BufferLength) {
         for (size_t i = 0; i < this->_Capacity; i++) {
             this->_OccupiedBuffer[i] = 0;
         }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 class InputDevice;
 class GLFWGamepadDevice;
 

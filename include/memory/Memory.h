@@ -3,9 +3,6 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include "StackAllocator.h"
-#include "PoolAllocator.h"
-
 /**
  * @brief Aligns the given unaligned value to the given alignment.
  *
@@ -20,6 +17,9 @@ inline size_t Align(size_t unaligned, size_t alignment) {
     return (unaligned + (alignment - 1)) & ~(alignment - 1);
 }
 
+#include "StackAllocator.h"
+#include "PoolAllocator.h"
+
 //
 // Override the default dynamic allocation system
 //
@@ -27,15 +27,15 @@ inline size_t Align(size_t unaligned, size_t alignment) {
 //
 
 // Instance allocation
-void* operator new(size_t size);
-void operator delete(void* allocation);
+/*void* operator new(size_t size) noexcept(false);
+void operator delete(void* allocation) noexcept(true);
 
 // Array allocation
-void* operator new[](size_t size);
-void operator delete[](void* allocation);
+void* operator new[](size_t size) noexcept(false);
+void operator delete[](void* allocation) noexcept(true);*/
 
-void* operator new(size_t size, Allocator& allocator);
-void operator delete(void* allocation, Allocator& allocator);
+void* operator new(size_t size, Allocator& allocator) noexcept(false);
+void operator delete(void* allocation, Allocator& allocator) noexcept(true);
 
 // Global allocators
 extern StackAllocator RootAllocator;

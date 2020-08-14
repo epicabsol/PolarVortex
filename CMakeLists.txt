@@ -14,7 +14,10 @@ add_executable(PolarVortex src/main.cpp src/memory/Memory.cpp src/memory/StackAl
 if(WIN32)
     target_link_libraries(PolarVortex opengl32 ${CMAKE_SOURCE_DIR}/lib/win64-vc2019/glfw3.lib)
 elseif(APPLE)
-    # TODO: Implement
+    find_library(LIBRARY_COCOA Cocoa)
+    find_library(LIBRARY_OPENGL OpenGL)
+    find_library(LIBRARY_IOKIT IOKit)
+    target_link_libraries(PolarVortex ${CMAKE_SOURCE_DIR}/lib/macos-clang/libglfw3.a ${LIBRARY_COCOA} ${LIBRARY_OPENGL} ${LIBRARY_IOKIT})
 else()
     target_link_libraries(PolarVortex GL)
 endif()

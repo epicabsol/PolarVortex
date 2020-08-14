@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 class InputElement;
 class GLTexture;
 

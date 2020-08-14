@@ -20,7 +20,7 @@ void CheckShaderStatus(unsigned int shaderHandle) {
 void CheckProgramStatus(unsigned int programHandle) {
     int success;
     static char infoLog[512];
-    glGetShaderiv(programHandle, GL_LINK_STATUS, &success);
+    glGetProgramiv(programHandle, GL_LINK_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(programHandle, 512, nullptr, infoLog);
         printf("ERROR: Failed to link shader program. Log:\n%s\n", infoLog);

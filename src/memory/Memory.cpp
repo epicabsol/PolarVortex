@@ -7,11 +7,11 @@
 #include "memory/PoolAllocator.h"
 
 // Redirect default new and delete to the frame allocator
-void* operator new(size_t size) {
+/*void* operator new(size_t size) {
     return FrameAllocator.Allocate(size);
 }
 
-void operator delete(void* allocation) {
+void operator delete(void* allocation) noexcept(true) {
     FrameAllocator.Free(allocation);
 }
 
@@ -21,9 +21,9 @@ void* operator new[](size_t size) {
     return nullptr;
 }
 
-void operator delete[](void* allocation) {
+void operator delete[](void* allocation) noexcept(true) {
     assert(false);
-}
+}*/
 
 // Root allocator
 #define ROOT_ALLOCATOR_SIZE (1024 * 1024 * 8)
