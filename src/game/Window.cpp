@@ -1,8 +1,9 @@
 #include "game/Window.h"
 
-#include "game/Screen.h"
-#include "memory/Memory.h"
 #include "render/glad.h"
+#include "game/Screen.h"
+#include "input/GLFWGamepadDevice.h"
+#include "memory/Memory.h"
 #include "render/glfw3.h"
 #include "render/GLRenderer.h"
 #include "render/GLTexture.h"
@@ -30,6 +31,12 @@ Window::Window(const char* title) : _Window(nullptr), _ClientWidth(800), _Client
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); // TODO: Check for success
 
     glfwSetFramebufferSizeCallback(window, WindowFramebufferSizeCallback);
+
+    for (size_t i = 0; i < WINDOW_GAMEPAD_COUNT; i++) {
+        this->_Gamepads[i] = RootAllocator.New<GLFWGamepadDevice>((int)i);
+        this->_Gamepads[i]->Update();
+        this->_InputDevices[i] = this->_Gamepads[i];
+    }
 }
 
 Window::~Window() {
@@ -38,6 +45,10 @@ Window::~Window() {
 
 void Window::Run() {
     while (!glfwWindowShouldClose((GLFWwindow*)this->_Window)) {
+        for (size_t i = 0; i < WINDOW_GAMEPAD_COUNT; i++) {
+            this->_Gamepads[i]->Update();
+        }
+
         Game->Tick();
 
         glfwSwapBuffers((GLFWwindow*)this->_Window);

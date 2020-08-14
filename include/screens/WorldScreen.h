@@ -4,11 +4,13 @@
 #include "../game/Screen.h"
 
 class World;
+class DynamicCollider;
 
 class WorldScreen : public Screen {
 private:
     World* _World;
     Camera _MainCamera;
+    DynamicCollider* _Player;
 
     virtual void RenderViewportContents(size_t index) override;
 
