@@ -49,7 +49,7 @@ float World::StepDynamic(DynamicCollider& dynamic, float timestep) {
     return (1.0f - closestIntersection.Time) * timestep;
 }
 
-World::World() : _Gravity(0.0f, -0.98f), _ColliderPool("World Collider Pool", this->_ColliderPoolBuffer, sizeof(Collider) * MAX_COLLIDERS), _DynamicColliderPool("World Dynamic Collider Pool", this->_DynamicColliderPoolBuffer, sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS), _DirtTexture(nullptr) {
+World::World() : _Gravity(0.0f, -9.8f), _ColliderPool("World Collider Pool", this->_ColliderPoolBuffer, sizeof(Collider) * MAX_COLLIDERS), _DynamicColliderPool("World Dynamic Collider Pool", this->_DynamicColliderPoolBuffer, sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS), _DirtTexture(nullptr) {
 
     // TEMP: Add some test colliders.
     this->AddCollider(Vector2(0.0f, 0.0f), Vector2(5.0f, 0.5f));
