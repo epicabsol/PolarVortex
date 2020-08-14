@@ -1,7 +1,5 @@
 #pragma once
 
-#include <chrono>
-
 #include "../assets/AssetManager.h"
 #include "Window.h"
 #include "render/GLRenderer.h"
@@ -14,7 +12,7 @@ private:
     Window* _MainWindow;
     GLRenderer* _Renderer;
 
-    std::chrono::high_resolution_clock::time_point _LastUpdateTimestamp;
+    uint64_t _LastUpdateTimestamp;
 
     Screen* _CurrentScreen;
 
