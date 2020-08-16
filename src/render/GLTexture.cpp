@@ -13,11 +13,11 @@ void GLTexture::LoadData(const void* data) {
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-GLTexture::GLTexture(unsigned int width, unsigned int height, const void* data) : _Handle(0), _Width(width), _Height(height) {
+GLTexture::GLTexture(Allocator& allocator, unsigned int width, unsigned int height, const void* data) : _Handle(0), _Width(width), _Height(height) {
     this->LoadData(data);
 }
 
-GLTexture::GLTexture(Hash filenameHash) : _Handle(0), _Width(0), _Height(0) {
+GLTexture::GLTexture(Allocator& allocator, Hash filenameHash) : _Handle(0), _Width(0), _Height(0) {
     Asset* textureAsset = Game->GetAssetManager().GetAsset(filenameHash);
     int width;
     int height;

@@ -19,7 +19,7 @@ static void GLFWErrorCallback(int code, const char* message) {
     printf("[ERROR]: GLFW error %d (%s)\n", code, message);
 }
 
-Window::Window(const char* title) : _Window(nullptr), _ClientWidth(800), _ClientHeight(600) {
+Window::Window(Allocator& allocator, const char* title) : _Window(nullptr), _ClientWidth(800), _ClientHeight(600) {
     glfwSetErrorCallback(GLFWErrorCallback);
 
     glfwInit();

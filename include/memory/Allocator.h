@@ -59,10 +59,12 @@ public:
 
     /**
      * @brief Creates a new instance of type `T`.
+     * 
+     * Passes in `this` as the first argument to the constructor, and then passes in the rest of the given arguments.
      *
      * @tparam T The type to instantiate.
      * @tparam TArgs The types of the arguments to pass to the instance's constructor.
-     * @param args The arguments to pass to the instance's constructor.
+     * @param args The additional arguments to pass to the instance's constructor.
      * @return The allocated and initialized instance.
      */
     template <typename T, typename ... TArgs>
@@ -70,7 +72,7 @@ public:
         T* address = (T*)this->Allocate(sizeof(T));
         T* result = address;
         if (address != nullptr) {
-            result = new (address) T(args...);
+            result = new (address) T(*this, args...);
             assert(address == result); // Can't have implementations returning weird address in placement new!
         }
         else {

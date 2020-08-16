@@ -4,21 +4,26 @@
 #include "GLShaderProgram.h"
 #include "GLTexture.h"
 #include "Math.h"
+#include "SpriteInstance.h"
 
+class Allocator;
 class Viewport;
 
 class GLRenderer {
 private:
+    Allocator& _Allocator;
     GLMesh* _SquareMesh;
     GLShaderProgram* _SpriteShader;
     GLTexture* _DefaultTexture;
     Matrix _Projection;
 
 public:
-    GLRenderer();
+    GLRenderer(Allocator& allocator);
     ~GLRenderer();
 
     void BeginViewport(Viewport* viewport);
     void DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const;
-    void DrawSprite(GLTexture* texture, float x, float y, float z, float width, float height) const;
+    inline void DrawSprite(const SpriteInstance& instance, float x, float y, float z, float width, float height) const { this->DrawSprite(instance.GetTexture(), instance.GetCurrentFrame().UMin, instance.GetCurrentFrame().VMin, instance.GetCurrentFrame().USize, instance.GetCurrentFrame().VSize, x, y, z, width, height); }
+    inline void DrawSprite(const GLTexture* texture, float x, float y, float z, float width, float height) const { this->DrawSprite(texture, 0.0f, 0.0f, 1.0f, 1.0f, x, y, z, width, height); }
+    void DrawSprite(const GLTexture* texture, float u, float v, float uSize, float vSize, float x, float y, float z, float width, float height) const;
 };

@@ -14,7 +14,7 @@ private:
     const char* _Name;
 
 public:
-    inline GLFWGamepadButtonElement(int buttonID, const GLFWgamepadstate* gamepadState, Hash spriteHash, const char* name) : InputElement(spriteHash), _ButtonID(buttonID), _GamepadState(gamepadState), _Name(name) { }
+    inline GLFWGamepadButtonElement(Allocator& allocator, int buttonID, const GLFWgamepadstate* gamepadState, Hash spriteHash, const char* name) : InputElement(allocator, spriteHash), _ButtonID(buttonID), _GamepadState(gamepadState), _Name(name) { }
 
     virtual const char* GetName() const override;
     virtual float GetValue() const override;

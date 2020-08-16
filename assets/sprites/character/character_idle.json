@@ -1,0 +1,33 @@
+{
+    "texture": "assets/sprites/character/character_idle.png",
+    "frames": [
+        {
+            "duration": 0.5,
+            "x": 0,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        },
+        {
+            "duration": 0.5,
+            "x": 32,
+            "y": 0,
+            "width": 32,
+            "height": 32
+        },
+        {
+            "duration": 0.5,
+            "x": 0,
+            "y": 32,
+            "width": 32,
+            "height": 32
+        },
+        {
+            "duration": 0.5,
+            "x": 32,
+            "y": 32,
+            "width": 32,
+            "height": 32
+        }
+    ]
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+class Allocator;
+
 class Camera {
 private:
     float _X;
@@ -8,7 +10,7 @@ private:
     float _Height;
 
 public:
-    inline Camera(float x, float y, float width, float height) : _X(x), _Y(y), _Width(width), _Height(height) { }
+    inline Camera(Allocator& allocator, float x, float y, float width, float height) : _X(x), _Y(y), _Width(width), _Height(height) { }
 
     inline float GetX() const { return this->_X; }
     inline float GetY() const { return this->_Y; }

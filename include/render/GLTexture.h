@@ -2,6 +2,8 @@
 
 #include "../Hash.h"
 
+class Allocator;
+
 class GLTexture {
 private:
     unsigned int _Handle;
@@ -11,8 +13,8 @@ private:
     void LoadData(const void* data);
 
 public:
-    GLTexture(unsigned int width, unsigned int height, const void* data);
-    GLTexture(Hash filenameHash);
+    GLTexture(Allocator& allocator, unsigned int width, unsigned int height, const void* data);
+    GLTexture(Allocator& allocator, Hash filenameHash);
     ~GLTexture();
 
     inline unsigned int GetHandle() const { return this->_Handle; }

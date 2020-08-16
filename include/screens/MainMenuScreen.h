@@ -2,6 +2,7 @@
 
 #include "../game/Screen.h"
 
+class Allocator;
 class GLTexture;
 class Camera;
 
@@ -13,7 +14,7 @@ private:
     virtual void RenderViewportContents(size_t index) override;
 
 public:
-    MainMenuScreen();
+    MainMenuScreen(Allocator& allocator);
     virtual ~MainMenuScreen() override;
 
     virtual void Update(float timestep) override;

@@ -52,11 +52,11 @@ void GLShaderProgram::LoadSource(const char* vertexShaderSource, int vertexShade
     glDeleteShader(pixelShaderHandle);
 }
 
-GLShaderProgram::GLShaderProgram(const char* vertexShaderSource, int vertexShaderLength, const char* pixelShaderSource, int pixelShaderLength) {
+GLShaderProgram::GLShaderProgram(Allocator& allocator, const char* vertexShaderSource, int vertexShaderLength, const char* pixelShaderSource, int pixelShaderLength) {
     this->LoadSource(vertexShaderSource, vertexShaderLength, pixelShaderSource, pixelShaderLength);
 }
 
-GLShaderProgram::GLShaderProgram(Hash vertexShaderFilenameHash, Hash pixelShaderFilenameHash) {
+GLShaderProgram::GLShaderProgram(Allocator& allocator, Hash vertexShaderFilenameHash, Hash pixelShaderFilenameHash) {
     Asset* vertexShaderAsset = Game->GetAssetManager().GetAsset(vertexShaderFilenameHash);
     Asset* pixelShaderAsset = Game->GetAssetManager().GetAsset(pixelShaderFilenameHash);
     this->LoadSource((const char*)vertexShaderAsset->GetData(), (int)vertexShaderAsset->GetDataLength(), (const char*)pixelShaderAsset->GetData(), (int)pixelShaderAsset->GetDataLength());

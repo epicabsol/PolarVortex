@@ -2,6 +2,7 @@
 
 #include "Collider.h"
 
+class Allocator;
 
 class DynamicCollider : public Collider {
 friend class World;
@@ -12,7 +13,7 @@ private:
     float _Mass;
 
 public:
-    inline DynamicCollider(BoundingBox bounds, float mass) : Collider(bounds), _Velocity(0.0f, 0.0f), _StepForce(0.0f, 0.0f), _Mass(mass) { }
+    inline DynamicCollider(Allocator& allocator, BoundingBox bounds, float mass) : Collider(allocator, bounds), _Velocity(0.0f, 0.0f), _StepForce(0.0f, 0.0f), _Mass(mass) { }
 
     inline Vector2 GetVelocity() const { return this->_Velocity; }
     inline Vector2& GetVelocity() { return this->_Velocity; }

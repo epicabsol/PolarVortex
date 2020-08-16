@@ -7,11 +7,12 @@
 
 class Screen {
 protected:
+    Allocator& _Allocator;
     Viewport _Viewports[MAX_VIEWPORT_COUNT];
     virtual void RenderViewportContents(size_t index);
 
 public:
-    Screen() { }
+    Screen(Allocator& allocator) : _Allocator(allocator) { }
     virtual ~Screen() { }
 
     virtual void Update(float timestep) = 0;

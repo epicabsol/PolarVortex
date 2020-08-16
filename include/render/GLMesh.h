@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 
+class Allocator;
 struct GLVertexAttribute;
 
 class GLMesh {
@@ -16,7 +17,7 @@ private:
     unsigned int _IndexFormat; // GLenum
 
 public:
-    GLMesh(GLVertexAttribute* vertexAttributes, size_t vertexAttributeCount, const void* vertexData, size_t vertexCount, const void* indexData, size_t indexSize, size_t indexCount);
+    GLMesh(Allocator& allocator, GLVertexAttribute* vertexAttributes, size_t vertexAttributeCount, const void* vertexData, size_t vertexCount, const void* indexData, size_t indexSize, size_t indexCount);
     ~GLMesh();
 
     inline unsigned int GetVertexArrayHandle() const { return this->_VertexArrayHandle; }

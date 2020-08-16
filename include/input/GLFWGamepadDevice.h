@@ -6,8 +6,11 @@
 #define GLFW_GAMEPAD_BUTTON_COUNT (GLFW_GAMEPAD_BUTTON_LAST + 1)
 #define GLFW_GAMEPAD_AXIS_COUNT (10)
 
+class Allocator;
+
 class GLFWGamepadDevice : public InputDevice {
 private:
+    Allocator& _Allocator;
     int _JoystickID;
     GLFWgamepadstate _State;
     GLTexture* _Sprite;
@@ -15,7 +18,7 @@ private:
     bool _IsConnected;
 
 public:
-    GLFWGamepadDevice(int joystickID);
+    GLFWGamepadDevice(Allocator& allocator, int joystickID);
 
     virtual GLTexture* GetSprite() const override;
     virtual const char* GetName() const override;

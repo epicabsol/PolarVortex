@@ -14,7 +14,7 @@ void MainMenuScreen::RenderViewportContents(size_t index) {
     Game->GetRenderer().DrawSprite(this->_TestTexture, 5, 0, 0, 1, 1);
 }
 
-MainMenuScreen::MainMenuScreen() {
+MainMenuScreen::MainMenuScreen(Allocator& allocator) : Screen(allocator) {
     this->_TestTexture = ScreenAllocator.New<GLTexture>(STRINGHASH("assets/sprites/tile_dirt.png"));
 
     this->_MainCamera = ScreenAllocator.New<Camera>(0.0f, 0.0f, 0.0f, 10.0f);

@@ -2,20 +2,25 @@
 
 #include "../game/Camera.h"
 #include "../game/Screen.h"
+#include "../render/SpriteInstance.h"
 
-class World;
+class Allocator;
 class DynamicCollider;
+class SpriteAnimation;
+class World;
 
 class WorldScreen : public Screen {
 private:
     World* _World;
     Camera _MainCamera;
     DynamicCollider* _Player;
+    SpriteAnimation* _PlayerIdleAnimation;
+    SpriteInstance _PlayerAnimation;
 
     virtual void RenderViewportContents(size_t index) override;
 
 public:
-    WorldScreen();
+    WorldScreen(Allocator& allocator);
     virtual ~WorldScreen() override;
 
     inline World* GetWorld() { return this->_World; }

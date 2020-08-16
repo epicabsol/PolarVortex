@@ -13,7 +13,7 @@ private:
     GLTexture* _Sprite;
 
 public:
-    inline InputElement(Hash spriteHash) : _Sprite(RootAllocator.New<GLTexture>(spriteHash)) { }
+    inline InputElement(Allocator& allocator, Hash spriteHash) : _Sprite(allocator.New<GLTexture>(spriteHash)) { }
     virtual ~InputElement() { }
 
     inline GLTexture* GetSprite() const { return this->_Sprite; }

@@ -2,6 +2,8 @@
 
 #include "BoundingBox.h"
 
+class Allocator;
+
 /**
  * @brief An axis-aligned bounding box that can be collided with.
  */
@@ -12,7 +14,7 @@ protected:
     float _Friction;
 
 public:
-    inline Collider(const BoundingBox& bounds) : _Bounds(bounds), _Restitution(0.3f), _Friction(0.1f) { }
+    inline Collider(Allocator& allocator, const BoundingBox& bounds) : _Bounds(bounds), _Restitution(0.3f), _Friction(0.1f) { }
 
     inline const BoundingBox& GetBounds() const { return this->_Bounds; }
     inline BoundingBox& GetBounds() { return this->_Bounds; }

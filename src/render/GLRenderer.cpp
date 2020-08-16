@@ -40,19 +40,19 @@ unsigned char DefaultTextureData[] = {
 unsigned int DefaultTextureWidth = 4;
 unsigned int DefaultTextureHeight = 4;
 
-GLRenderer::GLRenderer() {
-    this->_SquareMesh = RootAllocator.New<GLMesh>(SpriteVertexAttributes, SpriteVertexAttributeCount, SquareMeshVertices, SquareMeshVertexCount, SquareMeshIndices, sizeof(SquareMeshIndices[0]), SquareMeshIndexCount);
-    this->_SpriteShader = RootAllocator.New<GLShaderProgram>(STRINGHASH("assets/shaders/SpriteVertexShader.glsl"), STRINGHASH("assets/shaders/SpritePixelShader.glsl"));
+GLRenderer::GLRenderer(Allocator& allocator) : _Allocator(allocator) {
+    this->_SquareMesh = this->_Allocator.New<GLMesh>(SpriteVertexAttributes, SpriteVertexAttributeCount, SquareMeshVertices, SquareMeshVertexCount, SquareMeshIndices, sizeof(SquareMeshIndices[0]), SquareMeshIndexCount);
+    this->_SpriteShader = this->_Allocator.New<GLShaderProgram>(STRINGHASH("assets/shaders/SpriteVertexShader.glsl"), STRINGHASH("assets/shaders/SpritePixelShader.glsl"));
     this->_SpriteShader->SetTextureIndex("Texture", 0);
-    this->_DefaultTexture = RootAllocator.New<GLTexture>(DefaultTextureWidth, DefaultTextureHeight, DefaultTextureData);
+    this->_DefaultTexture = this->_Allocator.New<GLTexture>(DefaultTextureWidth, DefaultTextureHeight, DefaultTextureData);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 GLRenderer::~GLRenderer() {
-    RootAllocator.Delete(this->_DefaultTexture);
-    RootAllocator.Delete(this->_SpriteShader);
-    RootAllocator.Delete(this->_SquareMesh);
+    this->_Allocator.Delete(this->_DefaultTexture);
+    this->_Allocator.Delete(this->_SpriteShader);
+    this->_Allocator.Delete(this->_SquareMesh);
 }
 
 void GLRenderer::BeginViewport(Viewport* viewport) {
@@ -71,7 +71,7 @@ void GLRenderer::DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const {
     glDrawElements(GL_TRIANGLES, (int)mesh->GetIndexCount(), (int)mesh->GetIndexFormat(), nullptr);
 }
 
-void GLRenderer::DrawSprite(GLTexture* texture, float x, float y, float z, float width, float height) const {
+void GLRenderer::DrawSprite(const GLTexture* texture, float u, float v, float uSize, float vSize, float x, float y, float z, float width, float height) const {
     //glUseProgram(this->_SpriteShader->GetProgramHandle());
 
     Matrix transform = Math_Translate(Math_Vec3(x, y, z)) * Math_Scale(Math_Vec3(width, height, 1.0f));
@@ -79,6 +79,10 @@ void GLRenderer::DrawSprite(GLTexture* texture, float x, float y, float z, float
     glUniformMatrix4fv(transformUniform, 1, GL_FALSE, &transform.Elements[0][0]);
     unsigned int projectionUniform = glGetUniformLocation(this->_SpriteShader->GetProgramHandle(), "Projection");
     glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, &this->_Projection.Elements[0][0]);
+    unsigned int uvPositionUniform = glGetUniformLocation(this->_SpriteShader->GetProgramHandle(), "UVPosition");
+    glUniform2f(uvPositionUniform, u, v);
+    unsigned int uvSizeUniform = glGetUniformLocation(this->_SpriteShader->GetProgramHandle(), "UVSize");
+    glUniform2f(uvSizeUniform, uSize, vSize);
 
     if (texture == nullptr) {
         texture = this->_DefaultTexture;

@@ -3,7 +3,7 @@
 #include "render/glad.h"
 #include "render/GLVertexAttribute.h"
 
-GLMesh::GLMesh(GLVertexAttribute* vertexAttributes, size_t vertexAttributeCount, const void* vertexData, size_t vertexCount, const void* indexData, size_t indexSize, size_t indexCount) : _VertexArrayHandle(0), _VertexBufferHandle(0), _VertexSize(0), _VertexCount(vertexCount), _IndexBufferHandle(0), _IndexSize(indexSize), _IndexCount(indexCount), _IndexFormat(GL_UNSIGNED_BYTE) {
+GLMesh::GLMesh(Allocator& allocator, GLVertexAttribute* vertexAttributes, size_t vertexAttributeCount, const void* vertexData, size_t vertexCount, const void* indexData, size_t indexSize, size_t indexCount) : _VertexArrayHandle(0), _VertexBufferHandle(0), _VertexSize(0), _VertexCount(vertexCount), _IndexBufferHandle(0), _IndexSize(indexSize), _IndexCount(indexCount), _IndexFormat(GL_UNSIGNED_BYTE) {
     // Create the VAO
     glGenVertexArrays(1, &this->_VertexArrayHandle);
     glBindVertexArray(this->_VertexArrayHandle);

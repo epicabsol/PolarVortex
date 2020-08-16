@@ -11,6 +11,8 @@ void WorldScreen::RenderViewportContents(size_t index) {
     Screen::RenderViewportContents(index);
     this->_World->Render(this->_Viewports[index].GetCamera());
 
+    Game->GetRenderer().DrawSprite(this->_PlayerAnimation, this->_Player->GetBounds().Position.X, this->_Player->GetBounds().Position.Y, 0.0f, 1.0f, 1.0f);
+
     float x = this->_Player->GetBounds().Position.X;
     float y = this->_Player->GetBounds().Position.Y + 1.0f;
     float scale = 0.5f;
@@ -26,16 +28,15 @@ void WorldScreen::RenderViewportContents(size_t index) {
     }
 }
 
-WorldScreen::WorldScreen() : _World(nullptr), _MainCamera(0.0f, 0.0f, 10.0f, 10.0f), _Player(nullptr) {
-    this->_World = ScreenAllocator.New<World>();
-    this->_Player = this->_World->AddDynamicCollider(Vector2(0.0f, 3.0f), Vector2(0.5f, 0.5f), 1.0f);
+WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 10.0f, 10.0f), _Player(nullptr), _PlayerIdleAnimation(allocator.New<SpriteAnimation>(STRINGHASH("assets/sprites/character/character_idle.json"))), _PlayerAnimation(allocator, this->_PlayerIdleAnimation) {
+    this->_Player = this->_World->AddDynamicCollider(Vector2(0.0f, 3.0f), Vector2(0.2f, 0.4f), 1.0f);
 
     this->_Viewports[0].SetCamera(&this->_MainCamera);
     this->_Viewports[0].SetLayout(0, 0, (int)Game->GetMainWindow().GetClientWidth(), (int)Game->GetMainWindow().GetClientHeight());
 }
 
 WorldScreen::~WorldScreen() {
-    ScreenAllocator.Delete(this->_World);
+    this->_Allocator.Delete(this->_World);
 }
 
 void WorldScreen::Update(float timestep) {
@@ -53,6 +54,7 @@ void WorldScreen::Update(float timestep) {
     }
     this->_Player->GetVelocity().X = xvelocity;
     this->_World->Update(timestep);
+    this->_PlayerAnimation.Advance(timestep);
 }
 
 void WorldScreen::Resize(size_t width, size_t height) {

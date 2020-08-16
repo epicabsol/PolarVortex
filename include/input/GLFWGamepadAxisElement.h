@@ -12,7 +12,7 @@ private:
     float _Flip;
 
 public:
-    inline GLFWGamepadAxisElement(int axisID, const GLFWgamepadstate* gamepadState, Hash spriteHash, const char* name, float flip) : InputElement(spriteHash), _AxisID(axisID), _GamepadState(gamepadState), _Name(name), _Flip(flip) { }
+    inline GLFWGamepadAxisElement(Allocator& allocator, int axisID, const GLFWgamepadstate* gamepadState, Hash spriteHash, const char* name, float flip) : InputElement(allocator, spriteHash), _AxisID(axisID), _GamepadState(gamepadState), _Name(name), _Flip(flip) { }
 
     virtual const char* GetName() const override;
     virtual float GetValue() const override;

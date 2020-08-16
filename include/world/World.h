@@ -30,7 +30,7 @@ private:
     float StepDynamic(DynamicCollider& dynamic, float timestep);
 
 public:
-    World();
+    World(Allocator& allocator);
 
     Collider* AddCollider(Vector2 center, Vector2 halfSize);
     void RemoveCollider(Collider* collider);

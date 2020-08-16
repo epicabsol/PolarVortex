@@ -10,7 +10,7 @@
 #define DATA_ALLOCATOR_SIZE (1024 * 1024 * 32)
 #define ASSET_DIRECTORY "assets"
 
-AssetManager::AssetManager() : _Assets((Asset*)RootAllocator.Allocate(sizeof(Asset) * ASSET_MAX_COUNT)), _AssetCount(0) {
+AssetManager::AssetManager(Allocator& allocator) : _Allocator(allocator), _Assets((Asset*)allocator.Allocate(sizeof(Asset) * ASSET_MAX_COUNT)), _AssetCount(0) {
 
     using namespace std::filesystem;
     path assetDirectoryPath = path(ASSET_DIRECTORY);
@@ -43,7 +43,7 @@ AssetManager::AssetManager() : _Assets((Asset*)RootAllocator.Allocate(sizeof(Ass
 
         Hash pathHash = HashString(pathString);
 
-        new (&this->_Assets[this->_AssetCount]) Asset(pathHash, data, length);
+        new (&this->_Assets[this->_AssetCount]) Asset(allocator, pathHash, data, length);
         this->_AssetCount += 1;
     }
 }

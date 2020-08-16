@@ -2,8 +2,9 @@
 
 #include <stddef.h>
 
-class InputDevice;
+class Allocator;
 class GLFWGamepadDevice;
+class InputDevice;
 
 #define WINDOW_GAMEPAD_COUNT (4)
 
@@ -16,7 +17,7 @@ private:
     GLFWGamepadDevice* _Gamepads[WINDOW_GAMEPAD_COUNT];
 
 public:
-    Window(const char* title);
+    Window(Allocator& allocator, const char* title);
     ~Window();
 
     inline size_t GetClientWidth() const { return this->_ClientWidth; }
