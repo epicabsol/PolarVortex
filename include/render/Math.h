@@ -1240,6 +1240,21 @@ HMM_INLINE Vector4 HMM_PREFIX(NormalizeVec4)(Vector4 A)
     return (Result);
 }
 
+HMM_INLINE Vector2 HMM_PREFIX(LerpVec2)(Vector2 A, Vector2 B, float T)
+{
+    return HMM_PREFIX(AddVec2)(HMM_PREFIX(MultiplyVec2f)(A, 1.0f - T), HMM_PREFIX(MultiplyVec2f)(B, T));
+}
+
+HMM_INLINE Vector3 HMM_PREFIX(LerpVec3)(Vector3 A, Vector3 B, float T)
+{
+    return HMM_PREFIX(AddVec3)(HMM_PREFIX(MultiplyVec3f)(A, 1.0f - T), HMM_PREFIX(MultiplyVec3f)(B, T));
+}
+
+HMM_INLINE Vector4 HMM_PREFIX(LerpVec4)(Vector4 A, Vector4 B, float T)
+{
+    return HMM_PREFIX(AddVec4)(HMM_PREFIX(MultiplyVec4f)(A, 1.0f - T), HMM_PREFIX(MultiplyVec4f)(B, T));
+}
+
 COVERAGE(HMM_FastNormalizeVec2, 1)
 HMM_INLINE Vector2 HMM_PREFIX(FastNormalizeVec2)(Vector2 A)
 {
@@ -1801,6 +1816,21 @@ HMM_INLINE Vector4 HMM_PREFIX(Normalize)(Vector4 A)
     Vector4 Result = HMM_PREFIX(NormalizeVec4)(A);
 
     return (Result);
+}
+
+HMM_INLINE Vector2 HMM_PREFIX(Lerp)(Vector2 A, Vector2 B, float T)
+{
+    return HMM_PREFIX(LerpVec2(A, B, T));
+}
+
+HMM_INLINE Vector3 HMM_PREFIX(Lerp)(Vector3 A, Vector3 B, float T)
+{
+    return HMM_PREFIX(LerpVec3)(A, B, T);
+}
+
+HMM_INLINE Vector4 HMM_PREFIX(Lerp)(Vector4 A, Vector4 B, float T)
+{
+    return HMM_PREFIX(LerpVec4)(A, B, T);
 }
 
 COVERAGE(HMM_FastNormalizeVec2CPP, 1)

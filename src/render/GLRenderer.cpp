@@ -61,7 +61,7 @@ void GLRenderer::BeginViewport(Viewport* viewport) {
 
     Camera* camera = viewport->GetCamera();
     if (camera != nullptr) {
-        this->_Projection = Math_Orthographic(camera->GetX() - camera->GetWidth() * 0.5f, camera->GetX() + camera->GetWidth() * 0.5f, camera->GetY() - camera->GetHeight() * 0.5f, camera->GetY() + camera->GetHeight() * 0.5f, -100.0f, 100.0f);
+        this->_Projection = Math_Orthographic(camera->GetPosition().X - camera->GetSize().X * 0.5f, camera->GetPosition().X + camera->GetSize().X * 0.5f, camera->GetPosition().Y - camera->GetSize().Y * 0.5f, camera->GetPosition().Y + camera->GetSize().Y * 0.5f, -100.0f, 100.0f);
     }
 }
 
