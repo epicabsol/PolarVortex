@@ -4,6 +4,9 @@
 #include "world/Collision.h"
 #include "render/GLTexture.h"
 
+// How long after leaving the ground `DynamicCollder::IsOnGround()` becomes `false`.
+#define ONGROUND_THRESHOLD_TIME 0.3f
+
 /**
  * @brief Reflects a 2D vector according to the given normal, with the given bias scaling each axis.
  *
@@ -44,6 +47,9 @@ float World::StepDynamic(DynamicCollider& dynamic, float timestep) {
     if (closestStatic != nullptr) {
         Vector2 bias = Vector2(1.0f / (1.0f + dynamic.GetFriction() * closestStatic->GetFriction()), dynamic.GetRestitution() * closestStatic->GetRestitution());
         dynamic._Velocity = BiasedReflect2D(dynamic._Velocity, closestIntersection.Normal, bias);
+        if (closestIntersection.Normal.X == 0.0f && closestIntersection.Normal.Y == 1.0f) {
+            dynamic._OnGround = true;
+        }
     }
 
     return (1.0f - closestIntersection.Time) * timestep;
@@ -91,6 +97,7 @@ void World::Update(float timestep) {
     // 2. Detect collisions & solve constraints
     for (DynamicCollider& dynamic : this->_DynamicColliderPool) {
         float time = timestep;
+        dynamic._OnGround = false;
         while (time > HMM_EPSILON) {
             time = this->StepDynamic(dynamic, time);
         }

@@ -41,8 +41,8 @@ WorldScreen::~WorldScreen() {
 
 void WorldScreen::Update(float timestep) {
     InputDevice* device = Game->GetMainWindow().GetInputDevice(0);
-    if (device->GetInputElement(0)->GetValue() > 0.5f) {
-        this->_Player->GetVelocity().Y = 2.0f;
+    if (this->_Player->IsOnGround() && device->GetInputElement(0)->GetValue() > 0.5f) {
+        this->_Player->GetVelocity().Y = 5.0f;
     }
     float speed = 3.0f;
     float xvelocity = 0.0f;
