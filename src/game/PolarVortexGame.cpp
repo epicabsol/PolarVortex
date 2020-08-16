@@ -11,6 +11,8 @@
 #include "screens/MainMenuScreen.h"
 #include "screens/WorldScreen.h"
 
+#define MAX_TIMESTEP 0.1f
+
 PolarVortexGame* Game;
 
 PolarVortexGame::PolarVortexGame() : _AssetManager(nullptr), _MainWindow(nullptr), _Renderer(nullptr) {
@@ -54,6 +56,10 @@ void PolarVortexGame::Tick() {
         uint64_t now = glfwGetTimerValue();
         float timestep = (float)(now - this->_LastUpdateTimestamp) / glfwGetTimerFrequency();
         this->_LastUpdateTimestamp = now;
+        while (timestep > MAX_TIMESTEP) {
+            this->_CurrentScreen->Update(MAX_TIMESTEP);
+            timestep -= MAX_TIMESTEP;
+        }
         this->_CurrentScreen->Update(timestep);
 
         // Render
