@@ -13,7 +13,7 @@ protected:
     virtual Vector2 MeasureContent() const override;
 
 public:
-    inline UIAnimation(Allocator& allocator, UIElement* parent, SpriteInstance* sprite) : UIElement(allocator, parent), _Sprite(sprite) { }
+    inline UIAnimation(Allocator& allocator, SpriteInstance* sprite) : UIElement(allocator), _Sprite(sprite) { }
     ~UIAnimation();
 
     inline const SpriteInstance* GetSprite() const { return this->_Sprite; }

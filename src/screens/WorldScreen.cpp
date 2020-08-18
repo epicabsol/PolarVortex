@@ -6,6 +6,7 @@
 #include "input/InputElement.h"
 #include "memory/Memory.h"
 #include "ui/UIAnimation.h"
+#include "ui/UIDockContainer.h"
 #include "world/World.h"
 
 void WorldScreen::RenderViewportContents(size_t index) {
@@ -29,16 +30,24 @@ void WorldScreen::RenderViewportContents(size_t index) {
     }
 }
 
-WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 5.0f, 5.0f), _Player(nullptr), _PlayerIdleAnimation(allocator.New<SpriteAnimation>(STRINGHASH("assets/sprites/character/character_idle.json"))), _PlayerAnimation(allocator, this->_PlayerIdleAnimation), _TestImage(nullptr) {
+WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 5.0f, 5.0f), _Player(nullptr), _PlayerIdleAnimation(allocator.New<SpriteAnimation>(STRINGHASH("assets/sprites/character/character_idle.json"))), _PlayerAnimation(allocator, this->_PlayerIdleAnimation), _HUDContainer(nullptr), _RightContainer(nullptr) {
     this->_Player = this->_World->AddDynamicCollider(Vector2(0.0f, 3.0f), Vector2(0.15f, 0.35f), 1.0f);
 
-    this->_TestImage = allocator.New<UIAnimation>(nullptr, &this->_PlayerAnimation);
-    this->_TestImage->SetHorizontalAlignment(UIAlignment::Stretch);
-    this->_TestImage->SetVerticalAlignment(UIAlignment::Stretch);
+    this->_RightContainer = allocator.New<UIDockContainer>(10);
+    this->_HUDContainer = allocator.New<UIDockContainer>(5);
+
+    this->_HUDContainer->AddElement(this->_RightContainer, DockSide::Right);
+
+    for (size_t i = 0; i < 5; i++) {
+        UIAnimation* animation = allocator.New<UIAnimation>(&this->_PlayerAnimation);
+        animation->SetHorizontalAlignment(UIAlignment::Center);
+        animation->SetVerticalAlignment(UIAlignment::Center);
+        this->_RightContainer->AddElement(animation, DockSide::Bottom);
+    }
 
     this->_Viewports[0].SetCamera(&this->_MainCamera);
     this->_Viewports[0].SetLayout(0, 0, (int)Game->GetMainWindow().GetClientWidth(), (int)Game->GetMainWindow().GetClientHeight());
-    this->_Viewports[0].SetRootUIElement(this->_TestImage);
+    this->_Viewports[0].SetRootUIElement(this->_HUDContainer);
 }
 
 WorldScreen::~WorldScreen() {

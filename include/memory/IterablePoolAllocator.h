@@ -16,7 +16,8 @@ private:
 
     typedef typename PoolAllocator<T>::Element PoolElement;
     inline char* GetElements() { return this->_Elements; }
-    inline size_t FindNextOccupied(size_t startIndex) {
+    inline const char* GetElements() const { return this->_Elements; }
+    inline size_t FindNextOccupied(size_t startIndex) const {
         while (startIndex < this->_Capacity) {
             startIndex += 1;
 
@@ -30,13 +31,14 @@ private:
     }
 
 public:
+    template <typename TPool, typename TElement>
     class Iterator {
     private:
-        IterablePoolAllocator<T>* _Allocator;
+        TPool* _Allocator;
         size_t _Index;
 
     public:
-        Iterator(IterablePoolAllocator<T>* allocator, size_t index = 0) : _Allocator(allocator), _Index(index) {
+        Iterator(TPool* allocator, size_t index = 0) : _Allocator(allocator), _Index(index) {
             // If we were given an empty index before the end, find the next occupied index.
             if (index < this->_Allocator->_Capacity && ((this->_Allocator->_OccupiedBuffer[0] & 1) == 0)) {
                 this->_Index = this->_Allocator->FindNextOccupied(index);
@@ -52,12 +54,12 @@ public:
         Iterator operator++(int) { Iterator result = *this; ++(*this); return result; } // ?????
         bool operator==(const Iterator& other) const { return this->_Allocator == other._Allocator && this->_Index == other._Index; }
         bool operator!=(const Iterator& other) const { return !(*this == other); }
-        T& operator*() { return (((PoolElement*)this->_Allocator->GetElements())[this->_Index]).Occupied; }
+        TElement& operator*() { return (((PoolElement*)this->_Allocator->GetElements())[this->_Index]).Occupied; }
 
         using difference_type = std::ptrdiff_t;
-        using value_type = T;
-        using pointer = T*;
-        using reference = T&;
+        using value_type = TElement;
+        using pointer = TElement*;
+        using reference = TElement&;
         using iterator_category = std::input_iterator_tag;
     };
 
@@ -89,11 +91,19 @@ public:
         this->_OccupiedBuffer[obIndex] &= ~(1 << obBit);
     }
 
-    Iterator begin() {
-        return Iterator(this, 0);
+    Iterator<IterablePoolAllocator<T>, T> begin() {
+        return Iterator<IterablePoolAllocator<T>, T>(this, 0);
     }
 
-    Iterator end() {
-        return Iterator(this, this->_Capacity);
+    Iterator<IterablePoolAllocator<T>, T> end() {
+        return Iterator<IterablePoolAllocator<T>, T>(this, this->_Capacity);
+    }
+
+    Iterator<const IterablePoolAllocator<T>, const T> begin() const {
+        return Iterator<const IterablePoolAllocator<T>, const T>(this, 0);
+    }
+
+    Iterator<const IterablePoolAllocator<T>, const T> end() const {
+        return Iterator<const IterablePoolAllocator<T>, const T>(this, this->_Capacity);
     }
 };

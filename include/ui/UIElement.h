@@ -7,6 +7,8 @@
 class Allocator;
 
 class UIElement {
+template <typename TLayoutMeta>
+friend class UIContainer;
 private:
     Vector2 _ContentSize;
     bool _ContentSizeValid;
@@ -18,6 +20,7 @@ protected:
     UIElement* _Parent;
     UIAlignment _HorizontalAlignment;
     UIAlignment _VerticalAlignment;
+    void* _ChildMeta;
 
     /**
      * @brief Called when the element's cached content size is invalidated, and so the content must be measured.
@@ -31,7 +34,7 @@ protected:
     inline void InvalidateContentSize() { this->_ContentSizeValid = false; }
 
 public:
-    inline UIElement(Allocator& allocator, UIElement* parent) : _Allocator(allocator), _ContentSize(), _ContentSizeValid(false), _Bounds(), _Margins(), _Parent(parent), _HorizontalAlignment(UIAlignment::Near), _VerticalAlignment(UIAlignment::Near) { }
+    inline UIElement(Allocator& allocator) : _Allocator(allocator), _ContentSize(), _ContentSizeValid(false), _Bounds(), _Margins(), _Parent(nullptr), _HorizontalAlignment(UIAlignment::Near), _VerticalAlignment(UIAlignment::Near), _ChildMeta(nullptr) { }
     virtual ~UIElement() { }
 
     inline Allocator& GetAllocator() const { return this->_Allocator; }
@@ -49,7 +52,7 @@ public:
      * 
      * @param destination The rectangle to position this element within.
      */
-    void LayoutInto(const UIRectangle& destination);
+    virtual void LayoutInto(const UIRectangle& destination);
 
     /**
      * @brief Determines the ideal size of this element, including both content and margins.

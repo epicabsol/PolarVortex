@@ -14,12 +14,13 @@ private:
     int _Y;
     int _Width;
     int _Height;
+    int _UIScale;
 
 public:
     /**
      * @brief Constructs a disabled, zero-size Viewport.
      */
-    inline Viewport() : _Camera(nullptr), _RootUIElement(nullptr), _X(0), _Y(0), _Width(0), _Height(0) { }
+    inline Viewport() : _Camera(nullptr), _RootUIElement(nullptr), _X(0), _Y(0), _Width(0), _Height(0), _UIScale(1) { }
 
     inline Camera* GetCamera() const { return this->_Camera; }
     inline UIElement* GetRootUIElement() const { return this->_RootUIElement; }
@@ -27,6 +28,7 @@ public:
     inline int GetY() const { return this->_Y; }
     inline int GetWidth() const { return this->_Width; }
     inline int GetHeight() const { return this->_Height; }
+    inline int GetUIScale() const { return this->_UIScale; }
     inline bool IsEnabled() const { return this->_Camera != nullptr; }
 
     void SetCamera(Camera* camera);

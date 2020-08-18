@@ -8,6 +8,7 @@ class Allocator;
 class DynamicCollider;
 class SpriteAnimation;
 class UIAnimation;
+class UIDockContainer;
 class World;
 
 class WorldScreen : public Screen {
@@ -17,7 +18,8 @@ private:
     DynamicCollider* _Player;
     SpriteAnimation* _PlayerIdleAnimation;
     SpriteInstance _PlayerAnimation;
-    UIAnimation* _TestImage;
+    UIDockContainer* _HUDContainer;
+    UIDockContainer* _RightContainer;
 
     virtual void RenderViewportContents(size_t index) override;
 
