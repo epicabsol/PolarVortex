@@ -16,7 +16,7 @@ private:
 public:
     inline SpriteInstance(Allocator& allocator, SpriteAnimation* animation) : _Animation(animation), _FrameIndex(0), _FrameTime(0.0f) { }
 
-    inline const GLTexture* GetTexture() const { return this->_Animation->GetTexture(); }
+    inline const GLTexture* GetTexture() const { return this->GetCurrentFrame().Sprite.Texture; }
     inline const SpriteFrame& GetCurrentFrame() const { return this->_Animation->GetFrames()[this->_FrameIndex]; }
 
     void Advance(float timestep);

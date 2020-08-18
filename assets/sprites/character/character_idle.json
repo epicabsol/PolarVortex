@@ -1,7 +1,7 @@
 {
-    "texture": "assets/sprites/character/character_idle.png",
     "frames": [
         {
+            "texture": "assets/sprites/character/character.png",
             "duration": 0.5,
             "x": 0,
             "y": 0,
@@ -9,6 +9,7 @@
             "height": 32
         },
         {
+            "texture": "assets/sprites/character/character.png",
             "duration": 0.25,
             "x": 32,
             "y": 0,
@@ -16,6 +17,7 @@
             "height": 32
         },
         {
+            "texture": "assets/sprites/character/character.png",
             "duration": 0.5,
             "x": 0,
             "y": 32,
@@ -23,6 +25,7 @@
             "height": 32
         },
         {
+            "texture": "assets/sprites/character/character.png",
             "duration": 0.25,
             "x": 32,
             "y": 32,

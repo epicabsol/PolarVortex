@@ -1,7 +1,9 @@
 #pragma once
 
+#include "Sprite.h"
+
 /**
- * @brief Specifies a frame of a sprite animation as a rectangular region of some source texture that is displayed for a certain time duration.
+ * @brief A sprite that is displayed for a certain duration in an animation.
  */
 struct SpriteFrame {
     /**
@@ -10,23 +12,7 @@ struct SpriteFrame {
     float Duration;
 
     /**
-     * @brief The U coordinate of the top-left corner of the frame.
+     * @brief The sprite that is displayed while this frame is active.
      */
-    float UMin;
-
-    /**
-     * @brief The V coordinate of the top-left corner of the frame.
-     */
-    float VMin;
-
-    /**
-     * @brief The horizontal width of this frame in the texture.
-     */
-    float USize;
-
-    /**
-     * @brief The vertical height of this frame in the texture.
-     * 
-     */
-    float VSize;
+    Sprite Sprite;
 };

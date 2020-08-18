@@ -22,8 +22,9 @@ public:
     ~GLRenderer();
 
     void BeginViewport(Viewport* viewport);
+    void SetProjection(const Matrix& projection);
     void DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const;
-    inline void DrawSprite(const SpriteInstance& instance, float x, float y, float z, float width, float height) const { this->DrawSprite(instance.GetTexture(), instance.GetCurrentFrame().UMin, instance.GetCurrentFrame().VMin, instance.GetCurrentFrame().USize, instance.GetCurrentFrame().VSize, x, y, z, width, height); }
+    inline void DrawSprite(const SpriteInstance& instance, float x, float y, float z, float width, float height) const { this->DrawSprite(instance.GetTexture(), instance.GetCurrentFrame().Sprite.UMin, instance.GetCurrentFrame().Sprite.VMin, instance.GetCurrentFrame().Sprite.USize, instance.GetCurrentFrame().Sprite.VSize, x, y, z, width, height); }
     inline void DrawSprite(const GLTexture* texture, float x, float y, float z, float width, float height) const { this->DrawSprite(texture, 0.0f, 0.0f, 1.0f, 1.0f, x, y, z, width, height); }
     void DrawSprite(const GLTexture* texture, float u, float v, float uSize, float vSize, float x, float y, float z, float width, float height) const;
 };

@@ -65,6 +65,10 @@ void GLRenderer::BeginViewport(Viewport* viewport) {
     }
 }
 
+void GLRenderer::SetProjection(const Matrix& projection) {
+    this->_Projection = projection;
+}
+
 void GLRenderer::DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const {
     glUseProgram(shader->GetProgramHandle());
     glBindVertexArray(mesh->GetVertexArrayHandle());

@@ -1,6 +1,7 @@
 #pragma once
 
 class Camera;
+class UIElement;
 
 /**
  * @brief Defines a rectangular region of the screen that can render a `Camera`'s point of view.
@@ -8,6 +9,7 @@ class Camera;
 class Viewport {
 private:
     Camera* _Camera;
+    UIElement* _RootUIElement;
     int _X;
     int _Y;
     int _Width;
@@ -17,9 +19,10 @@ public:
     /**
      * @brief Constructs a disabled, zero-size Viewport.
      */
-    inline Viewport() : _Camera(nullptr), _X(0), _Y(0), _Width(0), _Height(0) { }
+    inline Viewport() : _Camera(nullptr), _RootUIElement(nullptr), _X(0), _Y(0), _Width(0), _Height(0) { }
 
     inline Camera* GetCamera() const { return this->_Camera; }
+    inline UIElement* GetRootUIElement() const { return this->_RootUIElement; }
     inline int GetX() const { return this->_X; }
     inline int GetY() const { return this->_Y; }
     inline int GetWidth() const { return this->_Width; }
@@ -27,5 +30,6 @@ public:
     inline bool IsEnabled() const { return this->_Camera != nullptr; }
 
     void SetCamera(Camera* camera);
+    void SetRootUIElement(UIElement* element);
     void SetLayout(int x, int y, int width, int height);
 };

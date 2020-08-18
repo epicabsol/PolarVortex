@@ -1,4 +1,4 @@
-  #define HMM_PREFIX(name) Math_##name
+#define HMM_PREFIX(name) Math_##name
 
 /*
   HandmadeMath v1.11.1

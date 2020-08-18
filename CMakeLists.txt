@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include_directories(include)
 
-add_executable(PolarVortex src/main.cpp src/memory/Memory.cpp src/memory/StackAllocator.cpp src/assets/AssetManager.cpp src/render/glad.c src/game/Window.cpp src/render/GLRenderer.cpp src/render/GLMesh.cpp src/render/GLShaderProgram.cpp src/render/GLTexture.cpp src/render/stb_image.c src/render/Math.cpp src/game/Screen.cpp src/game/Viewport.cpp src/screens/MainMenuScreen.cpp src/game/PolarVortexGame.cpp src/world/World.cpp src/screens/WorldScreen.cpp src/world/Collision.cpp src/input/GLFWGamepadDevice.cpp src/input/GLFWGamepadButtonElement.cpp src/input/GLFWGamepadAxisElement.cpp src/render/SpriteAnimation.cpp src/render/SpriteInstance.cpp)
+add_executable(PolarVortex src/main.cpp src/memory/Memory.cpp src/memory/StackAllocator.cpp src/assets/AssetManager.cpp src/render/glad.c src/game/Window.cpp src/render/GLRenderer.cpp src/render/GLMesh.cpp src/render/GLShaderProgram.cpp src/render/GLTexture.cpp src/render/stb_image.c src/render/Math.cpp src/game/Screen.cpp src/game/Viewport.cpp src/screens/MainMenuScreen.cpp src/game/PolarVortexGame.cpp src/world/World.cpp src/screens/WorldScreen.cpp src/world/Collision.cpp src/input/GLFWGamepadDevice.cpp src/input/GLFWGamepadButtonElement.cpp src/input/GLFWGamepadAxisElement.cpp src/render/SpriteAnimation.cpp src/render/SpriteInstance.cpp src/ui/UIElement.cpp src/ui/UIAnimation.cpp)
 
 if(WIN32)
     target_link_libraries(PolarVortex opengl32 ${CMAKE_SOURCE_DIR}/lib/win64-vc2019/glfw3.lib)

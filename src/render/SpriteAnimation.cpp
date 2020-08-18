@@ -18,10 +18,7 @@ SpriteAnimation::SpriteAnimation(Allocator& allocator, Hash layoutPathHash) : _A
     const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, JSON_BUFFER_LENGTH), sajson::mutable_string_view(asset->GetDataLength(), (char*)asset->GetData()));
 
     sajson::value rootObject = doc.get_root();
-    sajson::value texturePath = rootObject.get_value_of_key(sajson::literal("texture"));
-    Hash texturePathHash = HashData(texturePath.as_cstring(), texturePath.get_string_length());
-
-    this->_Texture = allocator.New<GLTexture>(texturePathHash);
+    
 
     sajson::value framesArray = rootObject.get_value_of_key(sajson::literal("frames"));
     this->_FrameCount = framesArray.get_length();
@@ -30,6 +27,10 @@ SpriteAnimation::SpriteAnimation(Allocator& allocator, Hash layoutPathHash) : _A
 
     for (size_t frameIndex = 0; frameIndex < this->_FrameCount; frameIndex++) {
         sajson::value frameObject = framesArray.get_array_element(frameIndex);
+        sajson::value texturePath = frameObject.get_value_of_key(sajson::literal("texture"));
+        Hash texturePathHash = HashData(texturePath.as_cstring(), texturePath.get_string_length());
+
+        GLTexture* texture = allocator.New<GLTexture>(texturePathHash);
 
         float duration = frameObject.get_value_of_key(sajson::literal("duration")).get_number_value();
         float x = frameObject.get_value_of_key(sajson::literal("x")).get_number_value();
@@ -38,16 +39,19 @@ SpriteAnimation::SpriteAnimation(Allocator& allocator, Hash layoutPathHash) : _A
         float height = frameObject.get_value_of_key(sajson::literal("height")).get_number_value();
 
         this->_Frames[frameIndex].Duration = duration;
-        this->_Frames[frameIndex].UMin = x / this->_Texture->GetWidth();
-        this->_Frames[frameIndex].VMin = y / this->_Texture->GetHeight();
-        this->_Frames[frameIndex].USize = width / this->_Texture->GetWidth();
-        this->_Frames[frameIndex].VSize = height / this->_Texture->GetHeight();
+        this->_Frames[frameIndex].Sprite.Texture = texture;
+        this->_Frames[frameIndex].Sprite.UMin = x / texture->GetWidth();
+        this->_Frames[frameIndex].Sprite.VMin = y / texture->GetHeight();
+        this->_Frames[frameIndex].Sprite.USize = width / texture->GetWidth();
+        this->_Frames[frameIndex].Sprite.VSize = height / texture->GetHeight();
     }
 
     FrameAllocator.Free(parseBuffer);
 }
 
 SpriteAnimation::~SpriteAnimation() {
-    this->_Allocator.Delete(this->_Texture);
+    for (size_t i = 0; i < this->_FrameCount; i++) {
+        this->_Allocator.Delete(this->_Frames[i].Sprite.Texture);
+    }
     this->_Allocator.Free(this->_Frames);
 }
