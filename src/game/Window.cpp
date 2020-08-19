@@ -19,7 +19,7 @@ static void GLFWErrorCallback(int code, const char* message) {
     printf("[ERROR]: GLFW error %d (%s)\n", code, message);
 }
 
-Window::Window(Allocator& allocator, const char* title) : _Window(nullptr), _ClientWidth(800), _ClientHeight(600) {
+Window::Window(Allocator& allocator, const char* title) : _Window(nullptr), _ClientWidth(0), _ClientHeight(0) {
     glfwSetErrorCallback(GLFWErrorCallback);
 
     glfwInit();
@@ -29,7 +29,7 @@ Window::Window(Allocator& allocator, const char* title) : _Window(nullptr), _Cli
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    GLFWwindow* window = glfwCreateWindow((int)this->_ClientWidth, (int)this->_ClientHeight, title, nullptr, nullptr); // TODO: Check for success
+    GLFWwindow* window = glfwCreateWindow(800, 600, title, nullptr, nullptr); // TODO: Check for success
     glfwMakeContextCurrent(window);
     glfwSetWindowUserPointer(window, this);
 
@@ -38,6 +38,12 @@ Window::Window(Allocator& allocator, const char* title) : _Window(nullptr), _Cli
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress); // TODO: Check for success
 
     glfwSetFramebufferSizeCallback(window, WindowFramebufferSizeCallback);
+
+    int width;
+    int height;
+    glfwGetFramebufferSize(window, &width, &height);
+    this->_ClientWidth = width;
+    this->_ClientHeight = height;
 
     for (size_t i = 0; i < WINDOW_GAMEPAD_COUNT; i++) {
         this->_Gamepads[i] = RootAllocator.New<GLFWGamepadDevice>((int)i);
