@@ -47,6 +47,9 @@ GLRenderer::GLRenderer(Allocator& allocator) : _Allocator(allocator) {
     this->_DefaultTexture = this->_Allocator.New<GLTexture>(DefaultTextureWidth, DefaultTextureHeight, DefaultTextureData);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 GLRenderer::~GLRenderer() {

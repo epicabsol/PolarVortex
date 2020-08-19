@@ -9,6 +9,7 @@ class DynamicCollider;
 class SpriteAnimation;
 class UIAnimation;
 class UIDockContainer;
+class UISprite;
 class World;
 
 class WorldScreen : public Screen {
@@ -20,6 +21,7 @@ private:
     SpriteInstance _PlayerAnimation;
     UIDockContainer* _HUDContainer;
     UIDockContainer* _RightContainer;
+    UISprite* _WeaponSprite;
 
     virtual void RenderViewportContents(size_t index) override;
 

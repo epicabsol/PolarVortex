@@ -1,6 +1,6 @@
 #pragma once
 
-class GLTexture;
+#include "GLTexture.h"
 
 /**
  * @brief A region of a texture.
@@ -30,4 +30,8 @@ struct Sprite {
      * @brief The vertical height of this frame in the texture.
      */
     float VSize;
+
+    inline Sprite() : Texture(nullptr), UMin(0.0f), VMin(0.0f), USize(1.0f), VSize(1.0f) { }
+    inline Sprite(GLTexture* texture) : Texture(texture), UMin(0.0f), VMin(0.0f), USize(1.0f), VSize(1.0f) { }
+    inline Sprite(GLTexture* texture, int left, int top, int width, int height) : Texture(texture), UMin(left / (float)texture->GetWidth()), VMin(top / (float)texture->GetHeight()), USize(width / (float)texture->GetWidth()), VSize(height / (float)texture->GetHeight()) { }
 };
