@@ -1,9 +1,7 @@
 #include "render/GLTexture.h"
 
-#include "assets/Asset.h"
 #include "render/glad.h"
 #include "render/stb_image.h"
-#include "game/PolarVortexGame.h"
 
 void GLTexture::LoadData(const void* data) {
     glGenTextures(1, &this->_Handle);
@@ -17,12 +15,11 @@ GLTexture::GLTexture(Allocator& allocator, unsigned int width, unsigned int heig
     this->LoadData(data);
 }
 
-GLTexture::GLTexture(Allocator& allocator, Hash filenameHash) : _Handle(0), _Width(0), _Height(0) {
-    Asset* textureAsset = Game->GetAssetManager().GetAsset(filenameHash);
+GLTexture::GLTexture(Allocator& allocator, const char* pngData, size_t pngDataLength) : _Handle(0), _Width(0), _Height(0) {
     int width;
     int height;
     int channelsInFile;
-    unsigned char* data = stbi_load_from_memory((unsigned char*)textureAsset->GetData(), (int)textureAsset->GetDataLength(), &width, &height, &channelsInFile, 4);
+    unsigned char* data = stbi_load_from_memory((unsigned char*)pngData, (int)pngDataLength, &width, &height, &channelsInFile, 4);
     this->_Width = width;
     this->_Height = height;
     this->LoadData(data);

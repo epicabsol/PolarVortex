@@ -8,7 +8,7 @@ class Camera;
 
 class MainMenuScreen : public Screen {
 private:
-    GLTexture* _TestTexture;
+    const GLTexture* _TestTexture;
     Camera* _MainCamera;
 
     virtual void RenderViewportContents(size_t index) override;

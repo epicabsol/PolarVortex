@@ -10,15 +10,12 @@
 
 #define JSON_BUFFER_LENGTH (1024 * 32)
 
-SpriteAnimation::SpriteAnimation(Allocator& allocator, Hash layoutPathHash) : _Allocator(allocator), _Frames(nullptr), _FrameCount(0) {
-    Asset* asset = Game->GetAssetManager().GetAsset(layoutPathHash);
-
+SpriteAnimation::SpriteAnimation(Allocator& allocator, const char* data, size_t dataLength) : _Allocator(allocator), _Frames(nullptr), _FrameCount(0) {
     void* parseBuffer = allocator.Allocate(JSON_BUFFER_LENGTH);
     
-    const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, JSON_BUFFER_LENGTH), sajson::mutable_string_view(asset->GetDataLength(), (char*)asset->GetData()));
+    const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, JSON_BUFFER_LENGTH), sajson::mutable_string_view(dataLength, (char*)data));
 
     sajson::value rootObject = doc.get_root();
-    
 
     sajson::value framesArray = rootObject.get_value_of_key(sajson::literal("frames"));
     this->_FrameCount = framesArray.get_length();
@@ -30,7 +27,7 @@ SpriteAnimation::SpriteAnimation(Allocator& allocator, Hash layoutPathHash) : _A
         sajson::value texturePath = frameObject.get_value_of_key(sajson::literal("texture"));
         Hash texturePathHash = HashData(texturePath.as_cstring(), texturePath.get_string_length());
 
-        GLTexture* texture = allocator.New<GLTexture>(texturePathHash);
+        const GLTexture* texture = Game->GetAssetManager().GetAsset(texturePathHash)->GetAsset<GLTexture>();
 
         float duration = frameObject.get_value_of_key(sajson::literal("duration")).get_number_value();
         float x = frameObject.get_value_of_key(sajson::literal("x")).get_number_value();
@@ -50,8 +47,5 @@ SpriteAnimation::SpriteAnimation(Allocator& allocator, Hash layoutPathHash) : _A
 }
 
 SpriteAnimation::~SpriteAnimation() {
-    for (size_t i = 0; i < this->_FrameCount; i++) {
-        this->_Allocator.Delete(this->_Frames[i].Sprite.Texture);
-    }
     this->_Allocator.Free(this->_Frames);
 }

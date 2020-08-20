@@ -1,7 +1,11 @@
 #pragma once
 
+#include "../assets/Asset.h"
+#include "../assets/AssetManager.h"
+#include "../game/PolarVortexGame.h"
 #include "../memory/Memory.h"
-#include "../render/GLTexture.h"
+
+class GLTexture;
 
 /**
  * @brief Abstract class that declares the functionality of all elements of an input device.
@@ -10,13 +14,13 @@
  */
 class InputElement {
 private:
-    GLTexture* _Sprite;
+    const GLTexture* _Sprite;
 
 public:
-    inline InputElement(Allocator& allocator, Hash spriteHash) : _Sprite(allocator.New<GLTexture>(spriteHash)) { }
+    inline InputElement(Allocator& allocator, Hash spriteHash) : _Sprite(Game->GetAssetManager().GetAsset(spriteHash)->GetAsset<GLTexture>()) { }
     virtual ~InputElement() { }
 
-    inline GLTexture* GetSprite() const { return this->_Sprite; }
+    inline const GLTexture* GetSprite() const { return this->_Sprite; }
     virtual const char* GetName() const = 0;
     virtual float GetValue() const = 0;
 };

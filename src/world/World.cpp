@@ -1,8 +1,10 @@
 #include "world/World.h"
 
+#include "assets/Asset.h"
+#include "assets/AssetManager.h"
 #include "game/PolarVortexGame.h"
-#include "world/Collision.h"
 #include "render/GLTexture.h"
+#include "world/Collision.h"
 
 // How long after leaving the ground `DynamicCollder::IsOnGround()` becomes `false`.
 #define ONGROUND_THRESHOLD_TIME 0.3f
@@ -68,7 +70,7 @@ World::World(Allocator& allocator) : _Gravity(0.0f, -9.8f), _ColliderPool("World
         dynamic->_Friction = 0.1f;
     }
 
-    this->_DirtTexture = ScreenAllocator.New<GLTexture>(STRINGHASH("assets/sprites/tile_dirt.png"));
+    this->_DirtTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/tile_dirt.png"))->GetAsset<GLTexture>();
 }
 
 Collider* World::AddCollider(Vector2 center, Vector2 halfSize) {

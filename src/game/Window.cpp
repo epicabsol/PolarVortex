@@ -44,16 +44,18 @@ Window::Window(Allocator& allocator, const char* title) : _Window(nullptr), _Cli
     glfwGetFramebufferSize(window, &width, &height);
     this->_ClientWidth = width;
     this->_ClientHeight = height;
+}
 
+Window::~Window() {
+    glfwTerminate();
+}
+
+void Window::Initialize() {
     for (size_t i = 0; i < WINDOW_GAMEPAD_COUNT; i++) {
         this->_Gamepads[i] = RootAllocator.New<GLFWGamepadDevice>((int)i);
         this->_Gamepads[i]->Update();
         this->_InputDevices[i] = this->_Gamepads[i];
     }
-}
-
-Window::~Window() {
-    glfwTerminate();
 }
 
 void Window::Run() {

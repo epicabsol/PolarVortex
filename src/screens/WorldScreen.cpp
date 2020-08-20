@@ -31,10 +31,10 @@ void WorldScreen::RenderViewportContents(size_t index) {
     }
 }
 
-WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 5.0f, 5.0f), _Player(nullptr), _PlayerIdleAnimation(allocator.New<SpriteAnimation>(STRINGHASH("assets/sprites/character/character_idle.json"))), _PlayerAnimation(allocator, this->_PlayerIdleAnimation), _HUDContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr) {
+WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 5.0f, 5.0f), _Player(nullptr), _PlayerIdleAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_idle.pva"))->GetAsset<SpriteAnimation>()), _PlayerAnimation(allocator, this->_PlayerIdleAnimation), _HUDContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr) {
     this->_Player = this->_World->AddDynamicCollider(Vector2(0.0f, 3.0f), Vector2(0.15f, 0.35f), 1.0f);
 
-    GLTexture* gunTexture = allocator.New<GLTexture>(STRINGHASH("assets/sprites/weapons/pistol/icon.png"));
+    const GLTexture* gunTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/weapons/pistol/icon.png"))->GetAsset<GLTexture>();
     this->_WeaponSprite = allocator.New<UISprite>(Sprite(gunTexture));
     this->_RightContainer = allocator.New<UIDockContainer>(10);
     this->_HUDContainer = allocator.New<UIDockContainer>(5);

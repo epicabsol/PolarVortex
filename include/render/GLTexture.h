@@ -14,7 +14,7 @@ private:
 
 public:
     GLTexture(Allocator& allocator, unsigned int width, unsigned int height, const void* data);
-    GLTexture(Allocator& allocator, Hash filenameHash);
+    GLTexture(Allocator& allocator, const char* pngData, size_t pngDataLength);
     ~GLTexture();
 
     inline unsigned int GetHandle() const { return this->_Handle; }

@@ -22,6 +22,7 @@ public:
     GLRenderer(Allocator& allocator);
     ~GLRenderer();
 
+    void Initialize();
     void BeginViewport(Viewport* viewport);
     void SetProjection(const Matrix& projection);
     void DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const;

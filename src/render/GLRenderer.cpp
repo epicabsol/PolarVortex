@@ -41,11 +41,6 @@ unsigned int DefaultTextureWidth = 4;
 unsigned int DefaultTextureHeight = 4;
 
 GLRenderer::GLRenderer(Allocator& allocator) : _Allocator(allocator) {
-    this->_SquareMesh = this->_Allocator.New<GLMesh>(SpriteVertexAttributes, SpriteVertexAttributeCount, SquareMeshVertices, SquareMeshVertexCount, SquareMeshIndices, sizeof(SquareMeshIndices[0]), SquareMeshIndexCount);
-    this->_SpriteShader = this->_Allocator.New<GLShaderProgram>(STRINGHASH("assets/shaders/SpriteVertexShader.glsl"), STRINGHASH("assets/shaders/SpritePixelShader.glsl"));
-    this->_SpriteShader->SetTextureIndex("Texture", 0);
-    this->_DefaultTexture = this->_Allocator.New<GLTexture>(DefaultTextureWidth, DefaultTextureHeight, DefaultTextureData);
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     glEnable(GL_BLEND);
@@ -56,6 +51,13 @@ GLRenderer::~GLRenderer() {
     this->_Allocator.Delete(this->_DefaultTexture);
     this->_Allocator.Delete(this->_SpriteShader);
     this->_Allocator.Delete(this->_SquareMesh);
+}
+
+void GLRenderer::Initialize() {
+    this->_SquareMesh = this->_Allocator.New<GLMesh>(SpriteVertexAttributes, SpriteVertexAttributeCount, SquareMeshVertices, SquareMeshVertexCount, SquareMeshIndices, sizeof(SquareMeshIndices[0]), SquareMeshIndexCount);
+    this->_SpriteShader = this->_Allocator.New<GLShaderProgram>(STRINGHASH("assets/shaders/SpriteVertexShader.glsl"), STRINGHASH("assets/shaders/SpritePixelShader.glsl"));
+    this->_SpriteShader->SetTextureIndex("Texture", 0);
+    this->_DefaultTexture = this->_Allocator.New<GLTexture>(DefaultTextureWidth, DefaultTextureHeight, DefaultTextureData);
 }
 
 void GLRenderer::BeginViewport(Viewport* viewport) {

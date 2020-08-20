@@ -17,7 +17,7 @@ private:
     World* _World;
     Camera _MainCamera;
     DynamicCollider* _Player;
-    SpriteAnimation* _PlayerIdleAnimation;
+    const SpriteAnimation* _PlayerIdleAnimation;
     SpriteInstance _PlayerAnimation;
     UIDockContainer* _HUDContainer;
     UIDockContainer* _RightContainer;

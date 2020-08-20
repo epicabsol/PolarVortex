@@ -15,7 +15,7 @@ private:
     Vector2 _Gravity;
     IterablePoolAllocator<Collider> _ColliderPool;
     IterablePoolAllocator<DynamicCollider> _DynamicColliderPool;
-    GLTexture* _DirtTexture;
+    const GLTexture* _DirtTexture;
 
     char _ColliderPoolBuffer[sizeof(Collider) * MAX_COLLIDERS];
     char _DynamicColliderPoolBuffer[sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS];

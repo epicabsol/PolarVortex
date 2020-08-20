@@ -11,7 +11,7 @@ private:
 public:
     virtual ~InputDevice() { }
 
-    virtual GLTexture* GetSprite() const = 0;
+    virtual const GLTexture* GetSprite() const = 0;
     virtual const char* GetName() const = 0;
     virtual bool IsConnected() const = 0;
     virtual const InputElement* const* GetInputElements() const = 0;

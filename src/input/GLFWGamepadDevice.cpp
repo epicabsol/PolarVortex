@@ -48,7 +48,7 @@ const GamepadAxisInfo GamepadAxes[] = {
     { "Right Trigger", STRINGHASH("assets/sprites/controls/xbox/trigger_r.png"), GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER, 1.0f },
 };
 
-GLFWGamepadDevice::GLFWGamepadDevice(Allocator& allocator, int joystickID) : _Allocator(allocator), _JoystickID(joystickID), _State(), _Sprite(RootAllocator.New<GLTexture>(STRINGHASH("assets/sprites/controls/xbox/controller.png"))) {
+GLFWGamepadDevice::GLFWGamepadDevice(Allocator& allocator, int joystickID) : _Allocator(allocator), _JoystickID(joystickID), _State(), _Sprite(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/controls/xbox/controller.png"))->GetAsset<GLTexture>()) {
     for (size_t i = 0; i < GLFW_GAMEPAD_BUTTON_COUNT; i++) {
         this->_InputElements[i] = RootAllocator.New<GLFWGamepadButtonElement>((int)i, &this->_State, GamepadButtons[i].SpriteHash, GamepadButtons[i].Name);
     }
@@ -57,7 +57,7 @@ GLFWGamepadDevice::GLFWGamepadDevice(Allocator& allocator, int joystickID) : _Al
     }
 }
 
-GLTexture* GLFWGamepadDevice::GetSprite() const {
+const GLTexture* GLFWGamepadDevice::GetSprite() const {
     return this->_Sprite;
 }
 

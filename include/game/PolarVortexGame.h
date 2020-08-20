@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../assets/AssetManager.h"
 #include "Window.h"
 #include "render/GLRenderer.h"
 
+class AssetManager;
 class Screen;
 
 class PolarVortexGame {

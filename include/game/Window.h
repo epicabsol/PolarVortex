@@ -26,6 +26,7 @@ public:
     inline InputDevice* GetInputDevice(size_t index) { return this->_InputDevices[index]; }
     inline size_t GetInputDeviceCount() { return sizeof(this->_InputDevices) / sizeof(this->_InputDevices[0]); }
 
+    void Initialize();
     void Run();
     void Resized(size_t width, size_t height);
 };

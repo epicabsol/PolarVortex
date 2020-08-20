@@ -5,6 +5,8 @@
 
 #include "assets/Asset.h"
 #include "memory/Memory.h"
+#include "render/GLTexture.h"
+#include "render/SpriteAnimation.h"
 
 #define ASSET_MAX_COUNT 64
 #define DATA_ALLOCATOR_SIZE (1024 * 1024 * 32)
@@ -27,6 +29,7 @@ AssetManager::AssetManager(Allocator& allocator) : _Allocator(allocator), _Asset
         }
 
         std::string pathString = entry.path().string();
+        std::string extension = entry.path().extension().string();
         for (size_t i = 0; i < pathString.size(); i++) {
             if (pathString[i] == '\\') {
                 pathString[i] = '/';
@@ -42,8 +45,9 @@ AssetManager::AssetManager(Allocator& allocator) : _Allocator(allocator), _Asset
         stream.close();
 
         Hash pathHash = HashString(pathString);
+        Hash typeHash = HashString(extension);
 
-        new (&this->_Assets[this->_AssetCount]) Asset(allocator, pathHash, data, length);
+        new (&this->_Assets[this->_AssetCount]) Asset(allocator, pathHash, typeHash, data, length, nullptr);
         this->_AssetCount += 1;
     }
 }
@@ -55,5 +59,14 @@ Asset* AssetManager::GetAsset(const Hash nameHash) const {
             return &this->_Assets[i];
         }
     }
+    printf("WARNING: Asset not found!");
     return nullptr;
+}
+
+void AssetManager::InitializeAssets() {
+    // .glsl: No initialization
+    // .png: GLTexture
+    this->InitializeAssetsWithType<GLTexture>(STRINGHASH(".png"));
+    // .pva: SpriteAnimation
+    this->InitializeAssetsWithType<SpriteAnimation>(STRINGHASH(".pva"));
 }

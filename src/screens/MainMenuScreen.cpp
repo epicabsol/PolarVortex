@@ -1,5 +1,7 @@
 #include "screens/MainMenuScreen.h"
 
+#include "assets/Asset.h"
+#include "assets/AssetManager.h"
 #include "game/Camera.h"
 #include "game/Window.h"
 #include "memory/Memory.h"
@@ -15,7 +17,7 @@ void MainMenuScreen::RenderViewportContents(size_t index) {
 }
 
 MainMenuScreen::MainMenuScreen(Allocator& allocator) : Screen(allocator) {
-    this->_TestTexture = ScreenAllocator.New<GLTexture>(STRINGHASH("assets/sprites/tile_dirt.png"));
+    this->_TestTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/tile_dirt.png"))->GetAsset<GLTexture>();
 
     this->_MainCamera = ScreenAllocator.New<Camera>(0.0f, 0.0f, 0.0f, 10.0f);
 
@@ -24,7 +26,6 @@ MainMenuScreen::MainMenuScreen(Allocator& allocator) : Screen(allocator) {
 }
 
 MainMenuScreen::~MainMenuScreen() {
-    ScreenAllocator.Delete(this->_TestTexture);
     ScreenAllocator.Delete(this->_MainCamera);
 }
 

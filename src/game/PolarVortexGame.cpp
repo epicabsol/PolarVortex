@@ -30,6 +30,9 @@ void PolarVortexGame::Load() {
     this->_AssetManager = RootAllocator.New<AssetManager>();
     this->_MainWindow = RootAllocator.New<Window>("Polar Vortex");
     this->_Renderer = RootAllocator.New<GLRenderer>();
+    this->_AssetManager->InitializeAssets();
+    this->_MainWindow->Initialize();
+    this->_Renderer->Initialize();
 
     // Create main menu
     //MainMenuScreen* mainMenu = ScreenAllocator.New<MainMenuScreen>();

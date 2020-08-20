@@ -15,7 +15,7 @@ private:
     size_t _FrameCount;
 
 public:
-    SpriteAnimation(Allocator& allocator, Hash layoutPathHash);
+    SpriteAnimation(Allocator& allocator, const char* data, size_t dataLength);
     ~SpriteAnimation();
 
     inline const SpriteFrame* GetFrames() const { return this->_Frames; }

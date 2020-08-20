@@ -13,14 +13,14 @@ private:
     Allocator& _Allocator;
     int _JoystickID;
     GLFWgamepadstate _State;
-    GLTexture* _Sprite;
+    const GLTexture* _Sprite;
     InputElement* _InputElements[GLFW_GAMEPAD_BUTTON_COUNT + GLFW_GAMEPAD_AXIS_COUNT];
     bool _IsConnected;
 
 public:
     GLFWGamepadDevice(Allocator& allocator, int joystickID);
 
-    virtual GLTexture* GetSprite() const override;
+    virtual const GLTexture* GetSprite() const override;
     virtual const char* GetName() const override;
     virtual bool IsConnected() const override;
     virtual const InputElement* const* GetInputElements() const override;
