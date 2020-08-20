@@ -573,6 +573,21 @@ HMM_INLINE float HMM_PREFIX(PowerF)(float Base, float Exponent)
     return (Result);
 }
 
+HMM_INLINE float HMM_PREFIX(Lerp)(float start, float end, float t)
+{
+    return start * (1.0f - t) + end * t;
+}
+
+/*
+ * Framerate-independent exponential blending
+ *
+ * Thanks to http://www.rorydriscoll.com/2016/03/07/frame-rate-independent-damping-using-lerp/
+ */
+HMM_INLINE float HMM_PREFIX(BlendExp)(float start, float end, float speed, float timestep)
+{
+    return HMM_PREFIX(Lerp)(start, end, 1.0f - HMM_PREFIX(PowerF)(speed, timestep));
+}
+
 
 /*
  * Utility functions
@@ -588,7 +603,7 @@ HMM_INLINE float HMM_PREFIX(ToRadians)(float Degrees)
     return (Result);
 }
 
-COVERAGE(HMM_Lerp, 1)
+/*COVERAGE(HMM_Lerp, 1)
 HMM_INLINE float HMM_PREFIX(Lerp)(float A, float Time, float B)
 {
     ASSERT_COVERED(HMM_Lerp);
@@ -596,7 +611,7 @@ HMM_INLINE float HMM_PREFIX(Lerp)(float A, float Time, float B)
     float Result = (1.0f - Time) * A + Time * B;
 
     return (Result);
-}
+}*/
 
 COVERAGE(HMM_Clamp, 1)
 HMM_INLINE float HMM_PREFIX(Clamp)(float Min, float Value, float Max)
@@ -1255,6 +1270,21 @@ HMM_INLINE Vector4 HMM_PREFIX(LerpVec4)(Vector4 A, Vector4 B, float T)
     return HMM_PREFIX(AddVec4)(HMM_PREFIX(MultiplyVec4f)(A, 1.0f - T), HMM_PREFIX(MultiplyVec4f)(B, T));
 }
 
+HMM_INLINE Vector2 HMM_PREFIX(BlendExpVec2)(Vector2 A, Vector2 B, float speed, float timestep)
+{
+    return HMM_PREFIX(LerpVec2)(A, B, 1.0f - HMM_PREFIX(PowerF)(speed, timestep));
+}
+
+HMM_INLINE Vector3 HMM_PREFIX(BlendExpVec3)(Vector3 A, Vector3 B, float speed, float timestep)
+{
+    return HMM_PREFIX(LerpVec3)(A, B, 1.0f - HMM_PREFIX(PowerF)(speed, timestep));
+}
+
+HMM_INLINE Vector4 HMM_PREFIX(BlendExpVec4)(Vector4 A, Vector4 B, float speed, float timestep)
+{
+    return HMM_PREFIX(LerpVec4)(A, B, 1.0f - HMM_PREFIX(PowerF)(speed, timestep));
+}
+
 COVERAGE(HMM_FastNormalizeVec2, 1)
 HMM_INLINE Vector2 HMM_PREFIX(FastNormalizeVec2)(Vector2 A)
 {
@@ -1831,6 +1861,21 @@ HMM_INLINE Vector3 HMM_PREFIX(Lerp)(Vector3 A, Vector3 B, float T)
 HMM_INLINE Vector4 HMM_PREFIX(Lerp)(Vector4 A, Vector4 B, float T)
 {
     return HMM_PREFIX(LerpVec4)(A, B, T);
+}
+
+HMM_INLINE Vector2 HMM_PREFIX(BlendExp)(Vector2 A, Vector2 B, float speed, float timestep)
+{
+    return HMM_PREFIX(BlendExpVec2)(A, B, speed, timestep);
+}
+
+HMM_INLINE Vector3 HMM_PREFIX(BlendExp)(Vector3 A, Vector3 B, float speed, float timestep)
+{
+    return HMM_PREFIX(BlendExpVec3)(A, B, speed, timestep);
+}
+
+HMM_INLINE Vector4 HMM_PREFIX(BlendExp)(Vector4 A, Vector4 B, float speed, float timestep)
+{
+    return HMM_PREFIX(BlendExpVec4)(A, B, speed, timestep);
 }
 
 COVERAGE(HMM_FastNormalizeVec2CPP, 1)

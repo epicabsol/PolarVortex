@@ -69,7 +69,7 @@ void WorldScreen::Update(float timestep) {
     this->_World->Update(timestep);
     this->_PlayerAnimation.Advance(timestep);
 
-    this->_MainCamera.SetPosition(Math_Lerp(this->_MainCamera.GetPosition(), this->_Player->GetBounds().Position, 0.1f));
+    this->_MainCamera.SetPosition(Math_BlendExp(this->_MainCamera.GetPosition(), this->_Player->GetBounds().Position, 0.05f, timestep));
 }
 
 void WorldScreen::Resize(size_t width, size_t height) {
