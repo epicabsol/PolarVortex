@@ -1,4 +1,5 @@
 {
+    "texture": "assets/fonts/vortex-body.png",
     "line-height": 12,
     "leading": 2,
     "descent": 2,
