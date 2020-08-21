@@ -21,6 +21,15 @@ namespace FontEditor
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static string AssetDirectory = "";
+
+        public static DependencyProperty ScaleProperty = DependencyProperty.Register(nameof(Scale), typeof(float), typeof(MainWindow), new PropertyMetadata((float)1));
+        public float Scale
+        {
+            get => (float)GetValue(ScaleProperty);
+            set => SetValue(ScaleProperty, value);
+        }
+
         public static DependencyProperty CurrentFontProperty = DependencyProperty.Register(nameof(CurrentFont), typeof(SpriteFont), typeof(MainWindow));
         public SpriteFont CurrentFont
         {
@@ -73,6 +82,20 @@ namespace FontEditor
             {
                 CurrentFont = SpriteFont.LoadFromFile(dialog.FileName);
             }
+        }
+
+        private void SetAssetDirectoryMenuItemClick(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog folderDialog = new System.Windows.Forms.FolderBrowserDialog();
+            if (folderDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                AssetDirectory = System.IO.Path.GetDirectoryName(folderDialog.SelectedPath);
+            }
+        }
+
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
         }
     }
 }

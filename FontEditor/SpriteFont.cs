@@ -113,6 +113,8 @@ namespace FontEditor
 
     public class SpriteFont
     {
+        [JsonPropertyName("texture")]
+        public string TexturePath { get; set; } = "";
         [JsonPropertyName("line-height")]
         public float LineHeight { get; set; } = 16;
         [JsonPropertyName("leading")]
