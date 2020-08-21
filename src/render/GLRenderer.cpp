@@ -106,7 +106,7 @@ void GLRenderer::DrawString(const SpriteFont* font, const char* string, float x,
     float startX = x;
 
     // Move down from the caps-height to the first baseline
-    y += (font->GetLineHeight() - font->GetLeading() - font->GetDescent()) * scale;
+    y -= (font->GetLineHeight() - font->GetDescent()) * scale;
 
     size_t length = strlen(string);
     for (size_t i = 0; i < length; i++) {
@@ -116,12 +116,12 @@ void GLRenderer::DrawString(const SpriteFont* font, const char* string, float x,
             continue;
         }
         // Check if we need to wrap this character to the next line.
-        if (x + (glyph->Left + glyph->Sprite.USize * glyph->Sprite.Texture->GetWidth()) * scale > maxWidth + startX) {
+        if (maxWidth > 0.0f && x + (glyph->Left + glyph->Sprite.USize * glyph->Sprite.Texture->GetWidth()) * scale > maxWidth + startX) {
             x = startX;
             y -= font->GetLineHeight() * scale;
         }
 
-        this->DrawSprite(glyph->Sprite, x + (glyph->Left + glyph->Sprite.USize * glyph->Sprite.Texture->GetWidth() * 0.5f) * scale, y - (glyph->Top + glyph->Sprite.VSize * glyph->Sprite.Texture->GetHeight() * 0.5f) * scale, z, glyph->Sprite.USize * glyph->Sprite.Texture->GetWidth() * scale, glyph->Sprite.VSize * glyph->Sprite.Texture->GetHeight() * scale);
+        this->DrawSprite(glyph->Sprite, x + (glyph->Left + glyph->Sprite.USize * glyph->Sprite.Texture->GetWidth() * 0.5f) * scale, y + (glyph->Top - glyph->Sprite.VSize * glyph->Sprite.Texture->GetHeight() * 0.5f) * scale, z, glyph->Sprite.USize * glyph->Sprite.Texture->GetWidth() * scale, glyph->Sprite.VSize * glyph->Sprite.Texture->GetHeight() * scale);
 
         x += glyph->Advance * scale;
     }

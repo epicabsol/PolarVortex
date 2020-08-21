@@ -47,3 +47,29 @@ SpriteFont::SpriteFont(Allocator& allocator, const char* data, size_t dataLength
 SpriteFont::~SpriteFont() {
     this->_Allocator.Free(this->_Glyphs);
 }
+
+Vector2 SpriteFont::MeasureString(const char* string, float scale, float maxWidth) const {
+    Vector2 result(0.0f, this->_LineHeight * scale);
+
+    size_t length = strlen(string);
+    float x = 0.0f;
+    for (size_t i = 0; i < length; i++) {
+        const SpriteFontGlyph* glyph = this->_GlyphMap[string[i]];
+
+        if (glyph == nullptr) {
+            continue;
+        }
+
+        if (maxWidth > 0.0f && x + (glyph->Left + glyph->Sprite.USize * glyph->Sprite.Texture->GetWidth()) * scale > maxWidth) {
+            result.X = HMM_MAX(x, result.X);
+            x = 0.0f;
+            result.Y += this->_LineHeight;
+        }
+
+        x += glyph->Advance * scale;
+    }
+
+    result.X = HMM_MAX(x, result.X);
+
+    return result;
+}

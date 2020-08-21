@@ -66,4 +66,6 @@ public:
     inline size_t GetGlyphCount() const { return this->_GlyphCount; }
     inline const SpriteFontGlyph* GetGlyph(size_t index) const { return &this->_Glyphs[index]; }
     inline const SpriteFontGlyph* GetGlyph(char character) const { return this->_GlyphMap[character]; }
+
+    Vector2 MeasureString(const char* string, float scale, float maxWidth) const;
 };
