@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FontEditor"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+        DataContext="{Binding RelativeSource={RelativeSource Self}}" Background="{StaticResource Background}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -34,7 +34,7 @@
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <ListBox x:Name="GlyphListBox" ItemsSource="{Binding CurrentFont.Glyphs}" SelectionChanged="GlyphListBox_SelectionChanged">
+            <ListBox x:Name="GlyphListBox" Background="{StaticResource Border}" ItemsSource="{Binding CurrentFont.Glyphs}" SelectionChanged="GlyphListBox_SelectionChanged" BorderThickness="0 0 1 0">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="SpriteFontGlyph">
                         <TextBlock Text="{Binding Character}">
@@ -48,11 +48,12 @@
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" Grid.Row="0">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="0">
                     <local:GlyphEditor Font="{Binding CurrentFont}" Glyph="{Binding CurrentGlyph}" Scale="{Binding Scale}"/>
                 </ScrollViewer>
-                <Slider Minimum="1" Maximum="15" Value="{Binding Scale, Mode=TwoWay}" Grid.Row="1"/>
+                <Slider Minimum="1" Maximum="35" Value="{Binding Scale, Mode=TwoWay}" Grid.Row="1"/>
             </Grid>
+            
             <TabControl Grid.Column="2">
                 <TabItem Header="Glyph">
                     <Grid>
@@ -110,6 +111,7 @@
                     </Grid>
                 </TabItem>
             </TabControl>
+            <!--<Border Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="1" Background="{StaticResource Border}"/> -->
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
