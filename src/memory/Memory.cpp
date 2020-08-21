@@ -41,7 +41,7 @@ char ScreenAllocatorBuffer[SCREEN_ALLOCATOR_SIZE];
 StackAllocator ScreenAllocator("Screen", ScreenAllocatorBuffer, sizeof(ScreenAllocatorBuffer));
 
 // Frame allocator
-#define FRAME_ALLOCATOR_SIZE (1024 * 16)
+#define FRAME_ALLOCATOR_SIZE (1024 * 1024 * 16)
 char FrameAllocatorBuffer[FRAME_ALLOCATOR_SIZE];
 StackAllocator FrameAllocator("Frame", FrameAllocatorBuffer, sizeof(FrameAllocatorBuffer));
 

@@ -15,12 +15,15 @@ void WorldScreen::RenderViewportContents(size_t index) {
     this->_World->Render(this->_Viewports[index].GetCamera());
 
     Game->GetRenderer().DrawSprite(this->_PlayerAnimation, this->_Player->GetBounds().Position.X, this->_Player->GetBounds().Position.Y, 0.0f, 1.0f, 1.0f);
+    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "HEY PETER", this->_Player->GetBounds().Position.X, this->_Player->GetBounds().Position.Y, 0.0f, 1.0f / 32.0f, 1.0f);
 
     float x = this->_Player->GetBounds().Position.X;
     float y = this->_Player->GetBounds().Position.Y + 1.0f;
     float scale = 0.5f;
     InputDevice* device = Game->GetMainWindow().GetInputDevice(0);
     Game->GetRenderer().DrawSprite(device->GetSprite(), x, y, 0.0f, scale, scale);
+    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), device->GetName(), x, y + 1.0f, 0.0f, 1.0f / 64.0f, 1.0f);
+
     x += scale * 1.25f;
     for (size_t i = 0; i < device->GetInputElementCount(); i++) {
         const InputElement* element = device->GetInputElement(i);

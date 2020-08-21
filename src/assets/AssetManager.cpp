@@ -7,6 +7,7 @@
 #include "memory/Memory.h"
 #include "render/GLTexture.h"
 #include "render/SpriteAnimation.h"
+#include "render/SpriteFont.h"
 
 #define ASSET_MAX_COUNT 64
 #define DATA_ALLOCATOR_SIZE (1024 * 1024 * 32)
@@ -69,4 +70,6 @@ void AssetManager::InitializeAssets() {
     this->InitializeAssetsWithType<GLTexture>(STRINGHASH(".png"));
     // .pva: SpriteAnimation
     this->InitializeAssetsWithType<SpriteAnimation>(STRINGHASH(".pva"));
+    // .pvf: SpriteFont
+    this->InitializeAssetsWithType<SpriteFont>(STRINGHASH(".pvf"));
 }

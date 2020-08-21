@@ -62,8 +62,8 @@ public:
      */
     inline float GetDescent() const { return this->_Descent; }
 
-    inline const SpriteFontGlyph* GetGlyphs() { return this->_Glyphs; }
-    inline size_t GetGlyphCount() { return this->_GlyphCount; }
-    inline const SpriteFontGlyph& GetGlyph(size_t index) { return this->_Glyphs[index]; }
-    inline const SpriteFontGlyph& GetGlyph(char character) { return *this->_GlyphMap[character]; }
+    inline const SpriteFontGlyph* GetGlyphs() const { return this->_Glyphs; }
+    inline size_t GetGlyphCount() const { return this->_GlyphCount; }
+    inline const SpriteFontGlyph* GetGlyph(size_t index) const { return &this->_Glyphs[index]; }
+    inline const SpriteFontGlyph* GetGlyph(char character) const { return this->_GlyphMap[character]; }
 };
