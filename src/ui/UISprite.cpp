@@ -5,7 +5,7 @@
 
 Vector2 UISprite::MeasureContent() const {
     if (this->_Sprite.Texture != nullptr) {
-        return Vector2(this->_Sprite.Texture->GetWidth(), this->_Sprite.Texture->GetHeight());
+        return Vector2(this->_Sprite.Texture->GetWidth() * this->_Sprite.USize, this->_Sprite.Texture->GetHeight() * this->_Sprite.VSize);
     }
     else {
         return Vector2();
