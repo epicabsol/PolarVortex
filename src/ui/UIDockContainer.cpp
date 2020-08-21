@@ -13,7 +13,7 @@ Vector2 UIDockContainer::MeasureContent() const {
                 break;
             }
             case DockSide::Top: {
-                margins.Top += size.Y;
+                margins.Bottom += size.Y;
                 result.X = HMM_MAX(result.X, margins.Left + margins.Right + size.X);
                 break;
             }
@@ -23,7 +23,7 @@ Vector2 UIDockContainer::MeasureContent() const {
                 break;
             }
             case DockSide::Bottom: {
-                margins.Bottom += size.Y;
+                margins.Top += size.Y;
                 result.X = HMM_MAX(result.X, margins.Left + margins.Right + size.X);
                 break;
             }
@@ -53,12 +53,11 @@ void UIDockContainer::LayoutInto(const UIRectangle& destination) {
                 break;
             }
             case DockSide::Top: {
-                float top = child.Element->Measure().Y;
+                float bottom = child.Element->Measure().Y;
 
-                child.Element->LayoutInto(UIRectangle(available.Position, Vector2(available.Size.X, top)));
+                child.Element->LayoutInto(UIRectangle(Vector2(available.Position.X, available.Position.Y + available.Size.Y - bottom), Vector2(available.Size.X, bottom)));
 
-                available.Position.Y += top;
-                available.Size.Y -= top;
+                available.Size.Y -= bottom;
                 break;
             }
             case DockSide::Right: {
@@ -70,11 +69,12 @@ void UIDockContainer::LayoutInto(const UIRectangle& destination) {
                 break;
             }
             case DockSide::Bottom: {
-                float bottom = child.Element->Measure().Y;
+                float top = child.Element->Measure().Y;
 
-                child.Element->LayoutInto(UIRectangle(Vector2(available.Position.X, available.Position.Y + available.Size.Y - bottom), Vector2(available.Size.X, bottom)));
+                child.Element->LayoutInto(UIRectangle(available.Position, Vector2(available.Size.X, top)));
 
-                available.Size.Y -= bottom;
+                available.Position.Y += top;
+                available.Size.Y -= top;
                 break;
             }
         }

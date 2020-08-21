@@ -17,7 +17,7 @@ void UIElement::LayoutInto(const UIRectangle& destination) {
 
     UIRectangle adjustedDestination = destination;
     adjustedDestination.Position.X += this->_Margins.Left;
-    adjustedDestination.Position.Y += this->_Margins.Top;
+    adjustedDestination.Position.Y += this->_Margins.Bottom;
     adjustedDestination.Size.X -= this->_Margins.Left + this->_Margins.Right;
     adjustedDestination.Size.Y -= this->_Margins.Top + this->_Margins.Bottom;
 

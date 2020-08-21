@@ -8,6 +8,7 @@
 #include "ui/UIAnimation.h"
 #include "ui/UIDockContainer.h"
 #include "ui/UISprite.h"
+#include "ui/UITextBlock.h"
 #include "world/World.h"
 
 void WorldScreen::RenderViewportContents(size_t index) {
@@ -43,6 +44,12 @@ WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(alloc
     this->_HUDContainer = allocator.New<UIDockContainer>(5);
 
     this->_RightContainer->AddElement(this->_WeaponSprite, DockSide::Bottom);
+
+    UITextBlock* weaponName = allocator.New<UITextBlock>(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>());
+    weaponName->SetText("gun");
+    weaponName->SetHorizontalAlignment(UIAlignment::Far);
+    weaponName->SetMargins(UIMargins(0.0f, 2.0f, 1.0f, -4.0f));
+    this->_RightContainer->AddElement(weaponName, DockSide::Bottom);
 
     this->_HUDContainer->AddElement(this->_RightContainer, DockSide::Right);
 

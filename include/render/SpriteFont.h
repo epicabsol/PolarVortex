@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sprite.h"
+#include "math.h"
 
 class Allocator;
 class GLTexture;
