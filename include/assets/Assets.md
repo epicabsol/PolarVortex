@@ -10,6 +10,7 @@ These are the known asset types, in the order that they are initialized:
 | `.glsl`   | GLSL shader source | `nullptr`          | Just use the raw data in the asset. |
 | `.png`    | PNG data           | `GLTexture`        |                                     |
 | `.pva`    | JSON               | `SpriteAnimation`  |                                     |
+| `.pvf`    | JSON               | `SpriteFont`       |                                     |
 
 All native classes for assets are expected to take a constructor with the following signature: `void (const char* data, size_t dataLength)`.
 

@@ -20,6 +20,7 @@ private:
     const SpriteAnimation* _PlayerIdleAnimation;
     SpriteInstance _PlayerAnimation;
     UIDockContainer* _HUDContainer;
+    UIDockContainer* _LeftContainer;
     UIDockContainer* _RightContainer;
     UISprite* _WeaponSprite;
 

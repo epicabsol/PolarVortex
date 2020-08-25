@@ -1,0 +1,125 @@
+﻿<Window x:Class="FontEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FontEditor"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}" Background="{StaticResource Background}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="File">
+                <MenuItem Header="New"/>
+                <MenuItem Header="Open" Click="OpenMenuItemClick"/>
+                <MenuItem Header="Save"/>
+                <MenuItem Header="Save As..."/>
+            </MenuItem>
+            <MenuItem Header="Glyph">
+                <MenuItem Header="Add Glyph" Click="AddGlyphMenuItemClick"/>
+                <MenuItem Header="Remove Glyph" Click="RemoveGlyphMenuItemClick"/>
+            </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Set Asset Directory..." Click="SetAssetDirectoryMenuItemClick"/>
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <ListBox x:Name="GlyphListBox" Background="{StaticResource Border}" ItemsSource="{Binding CurrentFont.Glyphs}" SelectionChanged="GlyphListBox_SelectionChanged" BorderThickness="0 0 1 0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="SpriteFontGlyph">
+                        <TextBlock Text="{Binding Character}">
+                            
+                        </TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Grid.Row="0">
+                    <local:GlyphEditor Font="{Binding CurrentFont}" Glyph="{Binding CurrentGlyph}" Scale="{Binding Scale}"/>
+                </ScrollViewer>
+                <Slider Minimum="1" Maximum="35" Value="{Binding Scale, Mode=TwoWay}" Grid.Row="1"/>
+            </Grid>
+            
+            <TabControl Grid.Column="2">
+                <TabItem Header="Glyph">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Text="Character"/>
+                        <TextBlock Grid.Row="1" Text="X"/>
+                        <TextBlock Grid.Row="2" Text="Y"/>
+                        <TextBlock Grid.Row="3" Text="Width"/>
+                        <TextBlock Grid.Row="4" Text="Height"/>
+                        <TextBlock Grid.Row="5" Text="Top"/>
+                        <TextBlock Grid.Row="6" Text="Left"/>
+                        <TextBlock Grid.Row="7" Text="Advance"/>
+
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CurrentGlyph.Character}"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CurrentGlyph.X}"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CurrentGlyph.Y}"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding CurrentGlyph.Width}"/>
+                        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding CurrentGlyph.Height}"/>
+                        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding CurrentGlyph.Top}"/>
+                        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding CurrentGlyph.Left}"/>
+                        <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding CurrentGlyph.Advance}"/>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Font">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Text="Line Height"/>
+                        <TextBlock Grid.Row="1" Text="Leading"/>
+                        <TextBlock Grid.Row="2" Text="Descent"/>
+
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CurrentFont.LineHeight}"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding CurrentFont.Leading}"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding CurrentFont.Descent}"/>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            <!--<Border Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="1" Background="{StaticResource Border}"/> -->
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Sample Text" Margin="5 10"/>
+            
+        </Grid>
+    </Grid>
+</Window>

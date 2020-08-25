@@ -14,7 +14,7 @@ void Screen::Render() {
             this->RenderViewportContents(i);
             UIElement* rootElement = this->_Viewports[i].GetRootUIElement();
             if (rootElement != nullptr) {
-                Game->GetRenderer().SetProjection(Math_Orthographic(0.0f, this->_Viewports[i].GetWidth() / (float)this->_Viewports[i].GetUIScale(), this->_Viewports[i].GetHeight() / (float)this->_Viewports[i].GetUIScale(), 0.0f, -100.0f, 100.0f));
+                Game->GetRenderer().SetProjection(Math_Orthographic(0.0f, this->_Viewports[i].GetWidth() / (float)this->_Viewports[i].GetUIScale(), 0.0f, this->_Viewports[i].GetHeight() / (float)this->_Viewports[i].GetUIScale(), -100.0f, 100.0f));
                 rootElement->Render(UIRectangle(0.0f, 0.0f, this->_Viewports[i].GetWidth() / (float)this->_Viewports[i].GetUIScale(), this->_Viewports[i].GetHeight() / (float)this->_Viewports[i].GetUIScale()));
             }
         }

@@ -1,5 +1,10 @@
 /build/
 /.vscode/
-/.vs/
+.vs/
 /cmake-build-*/
 /.idea/
+/.cmake/
+/out/
+bin/
+obj/
+*.user
