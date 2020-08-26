@@ -9,19 +9,19 @@
 #include "ui/UIDockContainer.h"
 #include "ui/UISprite.h"
 #include "ui/UITextBlock.h"
+#include "world/Player.h"
 #include "world/World.h"
 
 void WorldScreen::RenderViewportContents(size_t index) {
     Screen::RenderViewportContents(index);
     this->_World->Render(this->_Viewports[index].GetCamera());
 
-    Game->GetRenderer().DrawSprite(this->_PlayerAnimation, this->_Player->GetBounds().Position.X, this->_Player->GetBounds().Position.Y, 0.0f, 1.0f, 1.0f);
-    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "Dirt Reincarnate", this->_Player->GetBounds().Position.X - 1.25f, this->_Player->GetBounds().Position.Y + 0.75f, 0.0f, 1.0f / 32.0f, 0.0f);
+    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "Dirt Reincarnate", this->_Player->GetCollider()->GetBounds().Position.X - 1.25f, this->_Player->GetCollider()->GetBounds().Position.Y + 0.75f, 0.0f, 1.0f / 32.0f, 0.0f);
 
-    float x = this->_Player->GetBounds().Position.X;
-    float y = this->_Player->GetBounds().Position.Y + 1.0f;
+    float x = this->_Player->GetCollider()->GetBounds().Position.X;
+    float y = this->_Player->GetCollider()->GetBounds().Position.Y + 1.0f;
     float scale = 0.5f;
-    InputDevice* device = Game->GetMainWindow().GetInputDevice(0);
+    InputDevice* device = this->_Player->GetInputDevice();
     Game->GetRenderer().DrawSprite(device->GetSprite(), x, y, 0.0f, scale, scale);
     Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), device->GetName(), x - 0.25f, y + 0.5f, 0.0f, 1.0f / 64.0f, 0.0f);
 
@@ -35,8 +35,9 @@ void WorldScreen::RenderViewportContents(size_t index) {
     }
 }
 
-WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 5.0f, 5.0f), _Player(nullptr), _PlayerIdleAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_idle.pva"))->GetAsset<SpriteAnimation>()), _PlayerAnimation(allocator, this->_PlayerIdleAnimation), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr) {
-    this->_Player = this->_World->AddDynamicCollider(Vector2(0.0f, 3.0f), Vector2(0.15f, 0.35f), 1.0f);
+WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 5.0f, 5.0f), _Player(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr) {
+    this->_Player = allocator.New<Player>(Game->GetMainWindow().GetInputDevice(0));
+    this->_World->AddObject(this->_Player);
 
     const GLTexture* gunTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/weapons/pistol/icon.png"))->GetAsset<GLTexture>();
     this->_WeaponSprite = allocator.New<UISprite>(Sprite(gunTexture));
@@ -76,23 +77,9 @@ WorldScreen::~WorldScreen() {
 }
 
 void WorldScreen::Update(float timestep) {
-    InputDevice* device = Game->GetMainWindow().GetInputDevice(0);
-    if (this->_Player->IsOnGround() && device->GetInputElement(0)->GetValue() > 0.5f) {
-        this->_Player->GetVelocity().Y = 5.0f;
-    }
-    float speed = 3.0f;
-    float xvelocity = 0.0f;
-    if (device->GetInputElement(15)->GetValue() > 0.2f) {
-        xvelocity -= device->GetInputElement(15)->GetValue() * speed;
-    }
-    if (device->GetInputElement(16)->GetValue() > 0.2f) {
-        xvelocity += device->GetInputElement(16)->GetValue() * speed;
-    }
-    this->_Player->GetVelocity().X = xvelocity;
     this->_World->Update(timestep);
-    this->_PlayerAnimation.Advance(timestep);
 
-    this->_MainCamera.SetPosition(Math_BlendExp(this->_MainCamera.GetPosition(), this->_Player->GetBounds().Position, 0.05f, timestep));
+    this->_MainCamera.SetPosition(Math_BlendExp(this->_MainCamera.GetPosition(), this->_Player->GetCollider()->GetBounds().Position, 0.05f, timestep));
 }
 
 void WorldScreen::Resize(size_t width, size_t height) {

@@ -210,8 +210,8 @@
 #define HMM_PI 3.14159265358979323846
 #define HMM_EPSILON 0.00001f
 
-#define HMM_MIN(a, b) (a) > (b) ? (b) : (a)
-#define HMM_MAX(a, b) (a) < (b) ? (b) : (a)
+#define HMM_MIN(a, b) ((a) > (b) ? (b) : (a))
+#define HMM_MAX(a, b) ((a) < (b) ? (b) : (a))
 #define HMM_ABS(a) ((a) > 0 ? (a) : -(a))
 #define HMM_SIGN(a) ((a) >= 0 ? 1.0f : -1.0f)
 #define HMM_CLAMP(a, min, max) ((a) > (max) ? (max) : ((a) < (min) ? (min) : (a)))

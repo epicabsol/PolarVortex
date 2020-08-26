@@ -6,6 +6,7 @@
 
 class Allocator;
 class DynamicCollider;
+class Player;
 class SpriteAnimation;
 class UIAnimation;
 class UIDockContainer;
@@ -16,9 +17,7 @@ class WorldScreen : public Screen {
 private:
     World* _World;
     Camera _MainCamera;
-    DynamicCollider* _Player;
-    const SpriteAnimation* _PlayerIdleAnimation;
-    SpriteInstance _PlayerAnimation;
+    Player* _Player;
     UIDockContainer* _HUDContainer;
     UIDockContainer* _LeftContainer;
     UIDockContainer* _RightContainer;

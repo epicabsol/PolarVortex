@@ -5,6 +5,7 @@
 #include "game/PolarVortexGame.h"
 #include "render/GLTexture.h"
 #include "world/Collision.h"
+#include "world/Object.h"
 
 // How long after leaving the ground `DynamicCollder::IsOnGround()` becomes `false`.
 #define ONGROUND_THRESHOLD_TIME 0.3f
@@ -73,6 +74,12 @@ World::World(Allocator& allocator) : _Gravity(0.0f, -9.8f), _ColliderPool("World
     this->_DirtTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/tile_dirt.png"))->GetAsset<GLTexture>();
 }
 
+World::~World() {
+    for (size_t i = 0; i < this->_ObjectCount; i++) {
+        this->_Objects[i]->Removed();
+    }
+}
+
 Collider* World::AddCollider(Vector2 center, Vector2 halfSize) {
     return this->_ColliderPool.New<Collider>(BoundingBox(center, halfSize));
 }
@@ -87,6 +94,32 @@ DynamicCollider* World::AddDynamicCollider(Vector2 center, Vector2 halfSize, flo
 
 void World::RemoveDynamicCollider(DynamicCollider* collider) {
     this->_DynamicColliderPool.Delete(collider);
+}
+
+void World::AddObject(Object* object) {
+    assert(this->_ObjectCount < MAX_OBJECTS);
+
+    this->_Objects[this->_ObjectCount] = object;
+    ++this->_ObjectCount;
+    object->_World = this;
+    object->Added();
+}
+
+void World::RemoveObject(Object* object, bool immediate) {
+    object->Removed();
+    object->_World = nullptr;
+    if (immediate) {
+        for (size_t i = 0; i < this->_ObjectCount; i++) {
+            if (this->_Objects[i] == object) {
+                this->_Objects[i] = this->_Objects[this->_ObjectCount - 1];
+                --this->_ObjectCount;
+                break;
+            }
+        }
+    }
+    else {
+        object->_Remove = true;
+    }
 }
 
 void World::Update(float timestep) {
@@ -108,6 +141,18 @@ void World::Update(float timestep) {
     for (DynamicCollider& dynamic : this->_DynamicColliderPool) {
         dynamic._StepForce = this->_Gravity;
     }
+    // 4. Update Objects
+    for (size_t i = 0; i < this->_ObjectCount; i++) {
+        this->_Objects[i]->Update(timestep);
+    }
+    // 5. Remove all Objects marked for removal
+    for (size_t i = 0; i < this->_ObjectCount; i++) {
+        if (this->_Objects[i]->_Remove) {
+            this->_Objects[i] = this->_Objects[this->_ObjectCount - 1];
+            --this->_ObjectCount;
+            i--;
+        }
+    }
 }
 
 void World::Render(Camera* camera) {
@@ -116,5 +161,8 @@ void World::Render(Camera* camera) {
     }
     for (const DynamicCollider& collider : this->_DynamicColliderPool) {
         Game->GetRenderer().DrawSprite(this->_DirtTexture, collider.GetBounds().Position.X, collider.GetBounds().Position.Y, 0.0f, collider.GetBounds().HalfSize.X * 2.0f, collider.GetBounds().HalfSize.Y * 2.0f);
+    }
+    for (size_t i = 0; i < this->_ObjectCount; i++) {
+        this->_Objects[i]->Render();
     }
 }

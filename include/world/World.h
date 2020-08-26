@@ -2,6 +2,7 @@
 
 #define MAX_DYNAMIC_COLLIDERS (1 << 8)
 #define MAX_COLLIDERS (1 << 10)
+#define MAX_OBJECTS (1 << 8)
 
 #include "Collider.h"
 #include "DynamicCollider.h"
@@ -9,6 +10,7 @@
 
 class Camera;
 class GLTexture;
+class Object;
 
 class World {
 private:
@@ -19,6 +21,8 @@ private:
 
     char _ColliderPoolBuffer[sizeof(Collider) * MAX_COLLIDERS];
     char _DynamicColliderPoolBuffer[sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS];
+    Object* _Objects[MAX_OBJECTS];
+    size_t _ObjectCount;
 
     /**
      * @brief Moves the given dynamic collider according to its velocity for up to the given amount of time, or until it collides.
@@ -31,11 +35,14 @@ private:
 
 public:
     World(Allocator& allocator);
+    ~World();
 
     Collider* AddCollider(Vector2 center, Vector2 halfSize);
     void RemoveCollider(Collider* collider);
     DynamicCollider* AddDynamicCollider(Vector2 center, Vector2 halfSize, float mass);
     void RemoveDynamicCollider(DynamicCollider* collider);
+    void AddObject(Object* object);
+    void RemoveObject(Object* object, bool immediate = false);
 
     void Update(float timestep);
     void Render(Camera* camera);
