@@ -3,7 +3,7 @@
 #include "game/Camera.h"
 #include "ui/UIElement.h"
 
-#define UI_GOAL_HEIGHT 128
+#define UI_GOAL_HEIGHT 256
 
 void Viewport::SetCamera(Camera* camera) {
     this->_Camera = camera;

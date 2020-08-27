@@ -10,9 +10,9 @@ class World;
 
 enum class PlayerState {
     Idle,
-    JumpCrouch,
+    Crouch,
     Midair,
-    JumpRecover
+    CrouchStand,
 };
 
 class Player : public Object {
@@ -22,6 +22,7 @@ private:
     InputDevice* _InputDevice;
 
     const SpriteAnimation* _IdleAnimation;
+    const SpriteAnimation* _CrouchAnimation;
     const SpriteAnimation* _JumpAnimation;
 
     SpriteInstance _CurrentAnimation;
@@ -31,6 +32,8 @@ private:
     virtual void Update(float timestep) override;
     virtual void Render() override;
     virtual void Removed() override;
+
+    void EnterState(PlayerState state);
 
 public:
     Player(Allocator& allocator, InputDevice* inputDevice);

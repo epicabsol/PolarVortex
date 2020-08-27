@@ -16,11 +16,11 @@ void WorldScreen::RenderViewportContents(size_t index) {
     Screen::RenderViewportContents(index);
     this->_World->Render(this->_Viewports[index].GetCamera());
 
-    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "Dirt Reincarnate", this->_Player->GetCollider()->GetBounds().Position.X - 1.25f, this->_Player->GetCollider()->GetBounds().Position.Y + 0.75f, 0.0f, 1.0f / 32.0f, 0.0f);
+    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "CPT. Skytear", this->_Player->GetCollider()->GetBounds().Position.X - 0.65f, this->_Player->GetCollider()->GetBounds().Position.Y + 0.75f, 0.0f, 1.0f / 64.0f, 0.0f);
 
     float x = this->_Player->GetCollider()->GetBounds().Position.X;
     float y = this->_Player->GetCollider()->GetBounds().Position.Y + 1.0f;
-    float scale = 0.5f;
+    float scale = 0.25f;
     InputDevice* device = this->_Player->GetInputDevice();
     Game->GetRenderer().DrawSprite(device->GetSprite(), x, y, 0.0f, scale, scale);
     Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), device->GetName(), x - 0.25f, y + 0.5f, 0.0f, 1.0f / 64.0f, 0.0f);
@@ -39,7 +39,7 @@ WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(alloc
     this->_Player = allocator.New<Player>(Game->GetMainWindow().GetInputDevice(0));
     this->_World->AddObject(this->_Player);
 
-    const GLTexture* gunTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/weapons/pistol/icon.png"))->GetAsset<GLTexture>();
+    const GLTexture* gunTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/weapons/pistol/icon_2x.png"))->GetAsset<GLTexture>();
     this->_WeaponSprite = allocator.New<UISprite>(Sprite(gunTexture));
     this->_RightContainer = allocator.New<UIDockContainer>(10);
     this->_LeftContainer = allocator.New<UIDockContainer>(10);
@@ -50,18 +50,16 @@ WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(alloc
     const SpriteFont* font = Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>();
     UITextBlock* weaponName = allocator.New<UITextBlock>(font);
     weaponName->SetText("Reflex HC2");
-    weaponName->SetScale(0.5f);
     weaponName->SetHorizontalAlignment(UIAlignment::Far);
     weaponName->SetMargins(UIMargins(0.0f, 2.0f, 3.0f, -4.0f));
     this->_RightContainer->AddElement(weaponName, DockSide::Bottom);
 
-    UISprite* playerHead = allocator.New<UISprite>(Sprite(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/icon_helmet.png"))->GetAsset<GLTexture>(), 0, 0, 16, 16));
-    playerHead->SetMargins(UIMargins(4.0f, 0.0f, 4.0f, 8.0f));
+    UISprite* playerHead = allocator.New<UISprite>(Sprite(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/icon_helmet.png"))->GetAsset<GLTexture>(), 0, 24, 24, 24));
+    playerHead->SetMargins(UIMargins(0.0f, 0.0f, 0.0f, 2.0f));
     this->_LeftContainer->AddElement(playerHead, DockSide::Bottom);
     UITextBlock* playerName = allocator.New<UITextBlock>(font);
     playerName->SetText("CPT. Skytear");
-    playerName->SetScale(0.5f);
-    playerName->SetMargins(UIMargins(3.0f, 2.0f, 0.0f, 2.0f));
+    playerName->SetMargins(UIMargins(3.0f, 2.0f, 0.0f, 0.0f));
     this->_LeftContainer->AddElement(playerName, DockSide::Bottom);
 
     this->_HUDContainer->AddElement(this->_RightContainer, DockSide::Right);

@@ -64,12 +64,12 @@ World::World(Allocator& allocator) : _Gravity(0.0f, -9.8f), _ColliderPool("World
     this->AddCollider(Vector2(0.0f, 0.0f), Vector2(5.0f, 0.5f));
     this->AddCollider(Vector2(-5.0f, 1.0f), Vector2(0.25f, 0.25f));
 
-    for (float f = -4.0f; f <= 2.5f; f += 1.0f) {
+    /*for (float f = -4.0f; f <= 2.5f; f += 1.0f) {
         DynamicCollider* dynamic = this->AddDynamicCollider(Vector2(f, 2.0f), Vector2(0.25f, 0.25f), 0.125f);
         dynamic->_Velocity = Vector2(-2.5f, 0.0f);
         dynamic->_Restitution = 0.1f;
         dynamic->_Friction = 0.1f;
-    }
+    }*/
 
     this->_DirtTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/tile_dirt.png"))->GetAsset<GLTexture>();
 }
@@ -159,9 +159,9 @@ void World::Render(Camera* camera) {
     for (const Collider& collider : this->_ColliderPool) {
         Game->GetRenderer().DrawSprite(nullptr, collider.GetBounds().Position.X, collider.GetBounds().Position.Y, 0.0f, collider.GetBounds().HalfSize.X * 2.0f, collider.GetBounds().HalfSize.Y * 2.0f);
     }
-    for (const DynamicCollider& collider : this->_DynamicColliderPool) {
+    /*for (const DynamicCollider& collider : this->_DynamicColliderPool) {
         Game->GetRenderer().DrawSprite(this->_DirtTexture, collider.GetBounds().Position.X, collider.GetBounds().Position.Y, 0.0f, collider.GetBounds().HalfSize.X * 2.0f, collider.GetBounds().HalfSize.Y * 2.0f);
-    }
+    }*/
     for (size_t i = 0; i < this->_ObjectCount; i++) {
         this->_Objects[i]->Render();
     }

@@ -2,35 +2,35 @@
     "frames": [
         {
             "texture": "assets/sprites/character/character.png",
-            "duration": 0.5,
+            "duration": 0.25,
             "x": 0,
             "y": 0,
-            "width": 32,
-            "height": 32
+            "width": 64,
+            "height": 64
+        },
+        {
+            "texture": "assets/sprites/character/character.png",
+            "duration": 0.0666666,
+            "x": 64,
+            "y": 0,
+            "width": 64,
+            "height": 64
         },
         {
             "texture": "assets/sprites/character/character.png",
             "duration": 0.25,
-            "x": 32,
-            "y": 0,
-            "width": 32,
-            "height": 32
-        },
-        {
-            "texture": "assets/sprites/character/character.png",
-            "duration": 0.5,
             "x": 0,
-            "y": 32,
-            "width": 32,
-            "height": 32
+            "y": 64,
+            "width": 64,
+            "height": 64
         },
         {
             "texture": "assets/sprites/character/character.png",
-            "duration": 0.25,
-            "x": 32,
-            "y": 32,
-            "width": 32,
-            "height": 32
+            "duration": 0.0666666,
+            "x": 64,
+            "y": 64,
+            "width": 64,
+            "height": 64
         }
     ]
 }
