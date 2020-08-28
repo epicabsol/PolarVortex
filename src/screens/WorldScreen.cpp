@@ -14,6 +14,10 @@
 
 void WorldScreen::RenderViewportContents(size_t index) {
     Screen::RenderViewportContents(index);
+
+    Camera* camera = this->_Viewports[index].GetCamera();
+    Game->GetRenderer().DrawSprite(this->_GridTexture, camera->GetPosition().X - camera->GetSize().X * 0.5f + 0.5f / this->_GridTexture->GetWidth(), -camera->GetPosition().Y - camera->GetSize().Y - 0.5f / this->_GridTexture->GetHeight(), camera->GetSize().X, camera->GetSize().Y, camera->GetPosition().X, camera->GetPosition().Y, 0.0f, camera->GetSize().X, camera->GetSize().Y);
+
     this->_World->Render(this->_Viewports[index].GetCamera());
 
     Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "CPT. Skytear", this->_Player->GetCollider()->GetBounds().Position.X - 0.65f, this->_Player->GetCollider()->GetBounds().Position.Y + 0.75f, 0.0f, 1.0f / 64.0f, 0.0f);
@@ -35,7 +39,7 @@ void WorldScreen::RenderViewportContents(size_t index) {
     }
 }
 
-WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 5.0f, 5.0f), _Player(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr) {
+WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 5.0f, 5.0f), _Player(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr), _GridTexture(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/grid.png"))->GetAsset<GLTexture>()) {
     this->_Player = allocator.New<Player>(Game->GetMainWindow().GetInputDevice(0));
     this->_World->AddObject(this->_Player);
 

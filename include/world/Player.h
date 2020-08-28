@@ -20,6 +20,7 @@ private:
     PlayerState _State;
     float _StateTime;
     InputDevice* _InputDevice;
+    float _XFlip;
 
     const SpriteAnimation* _IdleAnimation;
     const SpriteAnimation* _CrouchAnimation;

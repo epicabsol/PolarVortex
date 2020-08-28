@@ -22,6 +22,7 @@ private:
     UIDockContainer* _LeftContainer;
     UIDockContainer* _RightContainer;
     UISprite* _WeaponSprite;
+    const GLTexture* _GridTexture;
 
     virtual void RenderViewportContents(size_t index) override;
 

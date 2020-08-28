@@ -77,15 +77,17 @@ void Player::Update(float timestep) {
     float xvelocity = 0.0f;
     if (this->_InputDevice->GetInputElement(15)->GetValue() > 0.2f) {
         xvelocity -= this->_InputDevice->GetInputElement(15)->GetValue() * movementSpeed;
+        this->_XFlip = -1.0f;
     }
     if (this->_InputDevice->GetInputElement(16)->GetValue() > 0.2f) {
         xvelocity += this->_InputDevice->GetInputElement(16)->GetValue() * movementSpeed;
+        this->_XFlip = 1.0f;
     }
     this->_Collider->GetVelocity().X = xvelocity;
 }
 
 void Player::Render() {
-    Game->GetRenderer().DrawSprite(this->_CurrentAnimation, this->_Collider->GetBounds().Position.X, this->_Collider->GetBounds().Position.Y, 0.0f, 1.0f, 1.0f);
+    Game->GetRenderer().DrawSprite(this->_CurrentAnimation, this->_Collider->GetBounds().Position.X, this->_Collider->GetBounds().Position.Y, 0.0f, 1.0f * this->_XFlip, 1.0f);
 }
 
 void Player::Removed() {
@@ -123,6 +125,6 @@ void Player::EnterState(PlayerState state) {
     this->_StateTime = 0.0f;
 }
 
-Player::Player(Allocator& allocator, InputDevice* inputDevice) : _State(PlayerState::Idle), _StateTime(0.0f), Object(allocator), _InputDevice(inputDevice), _IdleAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_idle.pva"))->GetAsset<SpriteAnimation>()), _CrouchAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_crouch.pva"))->GetAsset<SpriteAnimation>()), _JumpAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_jump.pva"))->GetAsset<SpriteAnimation>()), _CurrentAnimation(allocator, this->_IdleAnimation), _Collider(nullptr) {
+Player::Player(Allocator& allocator, InputDevice* inputDevice) : _State(PlayerState::Idle), _StateTime(0.0f), Object(allocator), _InputDevice(inputDevice), _XFlip(1.0f), _IdleAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_idle.pva"))->GetAsset<SpriteAnimation>()), _CrouchAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_crouch.pva"))->GetAsset<SpriteAnimation>()), _JumpAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_jump.pva"))->GetAsset<SpriteAnimation>()), _CurrentAnimation(allocator, this->_IdleAnimation), _Collider(nullptr) {
 
 }
