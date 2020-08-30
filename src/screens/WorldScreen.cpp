@@ -58,8 +58,8 @@ WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(alloc
     weaponName->SetMargins(UIMargins(0.0f, 2.0f, 3.0f, -4.0f));
     this->_RightContainer->AddElement(weaponName, DockSide::Bottom);
 
-    UISprite* playerHead = allocator.New<UISprite>(Sprite(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/icon_helmet.png"))->GetAsset<GLTexture>(), 0, 24, 24, 24));
-    playerHead->SetMargins(UIMargins(0.0f, 0.0f, 0.0f, 2.0f));
+    UISprite* playerHead = allocator.New<UISprite>(Sprite(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/icon_helmet.png"))->GetAsset<GLTexture>(), 0, 48, 48, 48));
+    playerHead->SetMargins(UIMargins(3.0f, 0.0f, 0.0f, 12.0f));
     this->_LeftContainer->AddElement(playerHead, DockSide::Bottom);
     UITextBlock* playerName = allocator.New<UITextBlock>(font);
     playerName->SetText("CPT. Skytear");
