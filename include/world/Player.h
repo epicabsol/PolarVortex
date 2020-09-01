@@ -13,6 +13,7 @@ enum class PlayerState {
     Crouch,
     Midair,
     CrouchStand,
+    Run,
 };
 
 class Player : public Object {
@@ -25,6 +26,7 @@ private:
     const SpriteAnimation* _IdleAnimation;
     const SpriteAnimation* _CrouchAnimation;
     const SpriteAnimation* _JumpAnimation;
+    const SpriteAnimation* _RunAnimation;
 
     SpriteInstance _CurrentAnimation;
     DynamicCollider* _Collider;

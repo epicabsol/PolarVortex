@@ -9,6 +9,7 @@
 #include "world/World.h"
 
 #define FRAME_LENGTH (1.0f / 30.0f)
+#define RUN_THRESHOLD (0.1f)
 
 void Player::Added() {
     this->_Collider = this->_World->AddDynamicCollider(Vector2(0.0f, 3.0f), Vector2(0.15f, 0.45f), 1.0f);
@@ -18,7 +19,7 @@ void Player::Update(float timestep) {
     this->_CurrentAnimation.Advance(timestep);
     this->_StateTime += timestep;
 
-    float movementSpeed = 3.0f;
+    float movementSpeed = 2.5f;
 
     switch (this->_State) {
         case PlayerState::Idle: {
@@ -29,6 +30,9 @@ void Player::Update(float timestep) {
                 else if (this->_InputDevice->GetInputElement(0)->GetValue() > 0.5f) {
                     this->_Collider->GetVelocity().Y = 4.0;
                     this->EnterState(PlayerState::Midair);
+                }
+                else if (this->_Collider->GetVelocity().X > RUN_THRESHOLD || this->_Collider->GetVelocity().X < -RUN_THRESHOLD) {
+                    this->EnterState(PlayerState::Run);
                 }
             }
             else if (this->_StateTime > FRAME_LENGTH * 2.0f) {
@@ -70,6 +74,28 @@ void Player::Update(float timestep) {
             if (this->_StateTime >= FRAME_LENGTH) {
                 this->EnterState(PlayerState::Idle);
             }
+            break;
+        }
+        case PlayerState::Run: {
+            if (this->_Collider->IsOnGround()) {
+                if (this->_StateTime > FRAME_LENGTH * 2.0f && this->_InputDevice->GetInputElement(18)->GetValue() > 0.5f) {
+                    // TODO: Slide animation
+                    this->EnterState(PlayerState::Crouch);
+                }
+                else if (this->_InputDevice->GetInputElement(0)->GetValue() > 0.5f) {
+                    this->_Collider->GetVelocity().Y = 4.0;
+                    this->EnterState(PlayerState::Midair);
+                }
+                else if (this->_Collider->GetVelocity().X < RUN_THRESHOLD && this->_Collider->GetVelocity().X > -RUN_THRESHOLD) {
+                    this->EnterState(PlayerState::Idle);
+                }
+                else {
+                    this->_CurrentAnimation.SetTimeScale(HMM_ABS(this->_Collider->GetVelocity().X) / movementSpeed);
+                }            }
+            else if (this->_StateTime > FRAME_LENGTH * 2.0f) {
+                this->EnterState(PlayerState::Midair);
+            }
+
             break;
         }
     }
@@ -120,11 +146,17 @@ void Player::EnterState(PlayerState state) {
             this->_CurrentAnimation.SetFrameIndex(0);
             break;
         }
+        case PlayerState::Run: {
+            this->_CurrentAnimation.SetAnimation(this->_RunAnimation);
+            this->_CurrentAnimation.SetTimeScale(1.0f);
+            this->_CurrentAnimation.SetFrameIndex(0);
+            break;
+        }
     }
     this->_State = state;
     this->_StateTime = 0.0f;
 }
 
-Player::Player(Allocator& allocator, InputDevice* inputDevice) : _State(PlayerState::Idle), _StateTime(0.0f), Object(allocator), _InputDevice(inputDevice), _XFlip(1.0f), _IdleAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_idle.pva"))->GetAsset<SpriteAnimation>()), _CrouchAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_crouch.pva"))->GetAsset<SpriteAnimation>()), _JumpAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_jump.pva"))->GetAsset<SpriteAnimation>()), _CurrentAnimation(allocator, this->_IdleAnimation), _Collider(nullptr) {
+Player::Player(Allocator& allocator, InputDevice* inputDevice) : _State(PlayerState::Idle), _StateTime(0.0f), Object(allocator), _InputDevice(inputDevice), _XFlip(1.0f), _IdleAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_idle.pva"))->GetAsset<SpriteAnimation>()), _CrouchAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_crouch.pva"))->GetAsset<SpriteAnimation>()), _JumpAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_jump.pva"))->GetAsset<SpriteAnimation>()), _RunAnimation(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/character/character_run.pva"))->GetAsset<SpriteAnimation>()), _CurrentAnimation(allocator, this->_IdleAnimation), _Collider(nullptr) {
 
 }
