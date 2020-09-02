@@ -102,6 +102,21 @@ void GLRenderer::DrawSprite(const GLTexture* texture, float u, float v, float uS
     this->DrawMesh(this->_SquareMesh, this->_SpriteShader);
 }
 
+void GLRenderer::DrawNineSlice(const Sprite& sprite, float x, float y, float z, float width, float height, Vector4 distances) const {
+    // Turn pixel distances into UV distances
+    Vector4 distancesScaled = Vector4(distances.X / sprite.Texture->GetWidth(), distances.Y / sprite.Texture->GetHeight(), distances.Z / sprite.Texture->GetWidth(), distances.W / sprite.Texture->GetHeight());
+
+    this->DrawSprite(sprite.Texture, sprite.UMin, sprite.VMin, distancesScaled.X, distancesScaled.Y, x - width * 0.5f + distances.X * 0.5f, y + height * 0.5f - distances.Y * 0.5f, z, distances.X, distances.Y); // Top left
+    this->DrawSprite(sprite.Texture, sprite.UMin + distancesScaled.X, sprite.VMin, sprite.USize - distancesScaled.X - distancesScaled.Z, distancesScaled.Y, x, y + height * 0.5f - distances.Y * 0.5f, z, width - distances.X - distances.Z, distances.Y); // Top
+    this->DrawSprite(sprite.Texture, sprite.UMin + sprite.USize - distancesScaled.Z, sprite.VMin, distancesScaled.Z, distancesScaled.Y, x + width * 0.5f - distances.Z * 0.5f, y + height * 0.5f - distances.Y * 0.5f, z, distances.Z, distances.Y); // Top right
+    this->DrawSprite(sprite.Texture, sprite.UMin + sprite.USize - distancesScaled.Z, sprite.VMin + distancesScaled.Y, distancesScaled.Z, sprite.VSize - distancesScaled.Y - distancesScaled.W, x + width * 0.5f - distances.Z * 0.5f, y, z, distances.Z, height - distances.Y - distances.W); // Right
+    this->DrawSprite(sprite.Texture, sprite.UMin + sprite.USize - distancesScaled.Z, sprite.VMin + sprite.VSize - distancesScaled.W, distancesScaled.Z, distancesScaled.W, x + width * 0.5f - distances.Z * 0.5f, y - height * 0.5f + distances.W * 0.5f, z, distances.Z, distances.W); // Bottom right
+    this->DrawSprite(sprite.Texture, sprite.UMin + distancesScaled.X, sprite.VMin + sprite.VSize - distancesScaled.W, sprite.USize - distancesScaled.X - distancesScaled.Z, distancesScaled.W, x, y - height * 0.5f + distances.W * 0.5f, z, width - distances.X - distances.Z, distances.W); // Bottom
+    this->DrawSprite(sprite.Texture, sprite.UMin, sprite.VMin + sprite.VSize - distancesScaled.W, distancesScaled.X, distancesScaled.W, x - width * 0.5f + distances.X * 0.5f, y - height * 0.5f + distances.W * 0.5f, z, distances.X, distances.W); // Bottom left
+    this->DrawSprite(sprite.Texture, sprite.UMin, sprite.VMin + distancesScaled.Y, distancesScaled.X, sprite.VSize - distancesScaled.Y - distancesScaled.W, x - width * 0.5f + distances.X * 0.5f, y, z, distances.X, height - distances.X - distances.W); // Left
+    this->DrawSprite(sprite.Texture, sprite.UMin + distancesScaled.X, sprite.VMin + distancesScaled.Y, sprite.USize - distancesScaled.X - distancesScaled.Z, sprite.VSize - distancesScaled.Y - distancesScaled.W, x, y, z, width - distances.X - distances.Z, height - distances.Y - distances.W); // Center
+}
+
 void GLRenderer::DrawString(const SpriteFont* font, const char* string, float x, float y, float z, float scale, float maxWidth) {
     float startX = x;
 

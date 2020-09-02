@@ -31,5 +31,6 @@ public:
     inline void DrawSprite(const GLTexture* texture, float x, float y, float z, float width, float height) const { this->DrawSprite(texture, 0.0f, 0.0f, 1.0f, 1.0f, x, y, z, width, height); }
     inline void DrawSprite(const Sprite& sprite, float x, float y, float z, float width, float height) const { this->DrawSprite(sprite.Texture, sprite.UMin, sprite.VMin, sprite.USize, sprite.VSize, x, y, z, width, height); }
     void DrawSprite(const GLTexture* texture, float u, float v, float uSize, float vSize, float x, float y, float z, float width, float height) const;
+    void DrawNineSlice(const Sprite& sprite, float x, float y, float z, float width, float height, Vector4 distances) const;
     void DrawString(const SpriteFont* font, const char* string, float x, float y, float z, float scale, float maxWidth);
 };

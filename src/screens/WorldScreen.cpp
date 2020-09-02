@@ -6,6 +6,7 @@
 #include "input/InputElement.h"
 #include "memory/Memory.h"
 #include "ui/UIAnimation.h"
+#include "ui/UIButton.h"
 #include "ui/UIDockContainer.h"
 #include "ui/UISprite.h"
 #include "ui/UITextBlock.h"
@@ -61,7 +62,8 @@ WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(alloc
     UISprite* playerHead = allocator.New<UISprite>(Sprite(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/icon_helmet.png"))->GetAsset<GLTexture>(), 0, 48, 48, 48));
     playerHead->SetMargins(UIMargins(3.0f, 0.0f, 0.0f, 12.0f));
     this->_LeftContainer->AddElement(playerHead, DockSide::Bottom);
-    UITextBlock* playerName = allocator.New<UITextBlock>(font);
+    //UITextBlock* playerName = allocator.New<UITextBlock>(font);
+    UIButton* playerName = allocator.New<UIButton>(font);
     playerName->SetText("CPT. Skytear");
     playerName->SetMargins(UIMargins(3.0f, 2.0f, 0.0f, 0.0f));
     this->_LeftContainer->AddElement(playerName, DockSide::Bottom);
