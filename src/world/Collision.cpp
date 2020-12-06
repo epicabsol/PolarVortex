@@ -125,3 +125,15 @@ bool SweptBoundingBoxIntersectsBoundingBox(const BoundingBox& bounds1, const Vec
         return false;
     }
 }
+
+bool SegmentIntersectsWorld(const Vector2& start, const Vector2& end, const World* world, Intersection& intersection) {
+
+    int cellX = (int)Math_Floor
+
+    return false;
+}
+
+bool SweptBoundingBoxIntersectsWorld(const BoundingBox& bounds, const Vector2& end, const World* world, Intersection& intersection) {
+    // TODO: Implement!
+    return false;
+}
