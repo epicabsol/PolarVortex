@@ -8,6 +8,7 @@
 #include "render/GLTexture.h"
 #include "render/SpriteAnimation.h"
 #include "render/SpriteFont.h"
+#include "world/TilePalette.h"
 
 #define ASSET_MAX_COUNT 64
 #define DATA_ALLOCATOR_SIZE (1024 * 1024 * 32)
@@ -72,4 +73,6 @@ void AssetManager::InitializeAssets() {
     this->InitializeAssetsWithType<SpriteAnimation>(STRINGHASH(".pva"));
     // .pvf: SpriteFont
     this->InitializeAssetsWithType<SpriteFont>(STRINGHASH(".pvf"));
+    // .pvp: TilePalette
+    this->InitializeAssetsWithType<TilePalette>(STRINGHASH(".pvp"));
 }
