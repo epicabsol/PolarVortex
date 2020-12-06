@@ -58,11 +58,13 @@ float World::StepDynamic(DynamicCollider& dynamic, float timestep) {
     return (1.0f - closestIntersection.Time) * timestep;
 }
 
-World::World(Allocator& allocator) : _Gravity(0.0f, -9.8f), _ColliderPool("World Collider Pool", this->_ColliderPoolBuffer, sizeof(Collider) * MAX_COLLIDERS), _DynamicColliderPool("World Dynamic Collider Pool", this->_DynamicColliderPoolBuffer, sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS), _DirtTexture(nullptr) {
+World::World(Allocator& allocator) : _Allocator(allocator), _TilePalette(nullptr), _Tiles(nullptr), _Width(32), _Height(32), _Gravity(0.0f, -9.8f), _ColliderPool("World Collider Pool", this->_ColliderPoolBuffer, sizeof(Collider) * MAX_COLLIDERS), _DynamicColliderPool("World Dynamic Collider Pool", this->_DynamicColliderPoolBuffer, sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS), _DirtTexture(nullptr) {
+
+    this->_TilePalette = Game->GetAssetManager().GetAsset(STRINGHASH("assets/tilemaps/grassland.pvp"))->GetAsset<TilePalette>();
 
     // TEMP: Add some test colliders.
-    this->AddCollider(Vector2(0.0f, 0.0f), Vector2(5.0f, 0.5f));
-    this->AddCollider(Vector2(-5.0f, 1.0f), Vector2(0.25f, 0.25f));
+    this->AddCollider(Vector2(16.0f, -0.5f), Vector2(16.0f, 0.5f));
+    this->AddCollider(Vector2(0.0f, 0.0f), Vector2(0.25f, 0.25f));
 
     /*for (float f = -4.0f; f <= 2.5f; f += 1.0f) {
         DynamicCollider* dynamic = this->AddDynamicCollider(Vector2(f, 2.0f), Vector2(0.25f, 0.25f), 0.125f);
@@ -72,9 +74,24 @@ World::World(Allocator& allocator) : _Gravity(0.0f, -9.8f), _ColliderPool("World
     }*/
 
     this->_DirtTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/tile_dirt.png"))->GetAsset<GLTexture>();
+
+    this->_Tiles = (WorldTile*)allocator.Allocate(sizeof(WorldTile) * this->_Width * this->_Height);
+    for (size_t y = 0; y < this->_Height; y++) {
+        for (size_t x = 0; x < this->_Width; x++) {
+            this->GetTile(x, y).Collides = (y == 0);
+            this->GetTile(x, y).PaletteIndex = (y == 0) ? 5 : -1;
+        }
+    }
+    this->GetTile(0, 0).PaletteIndex = 4;
+    this->GetTile(this->GetWidth() - 1, 0).PaletteIndex = 6;
+    this->GetTile(12, 1).PaletteIndex = 2;
+    this->GetTile(15, 1).PaletteIndex = 0;
+    this->GetTile(16, 1).PaletteIndex = 1;
 }
 
 World::~World() {
+    this->_Allocator.Free(this->_Tiles);
+    this->_Tiles = nullptr;
     for (size_t i = 0; i < this->_ObjectCount; i++) {
         this->_Objects[i]->Removed();
     }

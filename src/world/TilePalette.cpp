@@ -20,5 +20,7 @@ TilePalette::TilePalette(Allocator& allocator, const char* data, size_t dataLeng
     this->_TileWidth = tileSize / this->_Texture->GetWidth();
     this->_TileHeight = tileSize / this->_Texture->GetHeight();
 
+    this->_Stride = this->_Texture->GetWidth() / (size_t)tileSize;
+
     allocator.Free(parseBuffer);
 }

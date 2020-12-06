@@ -11,9 +11,21 @@
 class Camera;
 class GLTexture;
 class Object;
+class TilePalette;
+
+struct WorldTile {
+    int16_t PaletteIndex;
+    bool Collides;
+};
 
 class World {
 private:
+    Allocator& _Allocator;
+    const TilePalette* _TilePalette;
+    WorldTile* _Tiles;
+    size_t _Width;
+    size_t _Height;
+
     Vector2 _Gravity;
     IterablePoolAllocator<Collider> _ColliderPool;
     IterablePoolAllocator<DynamicCollider> _DynamicColliderPool;
@@ -36,6 +48,12 @@ private:
 public:
     World(Allocator& allocator);
     ~World();
+
+    inline const TilePalette* GetTilePalette() const { return this->_TilePalette; }
+    inline WorldTile& GetTile(size_t x, size_t y) { return this->_Tiles[y * this->_Width + x]; }
+    inline size_t GetWidth() const { return this->_Width; }
+    inline size_t GetHeight() const { return this->_Height; }
+    const WorldTile* GetTiles() const { return this->_Tiles; }
 
     Collider* AddCollider(Vector2 center, Vector2 halfSize);
     void RemoveCollider(Collider* collider);

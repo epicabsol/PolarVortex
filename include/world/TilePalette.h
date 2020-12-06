@@ -13,6 +13,7 @@ private:
     const GLTexture* _Texture; // The texture to draw with
     float _TileWidth; // In UV space
     float _TileHeight; // In UV space
+    size_t _Stride; // Tiles per row
 
 public:
     TilePalette(Allocator& allocator, const char* data, size_t dataLength);
@@ -38,4 +39,6 @@ public:
      * @return The height of a single tile.
      */
     inline float GetTileHeight() const { return this->_TileHeight; }
+
+    inline size_t GetStride() const { return this->_Stride; }
 };

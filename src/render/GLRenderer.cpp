@@ -12,34 +12,34 @@
 #include "render/Math.h"
 #include "render/SpriteFont.h"
 
-float SquareMeshVertices[] = {
+static float SquareMeshVertices[] = {
     0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
     0.5f, -0.5f, 0.0f, 1.0f, 1.0f,
     -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
     -0.5f, 0.5f, 0.0f, 0.0f, 0.0f,
 };
-const size_t SquareMeshVertexCount = 4;
+static const size_t SquareMeshVertexCount = 4;
 
-unsigned char SquareMeshIndices[] = {
+static unsigned char SquareMeshIndices[] = {
     0, 1, 3,
     1, 2, 3,
 };
-const size_t SquareMeshIndexCount = 6;
+static const size_t SquareMeshIndexCount = 6;
 
-GLVertexAttribute SpriteVertexAttributes[] = {
+static GLVertexAttribute SpriteVertexAttributes[] = {
     { 3, GL_FLOAT, sizeof(float) },
     { 2, GL_FLOAT, sizeof(float) },
 };
-const size_t SpriteVertexAttributeCount = 2;
+static const size_t SpriteVertexAttributeCount = 2;
 
-unsigned char DefaultTextureData[] = {
+static unsigned char DefaultTextureData[] = {
     255, 0, 255, 255, 255, 0, 255, 255, 0, 255, 0, 255, 0, 255, 0, 255,
     255, 0, 255, 255, 255, 0, 255, 255, 0, 255, 0, 255, 0, 255, 0, 255,
     0, 255, 0, 255, 0, 255, 0, 255, 255, 0, 255, 255, 255, 0, 255, 255,
     0, 255, 0, 255, 0, 255, 0, 255, 255, 0, 255, 255, 255, 0, 255, 255,
 };
-unsigned int DefaultTextureWidth = 4;
-unsigned int DefaultTextureHeight = 4;
+static unsigned int DefaultTextureWidth = 4;
+static unsigned int DefaultTextureHeight = 4;
 
 GLRenderer::GLRenderer(Allocator& allocator) : _Allocator(allocator) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -75,14 +75,18 @@ void GLRenderer::SetProjection(const Matrix& projection) {
     this->_Projection = projection;
 }
 
-void GLRenderer::DrawMesh(GLMesh* mesh, GLShaderProgram* shader) const {
+GLMesh* GLRenderer::CreateSpriteMesh(Allocator& allocator, const SpriteVertex* vertexData, size_t vertexCount, const void* indexData, size_t indexSize, size_t indexCount) {
+    return allocator.New<GLMesh>(SpriteVertexAttributes, SpriteVertexAttributeCount, vertexData, vertexCount, indexData, indexSize, indexCount);
+}
+
+void GLRenderer::DrawMesh(const GLMesh* mesh, const GLShaderProgram* shader) const {
     glUseProgram(shader->GetProgramHandle());
     glBindVertexArray(mesh->GetVertexArrayHandle());
     glDrawElements(GL_TRIANGLES, (int)mesh->GetIndexCount(), (int)mesh->GetIndexFormat(), nullptr);
 }
 
 void GLRenderer::DrawSprite(const GLTexture* texture, float u, float v, float uSize, float vSize, float x, float y, float z, float width, float height) const {
-    //glUseProgram(this->_SpriteShader->GetProgramHandle());
+    glUseProgram(this->_SpriteShader->GetProgramHandle());
 
     Matrix transform = Math_Translate(Math_Vec3(x, y, z)) * Math_Scale(Math_Vec3(width, height, 1.0f));
     unsigned int transformUniform = glGetUniformLocation(this->_SpriteShader->GetProgramHandle(), "Transform");

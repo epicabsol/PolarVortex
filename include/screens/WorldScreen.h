@@ -12,12 +12,16 @@ class UIAnimation;
 class UIDockContainer;
 class UISprite;
 class World;
+class GLMesh;
+class GLShaderProgram;
 
 class WorldScreen : public Screen {
 private:
     World* _World;
     Camera _MainCamera;
     Player* _Player;
+    GLMesh* _TileMesh;
+    GLShaderProgram* _TileShaderProgram;
     UIDockContainer* _HUDContainer;
     UIDockContainer* _LeftContainer;
     UIDockContainer* _RightContainer;
@@ -25,6 +29,7 @@ private:
     const GLTexture* _GridTexture;
 
     virtual void RenderViewportContents(size_t index) override;
+    void RebuildTileMesh();
 
 public:
     WorldScreen(Allocator& allocator);
