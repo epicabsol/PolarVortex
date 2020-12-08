@@ -1,14 +1,13 @@
 #include "world/World.h"
 
+#include <time.h>
+
 #include "assets/Asset.h"
 #include "assets/AssetManager.h"
 #include "game/PolarVortexGame.h"
 #include "render/GLTexture.h"
 #include "world/Collision.h"
 #include "world/Object.h"
-
-// How long after leaving the ground `DynamicCollder::IsOnGround()` becomes `false`.
-#define ONGROUND_THRESHOLD_TIME 0.3f
 
 /**
  * @brief Reflects a 2D vector according to the given normal, with the given bias scaling each axis.
@@ -30,37 +29,67 @@ inline Vector2 BiasedReflect2D(const Vector2& direction, const Vector2& normal, 
 float World::StepDynamic(DynamicCollider& dynamic, float timestep) {
     Intersection closestIntersection;
     Collider* closestStatic = nullptr;
+    World* closestWorld = nullptr;
 
     Vector2 goalPosition = dynamic._Bounds.Position + dynamic._Velocity * timestep;
     closestIntersection.Time = 1.0f;
     closestIntersection.EndPosition = goalPosition;
     closestIntersection.Overlap = Vector2();
 
+    // Check for collision with each static collider
     for (Collider& collider : this->_ColliderPool) {
         Intersection intersection;
         if (SweptBoundingBoxIntersectsBoundingBox(dynamic._Bounds, goalPosition, collider.GetBounds(), intersection)) {
             if (intersection.Time < closestIntersection.Time) {
                 closestStatic = &collider;
+                closestWorld = nullptr;
                 closestIntersection = intersection;
             }
         }
     }
 
+    // Check for collision with tiles
+    Intersection tileIntersection;
+    if (SweptBoundingBoxIntersectsWorld(dynamic._Bounds, goalPosition, this, tileIntersection)) {
+        if (tileIntersection.Time < closestIntersection.Time) {
+            closestStatic = nullptr;
+            closestWorld = this;
+            closestIntersection = tileIntersection;
+        }
+    }
+
     dynamic._Bounds.Position = closestIntersection.EndPosition - closestIntersection.Overlap;
+    dynamic._LastOnGround += closestIntersection.Time * timestep;
     if (closestStatic != nullptr) {
         Vector2 bias = Vector2(1.0f / (1.0f + dynamic.GetFriction() * closestStatic->GetFriction()), dynamic.GetRestitution() * closestStatic->GetRestitution());
         dynamic._Velocity = BiasedReflect2D(dynamic._Velocity, closestIntersection.Normal, bias);
         if (closestIntersection.Normal.X == 0.0f && closestIntersection.Normal.Y == 1.0f) {
-            dynamic._OnGround = true;
+            dynamic._LastOnGround = 0.0f;
         }
+    }
+    else if (closestWorld != nullptr) {
+        float worldFriction = 0.5f;
+        float worldRestitution = 0.1f;
+        Vector2 bias = Vector2(1.0f / (1.0f + dynamic.GetFriction() * worldFriction), dynamic.GetRestitution() * worldRestitution);
+        dynamic._Velocity = BiasedReflect2D(dynamic._Velocity, closestIntersection.Normal, bias);
+        if (closestIntersection.Normal.X == 0.0f && closestIntersection.Normal.Y == 1.0f) {
+            dynamic._LastOnGround = 0.0f;
+        }
+        dynamic._Bounds.Position += closestIntersection.Normal * HMM_EPSILON;
+    }
+
+    if (dynamic._Velocity.Y > 0.1f) {
+        dynamic._LastOnGround = INFINITY;
     }
 
     return (1.0f - closestIntersection.Time) * timestep;
 }
 
-World::World(Allocator& allocator) : _Allocator(allocator), _TilePalette(nullptr), _Tiles(nullptr), _Width(32), _Height(32), _Gravity(0.0f, -9.8f), _ColliderPool("World Collider Pool", this->_ColliderPoolBuffer, sizeof(Collider) * MAX_COLLIDERS), _DynamicColliderPool("World Dynamic Collider Pool", this->_DynamicColliderPoolBuffer, sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS), _DirtTexture(nullptr) {
+World::World(Allocator& allocator) : _Allocator(allocator), _TilePalette(nullptr), _Tiles(nullptr), _Width(32), _Height(32), _Gravity(0.0f, -9.8f * 2.0f), _ColliderPool("World Collider Pool", this->_ColliderPoolBuffer, sizeof(Collider) * MAX_COLLIDERS), _DynamicColliderPool("World Dynamic Collider Pool", this->_DynamicColliderPoolBuffer, sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS), _DirtTexture(nullptr) {
 
     this->_TilePalette = Game->GetAssetManager().GetAsset(STRINGHASH("assets/tilemaps/grassland.pvp"))->GetAsset<TilePalette>();
+
+    srand(time(nullptr));
 
     // TEMP: Add some test colliders.
     this->AddCollider(Vector2(16.0f, -0.5f), Vector2(16.0f, 0.5f));
@@ -78,8 +107,9 @@ World::World(Allocator& allocator) : _Allocator(allocator), _TilePalette(nullptr
     this->_Tiles = (WorldTile*)allocator.Allocate(sizeof(WorldTile) * this->_Width * this->_Height);
     for (size_t y = 0; y < this->_Height; y++) {
         for (size_t x = 0; x < this->_Width; x++) {
-            this->GetTile(x, y).Collides = (y == 0);
-            this->GetTile(x, y).PaletteIndex = (y == 0) ? 5 : -1;
+            bool r =  false; //rand() % (2 + y) == 0;
+            this->GetTile(x, y).Collides = (y == 0) || r;
+            this->GetTile(x, y).PaletteIndex = (y == 0) ? 5 : (r ? 5 : -1);
         }
     }
     this->GetTile(0, 0).PaletteIndex = 4;
@@ -149,14 +179,15 @@ void World::Update(float timestep) {
     // 2. Detect collisions & solve constraints
     for (DynamicCollider& dynamic : this->_DynamicColliderPool) {
         float time = timestep;
-        dynamic._OnGround = false;
-        while (time > HMM_EPSILON) {
+        int i = 0;
+        while (time > HMM_EPSILON && i < 10) {
             time = this->StepDynamic(dynamic, time);
+            i++;
         }
     }
     // 3. Reset forces
     for (DynamicCollider& dynamic : this->_DynamicColliderPool) {
-        dynamic._StepForce = this->_Gravity;
+        dynamic._StepForce = this->_Gravity * dynamic._Mass;
     }
     // 4. Update Objects
     for (size_t i = 0; i < this->_ObjectCount; i++) {

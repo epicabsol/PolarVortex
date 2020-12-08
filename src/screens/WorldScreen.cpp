@@ -24,18 +24,20 @@ void WorldScreen::RenderViewportContents(size_t index) {
     Screen::RenderViewportContents(index);
 
     Camera* camera = this->_Viewports[index].GetCamera();
-    Game->GetRenderer().DrawSprite(this->_GridTexture, camera->GetPosition().X - camera->GetSize().X * 0.5f + 0.5f / this->_GridTexture->GetWidth(), -camera->GetPosition().Y - camera->GetSize().Y - 0.5f / this->_GridTexture->GetHeight() + 0.5f, camera->GetSize().X, camera->GetSize().Y, camera->GetPosition().X, camera->GetPosition().Y, 0.0f, camera->GetSize().X, camera->GetSize().Y);
+
+    // Draw grid background
+    Game->GetRenderer().DrawSprite(this->_GridTexture, camera->GetPosition().X - camera->GetSize().X * 0.5f + 0.5f / this->_GridTexture->GetWidth(), -camera->GetPosition().Y - camera->GetSize().Y - 0.5f / this->_GridTexture->GetHeight(), camera->GetSize().X, camera->GetSize().Y, camera->GetPosition().X, camera->GetPosition().Y, 0.0f, camera->GetSize().X, camera->GetSize().Y);
 
     this->_World->Render(this->_Viewports[index].GetCamera());
 
-    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "CPT. Skytear", this->_Player->GetCollider()->GetBounds().Position.X - 0.65f, this->_Player->GetCollider()->GetBounds().Position.Y + 0.75f, 0.0f, 1.0f / 64.0f, 0.0f);
+    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "CPT. Skytear", this->_Player->GetCollider()->GetBounds().Position.X - 2.35f, this->_Player->GetCollider()->GetBounds().Position.Y + 3.0f, 0.0f, 1.0f / 16.0f, 0.0f);
 
     float x = this->_Player->GetCollider()->GetBounds().Position.X;
-    float y = this->_Player->GetCollider()->GetBounds().Position.Y + 1.0f;
-    float scale = 0.25f;
+    float y = this->_Player->GetCollider()->GetBounds().Position.Y + 4.0f;
+    float scale = 1.0f;
     InputDevice* device = this->_Player->GetInputDevice();
     Game->GetRenderer().DrawSprite(device->GetSprite(), x, y, 0.0f, scale, scale);
-    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), device->GetName(), x - 0.25f, y + 0.5f, 0.0f, 1.0f / 64.0f, 0.0f);
+    Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), device->GetName(), x - 0.25f, y + 1.25f, 0.0f, 1.0f / 16.0f, 0.0f);
 
     x += scale * 1.25f;
     for (size_t i = 0; i < device->GetInputElementCount(); i++) {
@@ -99,7 +101,7 @@ void WorldScreen::RebuildTileMesh() {
     this->_Allocator.Free(vertices);
 }
 
-WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 5.0f, 5.0f), _Player(nullptr), _TileMesh(nullptr), _TileShaderProgram(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr), _GridTexture(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/grid.png"))->GetAsset<GLTexture>()) {
+WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 20.0f, 20.0f), _Player(nullptr), _TileMesh(nullptr), _TileShaderProgram(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr), _GridTexture(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/grid.png"))->GetAsset<GLTexture>()) {
     this->_Player = allocator.New<Player>(Game->GetMainWindow().GetInputDevice(0));
     this->_World->AddObject(this->_Player);
     this->_Player->GetCollider()->GetBounds().Position = Vector2(16.0f, 16.0f);

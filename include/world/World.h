@@ -51,6 +51,7 @@ public:
 
     inline const TilePalette* GetTilePalette() const { return this->_TilePalette; }
     inline WorldTile& GetTile(size_t x, size_t y) { return this->_Tiles[y * this->_Width + x]; }
+    inline const WorldTile& GetTile(size_t x, size_t y) const { return this->_Tiles[y * this->_Width + x]; }
     inline size_t GetWidth() const { return this->_Width; }
     inline size_t GetHeight() const { return this->_Height; }
     const WorldTile* GetTiles() const { return this->_Tiles; }
