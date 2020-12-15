@@ -4,23 +4,23 @@
     "height": 5,
     "tiles": [
         {
-            "index": 4,
+            "index": 12,
             "collides": true
         },
         {
-            "index": 5,
+            "index": 13,
             "collides": true
         },
         {
-            "index": 5,
+            "index": 14,
             "collides": true
         },
         {
-            "index": 5,
+            "index": 14,
             "collides": true
         },
         {
-            "index": 6,
+            "index": 15,
             "collides": true
         },
         {
@@ -32,7 +32,7 @@
             "collides": false
         },
         {
-            "index": 2,
+            "index": -1,
             "collides": false
         },
         {
@@ -44,8 +44,28 @@
             "collides": false
         },
         {
+            "index": 8,
+            "collides": true
+        },
+        {
+            "index": 10,
+            "collides": true
+        },
+        {
+            "index": 11,
+            "collides": true
+        },
+        {
             "index": -1,
             "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": 3,
+            "collides": true
         },
         {
             "index": -1,
@@ -64,27 +84,7 @@
             "collides": false
         },
         {
-            "index": -1,
-            "collides": false
-        },
-        {
-            "index": -1,
-            "collides": false
-        },
-        {
-            "index": -1,
-            "collides": false
-        },
-        {
-            "index": -1,
-            "collides": false
-        },
-        {
-            "index": -1,
-            "collides": false
-        },
-        {
-            "index": -1,
+            "index": 2,
             "collides": false
         },
         {
