@@ -10,16 +10,17 @@
 
 #define FRAME_LENGTH (1.0f / 30.0f)
 #define RUN_THRESHOLD (0.1f)
+#define JUMP_VELOCITY (10.0f)
 
 void Player::Added() {
-    this->_Collider = this->_World->AddDynamicCollider(Vector2(0.0f, 3.0f), Vector2(0.15f, 0.45f), 1.0f);
+    this->_Collider = this->_World->AddDynamicCollider(Vector2(0.0f, 3.0f), Vector2(0.75f, 1.85f), 8.0f);
 }
 
 void Player::Update(float timestep) {
     this->_CurrentAnimation.Advance(timestep);
     this->_StateTime += timestep;
 
-    float movementSpeed = 2.5f;
+    float movementSpeed = 7.0f;
 
     switch (this->_State) {
         case PlayerState::Idle: {
@@ -28,7 +29,7 @@ void Player::Update(float timestep) {
                     this->EnterState(PlayerState::Crouch);
                 }
                 else if (this->_InputDevice->GetInputElement(0)->GetValue() > 0.5f) {
-                    this->_Collider->GetVelocity().Y = 4.0;
+                    this->_Collider->GetVelocity().Y = JUMP_VELOCITY;
                     this->EnterState(PlayerState::Midair);
                 }
                 else if (this->_Collider->GetVelocity().X > RUN_THRESHOLD || this->_Collider->GetVelocity().X < -RUN_THRESHOLD) {
@@ -43,7 +44,7 @@ void Player::Update(float timestep) {
         case PlayerState::Crouch: {
             movementSpeed = 0.0f;
             if (this->_StateTime >= FRAME_LENGTH * 2.0f && this->_Collider->IsOnGround() && (this->_InputDevice->GetInputElement(0)->GetValue() > 0.5f)) {
-                this->_Collider->GetVelocity().Y = 3.0f + HMM_MIN(this->_StateTime, 1.0f) * 3.0f;
+                this->_Collider->GetVelocity().Y = 8.0f + HMM_MIN(this->_StateTime, 1.0f) * 12.0f;
 
                 this->EnterState(PlayerState::Midair);
             }
@@ -83,7 +84,7 @@ void Player::Update(float timestep) {
                     this->EnterState(PlayerState::Crouch);
                 }
                 else if (this->_InputDevice->GetInputElement(0)->GetValue() > 0.5f) {
-                    this->_Collider->GetVelocity().Y = 4.0;
+                    this->_Collider->GetVelocity().Y = JUMP_VELOCITY;
                     this->EnterState(PlayerState::Midair);
                 }
                 else if (this->_Collider->GetVelocity().X < RUN_THRESHOLD && this->_Collider->GetVelocity().X > -RUN_THRESHOLD) {
@@ -113,7 +114,7 @@ void Player::Update(float timestep) {
 }
 
 void Player::Render() {
-    Game->GetRenderer().DrawSprite(this->_CurrentAnimation, this->_Collider->GetBounds().Position.X, this->_Collider->GetBounds().Position.Y, 0.0f, 1.0f * this->_XFlip, 1.0f);
+    Game->GetRenderer().DrawSprite(this->_CurrentAnimation, this->_Collider->GetBounds().Position.X, this->_Collider->GetBounds().Position.Y, 0.0f, 4.0f * this->_XFlip, 4.0f);
 }
 
 void Player::Removed() {

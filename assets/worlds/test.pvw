@@ -1,0 +1,107 @@
+{
+    "palette": "assets/tilemaps/grassland.pvp",
+    "width": 5,
+    "height": 5,
+    "tiles": [
+        {
+            "index": 4,
+            "collides": true
+        },
+        {
+            "index": 5,
+            "collides": true
+        },
+        {
+            "index": 5,
+            "collides": true
+        },
+        {
+            "index": 5,
+            "collides": true
+        },
+        {
+            "index": 6,
+            "collides": true
+        },
+        {
+            "index": 0,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": 2,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": 1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        },
+        {
+            "index": -1,
+            "collides": false
+        }
+    ]
+}
