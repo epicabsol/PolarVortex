@@ -101,10 +101,10 @@ void WorldScreen::RebuildTileMesh() {
     this->_Allocator.Free(vertices);
 }
 
-WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>()), _MainCamera(allocator, 0.0f, 0.0f, 20.0f, 20.0f), _Player(nullptr), _TileMesh(nullptr), _TileShaderProgram(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr), _GridTexture(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/grid.png"))->GetAsset<GLTexture>()) {
+WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>(Game->GetAssetManager().GetAsset(STRINGHASH("assets/worlds/test.pvw"))->GetAsset<WorldBlueprint>())), _MainCamera(allocator, 0.0f, 0.0f, 20.0f, 20.0f), _Player(nullptr), _TileMesh(nullptr), _TileShaderProgram(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr), _GridTexture(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/grid.png"))->GetAsset<GLTexture>()) {
     this->_Player = allocator.New<Player>(Game->GetMainWindow().GetInputDevice(0));
     this->_World->AddObject(this->_Player);
-    this->_Player->GetCollider()->GetBounds().Position = Vector2(16.0f, 16.0f);
+    this->_Player->GetCollider()->GetBounds().Position = Vector2(this->_World->GetWidth() * 0.5f, this->_World->GetHeight());
 
     const GLTexture* gunTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/weapons/pistol/icon_2x.png"))->GetAsset<GLTexture>();
     this->_WeaponSprite = allocator.New<UISprite>(Sprite(gunTexture));

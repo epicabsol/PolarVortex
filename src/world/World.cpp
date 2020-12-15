@@ -8,6 +8,7 @@
 #include "render/GLTexture.h"
 #include "world/Collision.h"
 #include "world/Object.h"
+#include "world/WorldBlueprint.h"
 
 /**
  * @brief Reflects a 2D vector according to the given normal, with the given bias scaling each axis.
@@ -85,15 +86,13 @@ float World::StepDynamic(DynamicCollider& dynamic, float timestep) {
     return (1.0f - closestIntersection.Time) * timestep;
 }
 
-World::World(Allocator& allocator) : _Allocator(allocator), _TilePalette(nullptr), _Tiles(nullptr), _Width(32), _Height(32), _Gravity(0.0f, -9.8f * 2.0f), _ColliderPool("World Collider Pool", this->_ColliderPoolBuffer, sizeof(Collider) * MAX_COLLIDERS), _DynamicColliderPool("World Dynamic Collider Pool", this->_DynamicColliderPoolBuffer, sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS), _DirtTexture(nullptr) {
-
-    this->_TilePalette = Game->GetAssetManager().GetAsset(STRINGHASH("assets/tilemaps/grassland.pvp"))->GetAsset<TilePalette>();
+World::World(Allocator& allocator, const WorldBlueprint* blueprint) : _Allocator(allocator), _TilePalette(blueprint->GetTilePalette()), _Tiles(nullptr), _Width(blueprint->GetWidth()), _Height(blueprint->GetHeight()), _Gravity(0.0f, -9.8f * 2.0f), _ColliderPool("World Collider Pool", this->_ColliderPoolBuffer, sizeof(Collider) * MAX_COLLIDERS), _DynamicColliderPool("World Dynamic Collider Pool", this->_DynamicColliderPoolBuffer, sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS) {
 
     srand(time(nullptr));
 
     // TEMP: Add some test colliders.
-    this->AddCollider(Vector2(16.0f, -0.5f), Vector2(16.0f, 0.5f));
-    this->AddCollider(Vector2(0.0f, 0.0f), Vector2(0.25f, 0.25f));
+    //this->AddCollider(Vector2(16.0f, -0.5f), Vector2(16.0f, 0.5f));
+    //this->AddCollider(Vector2(0.0f, 0.0f), Vector2(0.25f, 0.25f));
 
     /*for (float f = -4.0f; f <= 2.5f; f += 1.0f) {
         DynamicCollider* dynamic = this->AddDynamicCollider(Vector2(f, 2.0f), Vector2(0.25f, 0.25f), 0.125f);
@@ -102,21 +101,20 @@ World::World(Allocator& allocator) : _Allocator(allocator), _TilePalette(nullptr
         dynamic->_Friction = 0.1f;
     }*/
 
-    this->_DirtTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/tile_dirt.png"))->GetAsset<GLTexture>();
-
     this->_Tiles = (WorldTile*)allocator.Allocate(sizeof(WorldTile) * this->_Width * this->_Height);
     for (size_t y = 0; y < this->_Height; y++) {
         for (size_t x = 0; x < this->_Width; x++) {
-            bool r =  false; //rand() % (2 + y) == 0;
+            /*bool r =  false; //rand() % (2 + y) == 0;
             this->GetTile(x, y).Collides = (y == 0) || r;
-            this->GetTile(x, y).PaletteIndex = (y == 0) ? 5 : (r ? 5 : -1);
+            this->GetTile(x, y).PaletteIndex = (y == 0) ? 5 : (r ? 5 : -1);*/
+            this->GetTile(x, y) = blueprint->GetTiles()[y * this->_Width + x];
         }
     }
-    this->GetTile(0, 0).PaletteIndex = 4;
+    /*this->GetTile(0, 0).PaletteIndex = 4;
     this->GetTile(this->GetWidth() - 1, 0).PaletteIndex = 6;
     this->GetTile(12, 1).PaletteIndex = 2;
     this->GetTile(15, 1).PaletteIndex = 0;
-    this->GetTile(16, 1).PaletteIndex = 1;
+    this->GetTile(16, 1).PaletteIndex = 1;*/
 }
 
 World::~World() {

@@ -12,6 +12,7 @@ class Camera;
 class GLTexture;
 class Object;
 class TilePalette;
+class WorldBlueprint;
 
 struct WorldTile {
     int16_t PaletteIndex;
@@ -29,7 +30,6 @@ private:
     Vector2 _Gravity;
     IterablePoolAllocator<Collider> _ColliderPool;
     IterablePoolAllocator<DynamicCollider> _DynamicColliderPool;
-    const GLTexture* _DirtTexture;
 
     char _ColliderPoolBuffer[sizeof(Collider) * MAX_COLLIDERS];
     char _DynamicColliderPoolBuffer[sizeof(DynamicCollider) * MAX_DYNAMIC_COLLIDERS];
@@ -46,7 +46,7 @@ private:
     float StepDynamic(DynamicCollider& dynamic, float timestep);
 
 public:
-    World(Allocator& allocator);
+    World(Allocator& allocator, const WorldBlueprint* blueprint);
     ~World();
 
     inline const TilePalette* GetTilePalette() const { return this->_TilePalette; }

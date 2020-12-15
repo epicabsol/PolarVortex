@@ -12,6 +12,7 @@ These are the known asset types, in the order that they are initialized:
 | `.pva`    | JSON               | `SpriteAnimation`  |                                     |
 | `.pvf`    | JSON               | `SpriteFont`       |                                     |
 | `.pvp`    | JSON               | `TilePalette`      |                                     |
+| `.pvw`    | JSON               | `WorldBlueprint`   |                                     |
 
 All native classes for assets are expected to take a constructor with the following signature: `void (const char* data, size_t dataLength)`.
 

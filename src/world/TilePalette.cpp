@@ -9,18 +9,18 @@
 TilePalette::TilePalette(Allocator& allocator, const char* data, size_t dataLength) : _Allocator(allocator) {
     void* parseBuffer = allocator.Allocate(JSON_BUFFER_LENGTH);
 
-    const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, JSON_BUFFER_LENGTH), sajson::mutable_string_view(dataLength, (char*)data));
+    const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, JSON_BUFFER_LENGTH / 4), sajson::mutable_string_view(dataLength, (char*)data));
 
     sajson::value rootObject = doc.get_root();
     sajson::value texturePath = rootObject.get_value_of_key(sajson::literal("texture"));
-    Hash texturePathHash = HashData(texturePath.as_cstring(), texturePath.get_string_length());
+    Hash texturePathHash = HashData(texturePath.as_cstring(), (uint32_t)texturePath.get_string_length());
     this->_Texture = Game->GetAssetManager().GetAsset(texturePathHash)->GetAsset<GLTexture>();
 
-    float tileSize = rootObject.get_value_of_key(sajson::literal("tile-size")).get_number_value();
-    this->_TileWidth = tileSize / this->_Texture->GetWidth();
-    this->_TileHeight = tileSize / this->_Texture->GetHeight();
+    int tileSize = rootObject.get_value_of_key(sajson::literal("tile-size")).get_integer_value();
+    this->_TileWidth = (float)tileSize / this->_Texture->GetWidth();
+    this->_TileHeight = (float)tileSize / this->_Texture->GetHeight();
 
-    this->_Stride = this->_Texture->GetWidth() / (size_t)tileSize;
+    this->_Stride = this->_Texture->GetWidth() / tileSize;
 
     allocator.Free(parseBuffer);
 }
