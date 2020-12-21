@@ -6,7 +6,40 @@
         xmlns:local="clr-namespace:WorldEditor"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        
+    </Window.Resources>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="250px" MinWidth="20px" />
+        </Grid.ColumnDefinitions>
+
+        <Menu Grid.ColumnSpan="4">
+            <MenuItem Header="File" />
+            <MenuItem Header="Edit" />
+            <MenuItem Header="View" />
+            <MenuItem Header="Help" />
+        </Menu>
+
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            <RadioButton Content="Tile Paint" Style="{StaticResource ResourceKey={x:Type ToggleButton}}" />
+            <RadioButton Content="Collision Paint" Style="{StaticResource ResourceKey={x:Type ToggleButton}}" />
+            <RadioButton Content="Entities" Style="{StaticResource ResourceKey={x:Type ToggleButton}}" />
+            <RadioButton Content="Decor" Style="{StaticResource ResourceKey={x:Type ToggleButton}}" />
+        </StackPanel>
+
+        <GridSplitter Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="4" />
+
+        <Grid Grid.Row="1" Grid.Column="3">
+            
+        </Grid>
     </Grid>
 </Window>

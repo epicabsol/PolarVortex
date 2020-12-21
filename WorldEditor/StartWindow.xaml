@@ -1,0 +1,51 @@
+﻿<Window x:Class="WorldEditor.StartWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WorldEditor"
+        mc:Ignorable="d"
+        Title="StartWindow" Height="450" Width="800" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Polar Vortex" />
+            <TextBlock Grid.Row="1" Text="World Editor" />
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="1.0.0.0" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1px" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="Recent Worlds" />
+                <TextBlock Text="No recent worlds" />
+                
+            </StackPanel>
+
+            <Border Grid.Column="1" Background="Black" Margin="0 10" />
+
+            <StackPanel Margin="10" Grid.Column="2" Orientation="Vertical">
+                <Button Content="New World..." Padding="6 2" Click="NewWorldButton_Click" />
+                <Button Content="Open World..." Padding="6 2" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
