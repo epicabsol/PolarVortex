@@ -11,6 +11,7 @@
         <Color x:Key="BackgroundHeading">#404040</Color>
         <Color x:Key="BackgroundWell">#282828</Color>
         <Color x:Key="Accent">#DD22AA</Color>
+        <Color x:Key="Collision">#CC3322</Color>
         <Color x:Key="ForegroundPrimary">#F1F1F1</Color>
         <Color x:Key="ForegroundSecondary">#C8C8C8</Color>
 
@@ -20,6 +21,7 @@
         <SolidColorBrush x:Key="BackgroundHeadingBrush" Color="{StaticResource BackgroundHeading}" />
         <SolidColorBrush x:Key="BackgroundWellBrush" Color="{StaticResource BackgroundWell}" />
         <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent}" />
+        <SolidColorBrush x:Key="CollisionBrush" Color="{StaticResource Collision}" />
         <SolidColorBrush x:Key="ForegroundPrimaryBrush" Color="{StaticResource ForegroundPrimary}" />
         <SolidColorBrush x:Key="ForegroundSecondaryBrushh" Color="{StaticResource ForegroundSecondary}" />
 

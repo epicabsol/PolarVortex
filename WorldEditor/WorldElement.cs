@@ -34,10 +34,18 @@ namespace WorldEditor
 
         private BitmapSource PaletteImage = null;
         private TilePalette Palette = null;
+        private DrawingVisual TileVisual = new DrawingVisual();
+        private DrawingVisual CollisionVisual = new DrawingVisual();
+        private List<DrawingVisual> ChildVisuals = new List<DrawingVisual>();
+
+        protected override int VisualChildrenCount => ChildVisuals.Count;
+        protected override Visual GetVisualChild(int index) => ChildVisuals[index];
 
         protected override void OnInitialized(EventArgs e)
         {
             RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
+            ChildVisuals.Add(TileVisual);
+            ChildVisuals.Add(CollisionVisual);
             base.OnInitialized(e);
         }
 
@@ -45,7 +53,7 @@ namespace WorldEditor
         {
             if (this.World != null)
             {
-                return new Size(this.World.Width * Scale, this.World.Height * Scale);
+                return new Size(this.Palette.TileSize * this.World.Width * Scale, this.Palette.TileSize * this.World.Height * Scale);
             }
             else
             {
@@ -55,11 +63,18 @@ namespace WorldEditor
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            if (this.World != null)
+            if (this.World != null && this.Palette != null)
             {
                 Brush backgroundBrush = (Brush)FindResource("BackgroundBrush");
                 drawingContext.DrawRectangle(backgroundBrush, null, new Rect(0.0f, 0.0f, this.World.Width * this.Palette.TileSize * Scale - 0.0f, this.World.Height * this.Palette.TileSize * Scale - 0.0f));
+            }
+        }
 
+        public void InvalidateTileVisual()
+        {
+            DrawingContext drawingContext = TileVisual.RenderOpen();
+            if (this.World != null && this.Palette != null)
+            {
                 if (this.PaletteImage != null)
                 {
                     for (int x = 0; x < this.World.Width; x++)
@@ -75,6 +90,32 @@ namespace WorldEditor
                     }
                 }
             }
+
+            drawingContext.Close();
+            this.InvalidateVisual();
+        }
+
+        public void InvalidateCollisionVisual()
+        {
+            DrawingContext drawingContext = CollisionVisual.RenderOpen();
+
+            if (this.World != null && this.Palette != null)
+            {
+                Brush collisionBrush = (Brush)FindResource("CollisionBrush");
+                for (int x = 0; x < this.World.Width; x++)
+                {
+                    for (int y = 0; y < this.World.Height; y++)
+                    {
+                        if (this.World.Tiles[x, y].PaletteIndex != WorldTile.EmptyPaletteIndex)
+                        {
+                            drawingContext.DrawRectangle(collisionBrush, null, new Rect(this.Palette.TileSize * x * Scale, this.Palette.TileSize * (World.Height - y - 1) * Scale, this.Palette.TileSize * Scale, this.Palette.TileSize * Scale));
+                        }
+                    }
+                }
+            }
+
+            drawingContext.Close();
+            this.InvalidateVisual();
         }
 
         private void ReloadPaletteImage()
@@ -83,13 +124,13 @@ namespace WorldEditor
             {
                 this.Palette = TilePalette.LoadFromFile(System.IO.Path.Combine(this.BaseDirectory, this.World.PalettePath));
                 this.PaletteImage = new BitmapImage(new Uri(System.IO.Path.Combine(this.BaseDirectory, this.Palette.TexturePath)));
-                //this.Scale = this.Palette.TileSize * 2.0f;
+                this.InvalidateCollisionVisual();
             }
             else
             {
                 this.PaletteImage = null;
             }
-            this.InvalidateVisual();
+            this.InvalidateTileVisual();
         }
 
         protected virtual void OnWorldChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -106,6 +147,7 @@ namespace WorldEditor
 
         protected virtual void OnScaleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            TileVisual.Transform = CollisionVisual.Transform = new ScaleTransform(Scale, Scale);
             InvalidateMeasure();
             InvalidateVisual();
             ScaleChanged?.Invoke(sender, Scale);
