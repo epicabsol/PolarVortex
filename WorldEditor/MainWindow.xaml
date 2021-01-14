@@ -66,14 +66,14 @@
             </Grid.RowDefinitions>
             
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <local:WorldElement x:Name="WorldElement" World="{Binding CurrentWorld}" BaseDirectory="{Binding BaseDirectory}" />
+                <local:WorldElement x:Name="WorldElement" World="{Binding CurrentWorld}" BaseDirectory="{Binding BaseDirectory}" ScaleChanged="WorldElement_ScaleChanged" />
             </ScrollViewer>
 
             <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="1x" Padding="8 0" VerticalAlignment="Center" />
-                    <Button Content="{StaticResource Plus16px}" Width="20" />
-                    <Button Content="{StaticResource Minux16px}" Width="20" />
+                    <TextBlock x:Name="ZoomLabel" Text="1x" Padding="4 0" VerticalAlignment="Center" MinWidth="40" TextAlignment="Right" />
+                    <Button Content="{StaticResource Plus16px}" Width="20" Click="ZoomInButton_Click" />
+                    <Button Content="{StaticResource Minux16px}" Width="20" Click="ZoomOutButton_Click" />
                 </StackPanel>
             </Border>
         </Grid>

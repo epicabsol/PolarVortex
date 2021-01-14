@@ -30,5 +30,23 @@ namespace WorldEditor
 
             InitializeComponent();
         }
+
+        private void ZoomInButton_Click(object sender, RoutedEventArgs e)
+        {
+            WorldElement.Scale = WorldElement.Scale * 2.0f;
+        }
+
+        private void ZoomOutButton_Click(object sender, RoutedEventArgs e)
+        {
+            WorldElement.Scale = WorldElement.Scale * 0.5f;
+        }
+
+        private void WorldElement_ScaleChanged(object sender, float e)
+        {
+            if (ZoomLabel != null)
+            {
+                ZoomLabel.Text = $"{e}x";
+            }
+        }
     }
 }

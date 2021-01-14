@@ -24,7 +24,13 @@ namespace WorldEditor
             set => this.SetValue(BaseDirectoryProperty, value);
         }
 
-        public float Scale { get; set; } = 1.0f;
+        public static DependencyProperty ScaleProperty = DependencyProperty.Register(nameof(Scale), typeof(float), typeof(WorldElement), new PropertyMetadata(1.0f, ScalePropertyChanged));
+        public float Scale
+        {
+            get => (float)this.GetValue(ScaleProperty);
+            set => this.SetValue(ScaleProperty, value);
+        }
+        public event EventHandler<float> ScaleChanged;
 
         private BitmapSource PaletteImage = null;
         private TilePalette Palette = null;
@@ -52,7 +58,7 @@ namespace WorldEditor
             if (this.World != null)
             {
                 Brush backgroundBrush = (Brush)FindResource("BackgroundBrush");
-                drawingContext.DrawRectangle(backgroundBrush, null, new Rect(0.0f, 0.0f, this.World.Width * Scale - 0.0f, this.World.Height * Scale - 0.0f));
+                drawingContext.DrawRectangle(backgroundBrush, null, new Rect(0.0f, 0.0f, this.World.Width * this.Palette.TileSize * Scale - 0.0f, this.World.Height * this.Palette.TileSize * Scale - 0.0f));
 
                 if (this.PaletteImage != null)
                 {
@@ -63,7 +69,7 @@ namespace WorldEditor
                             if (this.World.Tiles[x, y].PaletteIndex != WorldTile.EmptyPaletteIndex)
                             {
                                 CroppedBitmap tileSource = new CroppedBitmap(this.PaletteImage, new Int32Rect(Palette.TileSize * (this.World.Tiles[x, y].PaletteIndex % (PaletteImage.PixelWidth / Palette.TileSize)), Palette.TileSize * (this.World.Tiles[x, y].PaletteIndex / (PaletteImage.PixelHeight / Palette.TileSize)), Palette.TileSize, Palette.TileSize));
-                                drawingContext.DrawImage(tileSource, new Rect(x * Scale, (World.Height - y - 1) * Scale, Scale, Scale));
+                                drawingContext.DrawImage(tileSource, new Rect(this.Palette.TileSize * x * Scale, this.Palette.TileSize * (World.Height - y - 1) * Scale, this.Palette.TileSize * Scale, this.Palette.TileSize * Scale));
                             }
                         }
                     }
@@ -77,7 +83,7 @@ namespace WorldEditor
             {
                 this.Palette = TilePalette.LoadFromFile(System.IO.Path.Combine(this.BaseDirectory, this.World.PalettePath));
                 this.PaletteImage = new BitmapImage(new Uri(System.IO.Path.Combine(this.BaseDirectory, this.Palette.TexturePath)));
-                this.Scale = this.Palette.TileSize * 3.0f;
+                //this.Scale = this.Palette.TileSize * 2.0f;
             }
             else
             {
@@ -98,6 +104,13 @@ namespace WorldEditor
             ReloadPaletteImage();
         }
 
+        protected virtual void OnScaleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            InvalidateMeasure();
+            InvalidateVisual();
+            ScaleChanged?.Invoke(sender, Scale);
+        }
+
         private static void WorldPropertyChanged(DependencyObject dp, DependencyPropertyChangedEventArgs e)
         {
             if (dp is WorldElement worldElement)
@@ -111,6 +124,14 @@ namespace WorldEditor
             if (dp is WorldElement worldElement)
             {
                 worldElement.OnBaseDirectoryChanged(worldElement, e);
+            }
+        }
+
+        private static void ScalePropertyChanged(DependencyObject dp, DependencyPropertyChangedEventArgs e)
+        {
+            if (dp is WorldElement worldElement)
+            {
+                worldElement.OnScaleChanged(worldElement, e);
             }
         }
     }
