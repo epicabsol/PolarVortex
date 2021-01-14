@@ -54,7 +54,7 @@
 
         <StackPanel Grid.Row="1" Orientation="Vertical">
             <RadioButton Content="{StaticResource ToolBrush32px}" IsChecked="True" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
-            <RadioButton Content="{StaticResource ToolCollision32px}" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton Content="{StaticResource ToolCollision32px}" Style="{StaticResource ResourceKey=ToolButtonStyle}" Checked="CollisionTool_Checked" Unchecked="CollisionTool_Unchecked" />
             <RadioButton Content="{StaticResource ToolEntities32px}" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
             <RadioButton Content="{StaticResource ToolDecor32px}" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
         </StackPanel>
@@ -66,7 +66,7 @@
             </Grid.RowDefinitions>
             
             <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                <local:WorldElement x:Name="WorldElement" World="{Binding CurrentWorld}" BaseDirectory="{Binding BaseDirectory}" ScaleChanged="WorldElement_ScaleChanged" />
+                <local:WorldElement x:Name="WorldElement" World="{Binding CurrentWorld}" BaseDirectory="{Binding BaseDirectory}" />
             </ScrollViewer>
 
             <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}">

@@ -24,13 +24,23 @@ namespace WorldEditor
             set => this.SetValue(BaseDirectoryProperty, value);
         }
 
-        public static DependencyProperty ScaleProperty = DependencyProperty.Register(nameof(Scale), typeof(float), typeof(WorldElement), new PropertyMetadata(1.0f, ScalePropertyChanged));
-        public float Scale
+        public bool ShowCollision
         {
-            get => (float)this.GetValue(ScaleProperty);
-            set => this.SetValue(ScaleProperty, value);
+            get => ChildVisuals.Contains(CollisionVisual);
+            set
+            {
+                if (value && !ChildVisuals.Contains(CollisionVisual))
+                {
+                    ChildVisuals.Add(CollisionVisual);
+                    this.AddVisualChild(CollisionVisual);
+                }
+                else if (!value && ChildVisuals.Contains(CollisionVisual))
+                {
+                    ChildVisuals.Remove(CollisionVisual);
+                    this.RemoveVisualChild(CollisionVisual);
+                }
+            }
         }
-        public event EventHandler<float> ScaleChanged;
 
         private BitmapSource PaletteImage = null;
         private TilePalette Palette = null;
@@ -45,7 +55,7 @@ namespace WorldEditor
         {
             RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
             ChildVisuals.Add(TileVisual);
-            ChildVisuals.Add(CollisionVisual);
+            //ChildVisuals.Add(CollisionVisual);
             base.OnInitialized(e);
         }
 
@@ -53,7 +63,7 @@ namespace WorldEditor
         {
             if (this.World != null)
             {
-                return new Size(this.Palette.TileSize * this.World.Width * Scale, this.Palette.TileSize * this.World.Height * Scale);
+                return new Size(this.Palette.TileSize * this.World.Width, this.Palette.TileSize * this.World.Height);
             }
             else
             {
@@ -66,7 +76,7 @@ namespace WorldEditor
             if (this.World != null && this.Palette != null)
             {
                 Brush backgroundBrush = (Brush)FindResource("BackgroundBrush");
-                drawingContext.DrawRectangle(backgroundBrush, null, new Rect(0.0f, 0.0f, this.World.Width * this.Palette.TileSize * Scale - 0.0f, this.World.Height * this.Palette.TileSize * Scale - 0.0f));
+                drawingContext.DrawRectangle(backgroundBrush, null, new Rect(0.0f, 0.0f, this.World.Width * this.Palette.TileSize - 0.0f, this.World.Height * this.Palette.TileSize - 0.0f));
             }
         }
 
@@ -84,7 +94,7 @@ namespace WorldEditor
                             if (this.World.Tiles[x, y].PaletteIndex != WorldTile.EmptyPaletteIndex)
                             {
                                 CroppedBitmap tileSource = new CroppedBitmap(this.PaletteImage, new Int32Rect(Palette.TileSize * (this.World.Tiles[x, y].PaletteIndex % (PaletteImage.PixelWidth / Palette.TileSize)), Palette.TileSize * (this.World.Tiles[x, y].PaletteIndex / (PaletteImage.PixelHeight / Palette.TileSize)), Palette.TileSize, Palette.TileSize));
-                                drawingContext.DrawImage(tileSource, new Rect(this.Palette.TileSize * x * Scale, this.Palette.TileSize * (World.Height - y - 1) * Scale, this.Palette.TileSize * Scale, this.Palette.TileSize * Scale));
+                                drawingContext.DrawImage(tileSource, new Rect(this.Palette.TileSize * x, this.Palette.TileSize * (World.Height - y - 1), this.Palette.TileSize, this.Palette.TileSize));
                             }
                         }
                     }
@@ -108,7 +118,7 @@ namespace WorldEditor
                     {
                         if (this.World.Tiles[x, y].PaletteIndex != WorldTile.EmptyPaletteIndex)
                         {
-                            drawingContext.DrawRectangle(collisionBrush, null, new Rect(this.Palette.TileSize * x * Scale, this.Palette.TileSize * (World.Height - y - 1) * Scale, this.Palette.TileSize * Scale, this.Palette.TileSize * Scale));
+                            drawingContext.DrawRectangle(collisionBrush, null, new Rect(this.Palette.TileSize * x, this.Palette.TileSize * (World.Height - y - 1), this.Palette.TileSize, this.Palette.TileSize));
                         }
                     }
                 }
@@ -145,14 +155,6 @@ namespace WorldEditor
             ReloadPaletteImage();
         }
 
-        protected virtual void OnScaleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            TileVisual.Transform = CollisionVisual.Transform = new ScaleTransform(Scale, Scale);
-            InvalidateMeasure();
-            InvalidateVisual();
-            ScaleChanged?.Invoke(sender, Scale);
-        }
-
         private static void WorldPropertyChanged(DependencyObject dp, DependencyPropertyChangedEventArgs e)
         {
             if (dp is WorldElement worldElement)
@@ -166,14 +168,6 @@ namespace WorldEditor
             if (dp is WorldElement worldElement)
             {
                 worldElement.OnBaseDirectoryChanged(worldElement, e);
-            }
-        }
-
-        private static void ScalePropertyChanged(DependencyObject dp, DependencyPropertyChangedEventArgs e)
-        {
-            if (dp is WorldElement worldElement)
-            {
-                worldElement.OnScaleChanged(worldElement, e);
             }
         }
     }

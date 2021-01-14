@@ -23,6 +23,24 @@ namespace WorldEditor
         public string BaseDirectory { get; }
         public Models.World CurrentWorld { get; }
 
+        private float _scale = 1.0f;
+        public float Scale
+        {
+            get => _scale;
+            set
+            {
+                _scale = value;
+                if (ZoomLabel != null)
+                {
+                    ZoomLabel.Text = $"{Scale}x";
+                }
+                if (WorldElement != null)
+                {
+                    WorldElement.LayoutTransform = new ScaleTransform(Scale, Scale);
+                }
+            }
+        }
+
         public MainWindow(string baseDirectory, Models.World world)
         {
             this.BaseDirectory = baseDirectory;
@@ -33,20 +51,22 @@ namespace WorldEditor
 
         private void ZoomInButton_Click(object sender, RoutedEventArgs e)
         {
-            WorldElement.Scale = WorldElement.Scale * 2.0f;
+            Scale = Scale * 2.0f;
         }
 
         private void ZoomOutButton_Click(object sender, RoutedEventArgs e)
         {
-            WorldElement.Scale = WorldElement.Scale * 0.5f;
+            Scale = Scale * 0.5f;
         }
 
-        private void WorldElement_ScaleChanged(object sender, float e)
+        private void CollisionTool_Checked(object sender, RoutedEventArgs e)
         {
-            if (ZoomLabel != null)
-            {
-                ZoomLabel.Text = $"{e}x";
-            }
+            WorldElement.ShowCollision = true;
+        }
+
+        private void CollisionTool_Unchecked(object sender, RoutedEventArgs e)
+        {
+            WorldElement.ShowCollision = false;
         }
     }
 }
