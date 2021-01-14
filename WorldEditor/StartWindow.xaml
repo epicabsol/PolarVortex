@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WorldEditor"
         mc:Ignorable="d"
-        Title="StartWindow" Height="450" Width="800" ResizeMode="NoResize">
+        Title="StartWindow" Height="450" Width="800" ResizeMode="NoResize" Background="{StaticResource BackgroundBrush}" TextBlock.Foreground="{StaticResource ForegroundPrimaryBrush}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -44,7 +44,7 @@
 
             <StackPanel Margin="10" Grid.Column="2" Orientation="Vertical">
                 <Button Content="New World..." Padding="6 2" Click="NewWorldButton_Click" />
-                <Button Content="Open World..." Padding="6 2" />
+                <Button Content="Open World..." Padding="6 2" Click="OpenWorldButton_Click" />
             </StackPanel>
         </Grid>
     </Grid>

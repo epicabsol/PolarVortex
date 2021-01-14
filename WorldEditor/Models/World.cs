@@ -97,26 +97,26 @@ namespace WorldEditor.Models
             using (System.IO.TextReader textReader = new System.IO.StreamReader(stream))
             using (JsonReader reader = new JsonTextReader(textReader))
             {
-                reader.Read(); // Now at the StartObject
-                reader.Read(); // Now at the "palette" name
-                reader.Read(); // Now at the palette value
-                string palettePath = reader.ReadAsString(); // Now at the "width" name
                 reader.Read();
-                int width = reader.ReadAsInt32().Value; // Now at the "height" name
                 reader.Read();
-                int height = reader.ReadAsInt32().Value; // Now at the "tiles" name
-                reader.Read(); // Now at array start
-                reader.Read(); // Now at object start
+                string palettePath = reader.ReadAsString();
+                reader.Read();
+                int width = reader.ReadAsInt32().Value;
+                reader.Read();
+                int height = reader.ReadAsInt32().Value;
+                reader.Read();
+                reader.Read();
                 World result = new World(palettePath, width, height);
                 int i = 0;
+                reader.Read(); // Read the beginning of the object
                 while (reader.TokenType != JsonToken.EndArray)
                 {
-                    reader.Read(); // Now at "index" name
-                    reader.Read(); // Now at index value
-                    int paletteIndex = reader.ReadAsInt32().Value; // Now at "collides" name
+                    reader.Read(); 
+                    int paletteIndex = reader.ReadAsInt32().Value;
                     reader.Read();
-                    bool collides = reader.ReadAsBoolean().Value; // Now at end object
-                    reader.Read(); // Now at object start or end array
+                    bool collides = reader.ReadAsBoolean().Value; 
+                    reader.Read(); 
+                    reader.Read(); // Read the beginning of the next object or the end of the array
                     result.Tiles[i % width, i / width] = new WorldTile(paletteIndex, collides);
 
                     i++;

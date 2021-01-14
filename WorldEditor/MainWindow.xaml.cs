@@ -20,10 +20,12 @@ namespace WorldEditor
     /// </summary>
     public partial class MainWindow : Window
     {
+        public string BaseDirectory { get; }
         public Models.World CurrentWorld { get; }
 
-        public MainWindow(Models.World world)
+        public MainWindow(string baseDirectory, Models.World world)
         {
+            this.BaseDirectory = baseDirectory;
             this.CurrentWorld = world;
 
             InitializeComponent();

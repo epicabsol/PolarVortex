@@ -17,6 +17,8 @@ namespace WorldEditor
     /// </summary>
     public partial class StartWindow : Window
     {
+        public string BaseDirectory = @"E:\Projects\PolarVortex";
+
         public StartWindow()
         {
             InitializeComponent();
@@ -26,9 +28,23 @@ namespace WorldEditor
         {
             /*MainWindow window = new MainWindow();
             window.Show();*/
-            CreateWorldWindow window = new CreateWorldWindow();
+            CreateWorldWindow window = new CreateWorldWindow(BaseDirectory);
             window.Show();
             Close();
+        }
+
+        private void OpenWorldButton_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+            dialog.Filter = "Polar Vortex Worlds (*.pvw)|*.pvw";
+            dialog.InitialDirectory = BaseDirectory;
+            if (dialog.ShowDialog() ?? false)
+            {
+                Models.World world = Models.World.LoadFromFile(dialog.FileName);
+                MainWindow window = new MainWindow(BaseDirectory, world);
+                window.Show();
+                Close();
+            }
         }
     }
 }

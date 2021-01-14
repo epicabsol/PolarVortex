@@ -7,7 +7,9 @@ namespace WorldEditor.Models
 {
     public class WorldTile : INotifyPropertyChanged
     {
-        private int _paletteIndex = -1;
+        public const int EmptyPaletteIndex = -1;
+
+        private int _paletteIndex = EmptyPaletteIndex;
         public int PaletteIndex
         {
             get => this._paletteIndex;
@@ -29,7 +31,7 @@ namespace WorldEditor.Models
             }
         }
 
-        public WorldTile(int paletteIndex = -1, bool collides = false)
+        public WorldTile(int paletteIndex = EmptyPaletteIndex, bool collides = false)
         {
             this._paletteIndex = paletteIndex;
             this._collides = collides;
