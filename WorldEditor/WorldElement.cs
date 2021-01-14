@@ -75,7 +75,7 @@ namespace WorldEditor
         {
             if (this.World != null && this.Palette != null)
             {
-                Brush backgroundBrush = (Brush)FindResource("BackgroundBrush");
+                Brush backgroundBrush = (Brush)FindResource("BackgroundWellBrush");
                 drawingContext.DrawRectangle(backgroundBrush, null, new Rect(0.0f, 0.0f, this.World.Width * this.Palette.TileSize - 0.0f, this.World.Height * this.Palette.TileSize - 0.0f));
             }
         }
