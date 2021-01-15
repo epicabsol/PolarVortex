@@ -34,9 +34,9 @@ namespace WorldEditor
                 {
                     ZoomLabel.Text = $"{Scale}x";
                 }
-                if (WorldElement != null)
+                if (WorldView != null)
                 {
-                    WorldElement.LayoutTransform = new ScaleTransform(Scale, Scale);
+                    WorldView.LayoutTransform = new ScaleTransform(Scale, Scale);
                 }
             }
         }
@@ -47,6 +47,9 @@ namespace WorldEditor
             this.CurrentWorld = world;
 
             InitializeComponent();
+
+            TileHoverRectangle.Width = WorldElement.Palette.TileSize;
+            TileHoverRectangle.Height = WorldElement.Palette.TileSize;
         }
 
         private void ZoomInButton_Click(object sender, RoutedEventArgs e)
@@ -67,6 +70,22 @@ namespace WorldEditor
         private void CollisionTool_Unchecked(object sender, RoutedEventArgs e)
         {
             WorldElement.ShowCollision = false;
+        }
+
+        private void WorldElement_MouseEnter(object sender, MouseEventArgs e)
+        {
+            TileHoverRectangle.Visibility = Visibility.Visible;
+        }
+
+        private void WorldElement_MouseLeave(object sender, MouseEventArgs e)
+        {
+            TileHoverRectangle.Visibility = Visibility.Hidden;
+        }
+
+        private void WorldElement_MouseMove(object sender, MouseEventArgs e)
+        {
+            Canvas.SetLeft(TileHoverRectangle, Math.Floor(e.GetPosition(WorldElement).X / WorldElement.Palette.TileSize) * WorldElement.Palette.TileSize);
+            Canvas.SetTop(TileHoverRectangle, Math.Floor(e.GetPosition(WorldElement).Y / WorldElement.Palette.TileSize) * WorldElement.Palette.TileSize);
         }
     }
 }

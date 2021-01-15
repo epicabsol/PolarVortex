@@ -43,7 +43,7 @@ namespace WorldEditor
         }
 
         private BitmapSource PaletteImage = null;
-        private TilePalette Palette = null;
+        public TilePalette Palette { get; private set; } = null;
         private DrawingVisual TileVisual = new DrawingVisual();
         private DrawingVisual CollisionVisual = new DrawingVisual();
         private List<DrawingVisual> ChildVisuals = new List<DrawingVisual>();
@@ -53,7 +53,9 @@ namespace WorldEditor
 
         protected override void OnInitialized(EventArgs e)
         {
+            this.IsHitTestVisible = false;
             RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
+            //TileVisual.
             ChildVisuals.Add(TileVisual);
             //ChildVisuals.Add(CollisionVisual);
             base.OnInitialized(e);
@@ -71,13 +73,28 @@ namespace WorldEditor
             }
         }
 
+        protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
+        {
+            if (hitTestParameters.HitPoint.X >= 0
+                && hitTestParameters.HitPoint.X < this.ActualWidth
+                && hitTestParameters.HitPoint.Y >= 0
+                && hitTestParameters.HitPoint.Y < this.ActualHeight)
+            {
+                return new PointHitTestResult(this, hitTestParameters.HitPoint);
+            }
+            else
+            {
+                return new PointHitTestResult(null, hitTestParameters.HitPoint);
+            }
+        }
+
         protected override void OnRender(DrawingContext drawingContext)
         {
-            if (this.World != null && this.Palette != null)
+            /*if (this.World != null && this.Palette != null)
             {
                 Brush backgroundBrush = (Brush)FindResource("BackgroundWellBrush");
                 drawingContext.DrawRectangle(backgroundBrush, null, new Rect(0.0f, 0.0f, this.World.Width * this.Palette.TileSize - 0.0f, this.World.Height * this.Palette.TileSize - 0.0f));
-            }
+            }*/
         }
 
         public void InvalidateTileVisual()
