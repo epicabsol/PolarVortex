@@ -23,6 +23,14 @@ namespace WorldEditor
         public string BaseDirectory { get; }
         public Models.World CurrentWorld { get; }
 
+        // Tile tool
+        public static DependencyProperty SelectedTileIndexProperty = DependencyProperty.Register(nameof(SelectedTileIndex), typeof(int), typeof(MainWindow));
+        public int SelectedTileIndex
+        {
+            get => (int)this.GetValue(SelectedTileIndexProperty);
+            set => this.SetValue(SelectedTileIndexProperty, value);
+        }
+
         private float _scale = 1.0f;
         public float Scale
         {
@@ -72,20 +80,99 @@ namespace WorldEditor
             WorldElement.ShowCollision = false;
         }
 
-        private void WorldElement_MouseEnter(object sender, MouseEventArgs e)
+        private void WorldView_MouseEnter(object sender, MouseEventArgs e)
         {
             TileHoverRectangle.Visibility = Visibility.Visible;
         }
 
-        private void WorldElement_MouseLeave(object sender, MouseEventArgs e)
+        private void WorldView_MouseLeave(object sender, MouseEventArgs e)
         {
             TileHoverRectangle.Visibility = Visibility.Hidden;
         }
 
-        private void WorldElement_MouseMove(object sender, MouseEventArgs e)
+        private void WorldView_MouseMove(object sender, MouseEventArgs e)
         {
-            Canvas.SetLeft(TileHoverRectangle, Math.Floor(e.GetPosition(WorldElement).X / WorldElement.Palette.TileSize) * WorldElement.Palette.TileSize);
-            Canvas.SetTop(TileHoverRectangle, Math.Floor(e.GetPosition(WorldElement).Y / WorldElement.Palette.TileSize) * WorldElement.Palette.TileSize);
+            int tileX = (int)Math.Floor(e.GetPosition(WorldElement).X / WorldElement.Palette.TileSize);
+            int tileY = CurrentWorld.Height - (int)Math.Floor(e.GetPosition(WorldElement).Y / WorldElement.Palette.TileSize) - 1;
+            Canvas.SetLeft(TileHoverRectangle, tileX * WorldElement.Palette.TileSize);
+            Canvas.SetTop(TileHoverRectangle, (CurrentWorld.Height - tileY - 1) * WorldElement.Palette.TileSize);
+
+            if (TileToolButton.IsChecked ?? false)
+            {
+                if ((e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
+                {
+                    int newTile = (e.LeftButton == MouseButtonState.Pressed) ? SelectedTileIndex : -1;
+                    if (CurrentWorld.Tiles[tileX, tileY].PaletteIndex != newTile)
+                    {
+                        CurrentWorld.Tiles[tileX, tileY].PaletteIndex = newTile;
+                        WorldElement.InvalidateTileVisual();
+                    }
+                }
+            }
+            else if (CollisionToolButton.IsChecked ?? false)
+            {
+                if ((e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
+                {
+                    bool shouldCollide = e.LeftButton == MouseButtonState.Pressed;
+                    if (CurrentWorld.Tiles[tileX, tileY].Collides != shouldCollide)
+                    {
+                        CurrentWorld.Tiles[tileX, tileY].Collides = shouldCollide;
+                        WorldElement.InvalidateCollisionVisual();
+                    }
+                }
+            }
+            else if (EntityToolButton.IsChecked ?? false)
+            {
+
+            }
+            else if (DecorToolButton.IsChecked ?? false)
+            {
+
+            }
+        }
+
+        private void WorldView_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            int tileX = (int)Math.Floor(e.GetPosition(WorldElement).X / WorldElement.Palette.TileSize);
+            int tileY = CurrentWorld.Height - (int)Math.Floor(e.GetPosition(WorldElement).Y / WorldElement.Palette.TileSize) - 1;
+            if (TileToolButton.IsChecked ?? false)
+            {
+                CurrentWorld.Tiles[tileX, tileY].PaletteIndex = (e.ChangedButton == MouseButton.Left) ? SelectedTileIndex : -1;
+                WorldElement.InvalidateTileVisual();
+            }
+            else if (CollisionToolButton.IsChecked ?? false)
+            {
+                CurrentWorld.Tiles[tileX, tileY].Collides = (e.ChangedButton == MouseButton.Left) ? true : false;
+                WorldElement.InvalidateCollisionVisual();
+            }
+            else if (EntityToolButton.IsChecked ?? false)
+            {
+
+            }
+            else if (DecorToolButton.IsChecked ?? false)
+            {
+
+            }
+        }
+
+        private void WorldView_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (TileToolButton.IsChecked ?? false)
+            {
+
+            }
+            else if (CollisionToolButton.IsChecked ?? false)
+            {
+
+            }
+            else if (EntityToolButton.IsChecked ?? false)
+            {
+
+            }
+            else if (DecorToolButton.IsChecked ?? false)
+            {
+
+            }
         }
     }
 }

@@ -53,10 +53,10 @@
         <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}" />
 
         <StackPanel Grid.Row="1" Orientation="Vertical">
-            <RadioButton Content="{StaticResource ToolBrush32px}" IsChecked="True" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
-            <RadioButton Content="{StaticResource ToolCollision32px}" Style="{StaticResource ResourceKey=ToolButtonStyle}" Checked="CollisionTool_Checked" Unchecked="CollisionTool_Unchecked" />
-            <RadioButton Content="{StaticResource ToolEntities32px}" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
-            <RadioButton Content="{StaticResource ToolDecor32px}" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton x:Name="TileToolButton" Content="{StaticResource ToolBrush32px}" ToolTip="Tile Paint Tool" IsChecked="True" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton x:Name="CollisionToolButton" Content="{StaticResource ToolCollision32px}" ToolTip="Tile Collision Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" Checked="CollisionTool_Checked" Unchecked="CollisionTool_Unchecked" />
+            <RadioButton x:Name="EntityToolButton" Content="{StaticResource ToolEntities32px}" ToolTip="Entities" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton x:Name="DecorToolButton" Content="{StaticResource ToolDecor32px}" ToolTip="Decor Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
         </StackPanel>
 
         <Grid Grid.Row="1" Grid.Column="2">
@@ -67,7 +67,7 @@
 
             <Border Background="{StaticResource BackgroundHeadingBrush}">
                 <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <Border x:Name="WorldView" Background="{StaticResource BackgroundBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="WorldElement_MouseEnter" MouseLeave="WorldElement_MouseLeave" MouseMove="WorldElement_MouseMove">
+                    <Border x:Name="WorldView" Background="{StaticResource BackgroundBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="WorldView_MouseEnter" MouseLeave="WorldView_MouseLeave" MouseMove="WorldView_MouseMove" MouseDown="WorldView_MouseDown" MouseUp="WorldView_MouseUp">
                         <Grid>
                             <local:WorldElement x:Name="WorldElement" World="{Binding CurrentWorld}" BaseDirectory="{Binding BaseDirectory}" HorizontalAlignment="Left" VerticalAlignment="Top" />
                             <Canvas x:Name="WorldCanvas">
@@ -104,7 +104,9 @@
                 </Grid.RowDefinitions>
 
                 <Border Grid.RowSpan="2" Background="{StaticResource BackgroundBrush}" />
-                <Border Grid.Row="2" Background="{StaticResource BackgroundHeadingBrush}" />
+                <Border Grid.Row="2" Background="{StaticResource BackgroundHeadingBrush}">
+                    <local:TilePicker PalettePath="{Binding CurrentWorld.PalettePath}" BaseDirectory="{Binding BaseDirectory}" SelectedIndex="{Binding SelectedTileIndex, Mode=TwoWay}" />
+                </Border>
 
                 <TextBlock Text="Palette" VerticalAlignment="Center" Margin="5 0" FontSize="14" />
                 <TextBlock Grid.Row="1" Text="{Binding CurrentWorld.PalettePath}" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrushh}" />

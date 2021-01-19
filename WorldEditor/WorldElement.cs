@@ -55,9 +55,8 @@ namespace WorldEditor
         {
             this.IsHitTestVisible = false;
             RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.NearestNeighbor);
-            //TileVisual.
             ChildVisuals.Add(TileVisual);
-            //ChildVisuals.Add(CollisionVisual);
+            this.AddVisualChild(TileVisual);
             base.OnInitialized(e);
         }
 
@@ -86,15 +85,6 @@ namespace WorldEditor
             {
                 return new PointHitTestResult(null, hitTestParameters.HitPoint);
             }
-        }
-
-        protected override void OnRender(DrawingContext drawingContext)
-        {
-            /*if (this.World != null && this.Palette != null)
-            {
-                Brush backgroundBrush = (Brush)FindResource("BackgroundWellBrush");
-                drawingContext.DrawRectangle(backgroundBrush, null, new Rect(0.0f, 0.0f, this.World.Width * this.Palette.TileSize - 0.0f, this.World.Height * this.Palette.TileSize - 0.0f));
-            }*/
         }
 
         public void InvalidateTileVisual()
@@ -133,7 +123,7 @@ namespace WorldEditor
                 {
                     for (int y = 0; y < this.World.Height; y++)
                     {
-                        if (this.World.Tiles[x, y].PaletteIndex != WorldTile.EmptyPaletteIndex)
+                        if (this.World.Tiles[x, y].Collides)
                         {
                             drawingContext.DrawRectangle(collisionBrush, null, new Rect(this.Palette.TileSize * x, this.Palette.TileSize * (World.Height - y - 1), this.Palette.TileSize, this.Palette.TileSize));
                         }

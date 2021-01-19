@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="WorldEditor.TilePicker"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WorldEditor"
+             mc:Ignorable="d" 
+             d:DesignHeight="250" d:DesignWidth="250" SizeChanged="UserControl_SizeChanged">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Image x:Name="PaletteImage" HorizontalAlignment="Stretch" VerticalAlignment="Top" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseEnter="PaletteImage_MouseEnter" MouseLeave="PaletteImage_MouseLeave" MouseMove="PaletteImage_MouseMove" MouseDown="PaletteImage_MouseDown" />
+            <Canvas IsHitTestVisible="False">
+                <Rectangle x:Name="HoverRectangle" Fill="{StaticResource HoverBrush}" />
+                <Rectangle x:Name="SelectionRectangle" Stroke="{StaticResource AccentBrush}" StrokeThickness="2" />
+            </Canvas>
+        </Grid>
+    </ScrollViewer>
+</UserControl>
