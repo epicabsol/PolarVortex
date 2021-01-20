@@ -1,0 +1,139 @@
+﻿<Window x:Class="WorldEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WorldEditor"
+        mc:Ignorable="d"
+        Title="Polar Vortex World Editor" Height="450" Width="800" Style="{StaticResource ResourceKey={x:Type Window}}" DataContext="{Binding RelativeSource={RelativeSource Self}}">
+    <Window.Resources>
+        <Style x:Key="ToolButtonStyle" TargetType="{x:Type RadioButton}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border x:Name="Border" Width="44" Height="44" Background="{TemplateBinding Background}">
+                            <ContentControl Content="{TemplateBinding Content}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=HoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{StaticResource ResourceKey=AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="4px" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="4px" />
+            <ColumnDefinition Width="250px" MinWidth="20px" />
+        </Grid.ColumnDefinitions>
+
+        <Menu Grid.ColumnSpan="5">
+            <MenuItem Header="File">
+                <MenuItem Header="New..." InputGestureText="Ctrl+N" />
+                <MenuItem Header="Save" InputGestureText="Ctrl+S" Click="SaveMenuItem_Click" />
+                <MenuItem Header="Save As..." InputGestureText="Ctrl+Shift+S" Click="SaveAsMenuItem_Click" />
+            </MenuItem>
+            <MenuItem Header="Edit" />
+            <MenuItem Header="View" />
+            <MenuItem Header="Help" />
+        </Menu>
+
+        <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}" />
+
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            <RadioButton x:Name="TileToolButton" Content="{StaticResource ToolBrush32px}" ToolTip="Tile Paint Tool" IsChecked="True" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton x:Name="CollisionToolButton" Content="{StaticResource ToolCollision32px}" ToolTip="Tile Collision Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" Checked="CollisionTool_Checked" Unchecked="CollisionTool_Unchecked" />
+            <RadioButton x:Name="EntityToolButton" Content="{StaticResource ToolEntities32px}" ToolTip="Entities" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton x:Name="DecorToolButton" Content="{StaticResource ToolDecor32px}" ToolTip="Decor Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton x:Name="GridsToolButton" Content="{StaticResource ToolGrids32px}" ToolTip="Grids Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton x:Name="BackgroundToolButton" Content="{StaticResource ToolBackground32px}" ToolTip="Background Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+        </StackPanel>
+
+        <Grid Grid.Row="1" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="20px" />
+            </Grid.RowDefinitions>
+
+            <Border Background="{StaticResource BackgroundHeadingBrush}">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Border x:Name="WorldView" Background="{StaticResource BackgroundBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="WorldView_MouseEnter" MouseLeave="WorldView_MouseLeave" MouseMove="WorldView_MouseMove" MouseDown="WorldView_MouseDown" MouseUp="WorldView_MouseUp">
+                        <Grid>
+                            <local:WorldElement x:Name="WorldElement" World="{Binding CurrentWorld}" BaseDirectory="{Binding BaseDirectory}" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                            <Canvas x:Name="WorldCanvas">
+                                <Rectangle x:Name="TileHoverRectangle" Visibility="Hidden" Fill="{StaticResource HoverBrush}" IsHitTestVisible="False" />
+                            </Canvas>
+                        </Grid>
+                    </Border>
+                </ScrollViewer>
+            </Border>
+
+            <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="ZoomLabel" Text="1x" Padding="4 0" VerticalAlignment="Center" MinWidth="40" TextAlignment="Right" />
+                    <Button Content="{StaticResource Plus16px}" Width="20" Click="ZoomInButton_Click" />
+                    <Button Content="{StaticResource Minux16px}" Width="20" Click="ZoomOutButton_Click" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <GridSplitter Grid.Row="1" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="4" />
+
+        <Grid Grid.Row="1" Grid.Column="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20px" />
+                    <RowDefinition Height="18px" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.RowSpan="2" Background="{StaticResource BackgroundBrush}" />
+                <Border Grid.Row="2" Background="{StaticResource BackgroundHeadingBrush}">
+                    <local:TilePicker PalettePath="{Binding CurrentWorld.PalettePath}" BaseDirectory="{Binding BaseDirectory}" SelectedIndex="{Binding SelectedTileIndex, Mode=TwoWay}" />
+                </Border>
+
+                <TextBlock Text="Palette" VerticalAlignment="Center" Margin="5 0" FontSize="14" />
+                <TextBlock Grid.Row="1" Text="{Binding CurrentWorld.PalettePath}" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrushh}" />
+            </Grid>
+
+            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Height="4" />
+
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20px" />
+                    <RowDefinition Height="18px" />
+                    <RowDefinition Height="1*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.RowSpan="2" Background="{StaticResource BackgroundBrush}" />
+                <Border Grid.Row="2" Background="{StaticResource BackgroundHeadingBrush}" />
+
+                <TextBlock Text="Properties" VerticalAlignment="Center" Margin="5 0" FontSize="14" />
+                <TextBlock Grid.Row="1" Text="No selection" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrushh}" />
+
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This file is compatible with Silverlight-->
+<Canvas xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Name="svg8" Width="16" Height="16">
+  <Canvas.RenderTransform>
+    <TranslateTransform X="0" Y="0"/>
+  </Canvas.RenderTransform>
+  <Canvas.Resources/>
+  <!--Unknown tag: sodipodi:namedview-->
+  <!--Unknown tag: metadata-->
+  <Canvas Name="layer1">
+    <Canvas.RenderTransform>
+      <TranslateTransform X="0" Y="-304.53333"/>
+    </Canvas.RenderTransform>
+    <Rectangle xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Canvas.Left="2" Canvas.Top="310.53333" Width="12" Height="4" Name="rect5628" Fill="#FF2D2D30" StrokeThickness="4" StrokeMiterLimit="4" StrokeLineJoin="Miter" StrokeStartLineCap="Square" StrokeEndLineCap="Square"/>
+    <Rectangle xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Canvas.Left="3" Canvas.Top="311.53333" Width="10" Height="2" Name="rect5626" Fill="#FFF1F1F1" StrokeThickness="4" StrokeMiterLimit="4" StrokeLineJoin="Miter" StrokeStartLineCap="Square" StrokeEndLineCap="Square"/>
+  </Canvas>
+</Canvas>
