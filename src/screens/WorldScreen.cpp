@@ -30,6 +30,17 @@ void WorldScreen::RenderViewportContents(size_t index) {
 
     this->_World->Render(this->_Viewports[index].GetCamera());
 
+    // Draw the tile mesh
+    glUseProgram(this->_TileShaderProgram->GetProgramHandle());
+    Matrix transform = Math_Mat4d(1.0f);
+    unsigned int transformUniform = glGetUniformLocation(this->_TileShaderProgram->GetProgramHandle(), "Transform");
+    glUniformMatrix4fv(transformUniform, 1, GL_FALSE, &transform.Elements[0][0]);
+    unsigned int projectionUniform = glGetUniformLocation(this->_TileShaderProgram->GetProgramHandle(), "Projection");
+    glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, &Game->GetRenderer().GetProjection().Elements[0][0]);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, this->_World->GetTilePalette()->GetTexture()->GetHandle());
+    Game->GetRenderer().DrawMesh(this->_TileMesh, this->_TileShaderProgram);
+
     Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "CPT. Skytear", this->_Player->GetCollider()->GetBounds().Position.X - 2.35f, this->_Player->GetCollider()->GetBounds().Position.Y + 3.0f, 0.0f, 1.0f / 16.0f, 0.0f);
 
     float x = this->_Player->GetCollider()->GetBounds().Position.X;
@@ -49,16 +60,6 @@ void WorldScreen::RenderViewportContents(size_t index) {
     }
 
 
-    glUseProgram(this->_TileShaderProgram->GetProgramHandle());
-    Matrix transform = Math_Mat4d(1.0f);
-    unsigned int transformUniform = glGetUniformLocation(this->_TileShaderProgram->GetProgramHandle(), "Transform");
-    glUniformMatrix4fv(transformUniform, 1, GL_FALSE, &transform.Elements[0][0]);
-    unsigned int projectionUniform = glGetUniformLocation(this->_TileShaderProgram->GetProgramHandle(), "Projection");
-    glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, &Game->GetRenderer().GetProjection().Elements[0][0]);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, this->_World->GetTilePalette()->GetTexture()->GetHandle());
-    Game->GetRenderer().DrawMesh(this->_TileMesh, this->_TileShaderProgram);
 }
 
 void WorldScreen::RebuildTileMesh() {
@@ -101,10 +102,10 @@ void WorldScreen::RebuildTileMesh() {
     this->_Allocator.Free(vertices);
 }
 
-WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>(Game->GetAssetManager().GetAsset(STRINGHASH("assets/worlds/test.pvw"))->GetAsset<WorldBlueprint>())), _MainCamera(allocator, 0.0f, 0.0f, 20.0f, 20.0f), _Player(nullptr), _TileMesh(nullptr), _TileShaderProgram(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr), _GridTexture(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/grid.png"))->GetAsset<GLTexture>()) {
+WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>(Game->GetAssetManager().GetAsset(STRINGHASH("assets/worlds/bigroom.pvw"))->GetAsset<WorldBlueprint>())), _MainCamera(allocator, 0.0f, 0.0f, 20.0f, 20.0f), _Player(nullptr), _TileMesh(nullptr), _TileShaderProgram(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr), _GridTexture(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/grid.png"))->GetAsset<GLTexture>()) {
     this->_Player = allocator.New<Player>(Game->GetMainWindow().GetInputDevice(0));
     this->_World->AddObject(this->_Player);
-    this->_Player->GetCollider()->GetBounds().Position = Vector2(this->_World->GetWidth() * 0.5f, this->_World->GetHeight());
+    this->_Player->GetCollider()->GetBounds().Position = Vector2(this->_World->GetWidth() * 0.5f, this->_World->GetHeight() * 0.5f);
 
     const GLTexture* gunTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/weapons/pistol/icon_2x.png"))->GetAsset<GLTexture>();
     this->_WeaponSprite = allocator.New<UISprite>(Sprite(gunTexture));

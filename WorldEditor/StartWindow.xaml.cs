@@ -36,12 +36,12 @@ namespace WorldEditor
         private void OpenWorldButton_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
-            dialog.Filter = "Polar Vortex Worlds (*.pvw)|*.pvw";
+            dialog.Filter = Models.World.DialogFilter;
             dialog.InitialDirectory = BaseDirectory;
             if (dialog.ShowDialog() ?? false)
             {
                 Models.World world = Models.World.LoadFromFile(dialog.FileName);
-                MainWindow window = new MainWindow(BaseDirectory, world);
+                MainWindow window = new MainWindow(BaseDirectory, world, dialog.FileName);
                 window.Show();
                 Close();
             }

@@ -8,6 +8,8 @@ namespace WorldEditor.Models
 {
     public class World : INotifyPropertyChanged
     {
+        public const string DialogFilter = "Polar Vortex Worlds (*.pvw)|*.pvw";
+
         private string _palettePath = "";
         public string PalettePath
         {
@@ -88,7 +90,45 @@ namespace WorldEditor.Models
         public void WriteToFile(string filename)
         {
             // See https://www.newtonsoft.com/json/help/html/ReadingWritingJSON.htm
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            using (System.IO.FileStream stream = new System.IO.FileStream(filename, System.IO.FileMode.Create))
+            using (System.IO.StreamWriter textWriter = new System.IO.StreamWriter(stream))
+            using (JsonWriter writer = new JsonTextWriter(textWriter))
+            {
+                writer.WriteStartObject(); // Start root
+
+                writer.WritePropertyName("palette");
+                writer.WriteValue(this.PalettePath);
+
+                writer.WritePropertyName("width");
+                writer.WriteValue(this.Width);
+
+                writer.WritePropertyName("height");
+                writer.WriteValue(this.Height);
+
+                writer.WritePropertyName("tiles");
+                writer.WriteStartArray(); // Start tiles
+
+                for (int y = 0; y < this.Height; y++)
+                {
+                    for (int x = 0; x < this.Width; x++)
+                    {
+                        writer.WriteStartObject(); // Start tile
+
+                        writer.WritePropertyName("index");
+                        writer.WriteValue(this.Tiles[x, y].PaletteIndex);
+
+                        writer.WritePropertyName("collides");
+                        writer.WriteValue(this.Tiles[x, y].Collides);
+
+                        writer.WriteEndObject(); // End tile
+                    }
+                }
+
+                writer.WriteEndArray(); // End tiles
+
+                writer.WriteEndObject(); // End root
+            }
         }
 
         public static World LoadFromFile(string filename)

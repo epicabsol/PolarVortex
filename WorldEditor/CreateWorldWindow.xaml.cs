@@ -42,7 +42,7 @@ namespace WorldEditor
             {
                 if (palettePath.Contains(@"\bin\"))
                     continue;
-                this.PalettePaths.Add(palettePath.Substring(BaseDirectory.Length + 1));
+                this.PalettePaths.Add(palettePath.Substring(BaseDirectory.Length + 1).Replace('\\', '/'));
             }
             if (this.PalettePaths.Count > 0 && (this.PalettePath == null || this.PalettePath == ""))
             {
@@ -80,7 +80,7 @@ namespace WorldEditor
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow window = new MainWindow(this.BaseDirectory, new Models.World(this.PalettePath, this.WorldWidth, this.WorldHeight));
+            MainWindow window = new MainWindow(this.BaseDirectory, new Models.World(this.PalettePath, this.WorldWidth, this.WorldHeight), null);
             window.Show();
             Close();
         }
