@@ -61,6 +61,8 @@
             <RadioButton x:Name="CollisionToolButton" Content="{StaticResource ToolCollision32px}" ToolTip="Tile Collision Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" Checked="CollisionTool_Checked" Unchecked="CollisionTool_Unchecked" />
             <RadioButton x:Name="EntityToolButton" Content="{StaticResource ToolEntities32px}" ToolTip="Entities" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
             <RadioButton x:Name="DecorToolButton" Content="{StaticResource ToolDecor32px}" ToolTip="Decor Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton x:Name="GridsToolButton" Content="{StaticResource ToolGrids32px}" ToolTip="Grids Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
+            <RadioButton x:Name="BackgroundToolButton" Content="{StaticResource ToolBackground32px}" ToolTip="Background Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
         </StackPanel>
 
         <Grid Grid.Row="1" Grid.Column="2">

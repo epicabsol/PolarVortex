@@ -170,6 +170,14 @@ namespace WorldEditor
             {
 
             }
+            else if (GridsToolButton.IsChecked ?? false)
+            {
+
+            }
+            else if (BackgroundToolButton.IsChecked ?? false)
+            {
+
+            }
         }
 
         private void WorldView_MouseDown(object sender, MouseButtonEventArgs e)
@@ -194,6 +202,14 @@ namespace WorldEditor
             {
 
             }
+            else if (GridsToolButton.IsChecked ?? false)
+            {
+
+            }
+            else if (BackgroundToolButton.IsChecked ?? false)
+            {
+
+            }
         }
 
         private void WorldView_MouseUp(object sender, MouseButtonEventArgs e)
@@ -211,6 +227,14 @@ namespace WorldEditor
 
             }
             else if (DecorToolButton.IsChecked ?? false)
+            {
+
+            }
+            else if (GridsToolButton.IsChecked ?? false)
+            {
+
+            }
+            else if (BackgroundToolButton.IsChecked ?? false)
             {
 
             }
