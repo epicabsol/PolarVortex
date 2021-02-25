@@ -24,6 +24,8 @@ namespace WorldEditor
         public Models.World CurrentWorld { get; }
         public string WorldFilename { get; set; } = null; // `null` means unsaved
 
+        public Actions.UndoContext UndoContext { get; }
+
         // Tile tool
         public static DependencyProperty SelectedTileIndexProperty = DependencyProperty.Register(nameof(SelectedTileIndex), typeof(int), typeof(MainWindow));
         public int SelectedTileIndex
@@ -55,6 +57,7 @@ namespace WorldEditor
             this.BaseDirectory = baseDirectory;
             this.CurrentWorld = world;
             this.WorldFilename = worldFilename;
+            this.UndoContext = new Actions.UndoContext(world);
 
             InitializeComponent();
 
@@ -131,6 +134,8 @@ namespace WorldEditor
             TileHoverRectangle.Visibility = Visibility.Hidden;
         }
 
+        private bool IsLeftMouseDown = false;
+        private bool IsRightMouseDown = false;
         private void WorldView_MouseMove(object sender, MouseEventArgs e)
         {
             int tileX = (int)Math.Floor(e.GetPosition(WorldElement).X / WorldElement.Palette.TileSize);
@@ -140,21 +145,25 @@ namespace WorldEditor
 
             if (TileToolButton.IsChecked ?? false)
             {
-                if ((e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
+                if ((IsLeftMouseDown || IsRightMouseDown) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
                 {
-                    int newTile = (e.LeftButton == MouseButtonState.Pressed) ? SelectedTileIndex : -1;
-                    if (CurrentWorld.Tiles[tileX, tileY].PaletteIndex != newTile)
+                    int newTile = (IsLeftMouseDown) ? SelectedTileIndex : -1;
+                    int oldTile = CurrentWorld.Tiles[tileX, tileY].PaletteIndex;
+                    if (oldTile != newTile)
                     {
-                        CurrentWorld.Tiles[tileX, tileY].PaletteIndex = newTile;
+                        //CurrentWorld.Tiles[tileX, tileY].PaletteIndex = newTile;
+                        this.UndoContext.ExecuteAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
+                        
+                        // HACK
                         WorldElement.InvalidateTileVisual();
                     }
                 }
             }
             else if (CollisionToolButton.IsChecked ?? false)
             {
-                if ((e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
+                if ((IsLeftMouseDown || IsRightMouseDown) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
                 {
-                    bool shouldCollide = e.LeftButton == MouseButtonState.Pressed;
+                    bool shouldCollide = IsLeftMouseDown;
                     if (CurrentWorld.Tiles[tileX, tileY].Collides != shouldCollide)
                     {
                         CurrentWorld.Tiles[tileX, tileY].Collides = shouldCollide;
@@ -182,12 +191,29 @@ namespace WorldEditor
 
         private void WorldView_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                IsLeftMouseDown = true;
+            }
+            else if (e.ChangedButton == MouseButton.Right)
+            {
+                IsRightMouseDown = true;
+            }
+
             int tileX = (int)Math.Floor(e.GetPosition(WorldElement).X / WorldElement.Palette.TileSize);
             int tileY = CurrentWorld.Height - (int)Math.Floor(e.GetPosition(WorldElement).Y / WorldElement.Palette.TileSize) - 1;
             if (TileToolButton.IsChecked ?? false)
             {
-                CurrentWorld.Tiles[tileX, tileY].PaletteIndex = (e.ChangedButton == MouseButton.Left) ? SelectedTileIndex : -1;
-                WorldElement.InvalidateTileVisual();
+                int newTile = (IsLeftMouseDown) ? SelectedTileIndex : -1;
+                int oldTile = CurrentWorld.Tiles[tileX, tileY].PaletteIndex;
+                if (oldTile != newTile)
+                {
+                    //CurrentWorld.Tiles[tileX, tileY].PaletteIndex = newTile;
+                    this.UndoContext.ExecuteAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
+
+                    // HACK
+                    WorldElement.InvalidateTileVisual();
+                }
             }
             else if (CollisionToolButton.IsChecked ?? false)
             {
@@ -214,6 +240,15 @@ namespace WorldEditor
 
         private void WorldView_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                IsLeftMouseDown = false;
+            }
+            else if (e.ChangedButton == MouseButton.Right)
+            {
+                IsRightMouseDown = false;
+            }
+
             if (TileToolButton.IsChecked ?? false)
             {
 
@@ -240,14 +275,63 @@ namespace WorldEditor
             }
         }
 
-        private void SaveMenuItem_Click(object sender, RoutedEventArgs e)
+        private void SaveAsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        #region Commands
+        private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.SaveWorld();
         }
 
-        private void SaveAsMenuItem_Click(object sender, RoutedEventArgs e)
+        private void SaveCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void UndoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.UndoContext.UndoAction();
+            WorldElement.InvalidateTileVisual(); // HACK: Do this automatically when necessary
+        }
+
+        private void UndoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.UndoContext.CanUndo;
+        }
+
+        private void RedoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.UndoContext.RedoAction();
+            WorldElement.InvalidateTileVisual(); // HACK: Do this automatically when necessary
+        }
+
+        private void RedoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = this.UndoContext.CanRedo;
+        }
+        #endregion
+
+        private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            // TODO: Implement!
+        }
+
+        private void NewCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void SaveAsCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.SaveWorldAs();
+        }
+
+        private void SaveAsCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
         }
     }
 }

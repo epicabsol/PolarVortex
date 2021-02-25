@@ -29,9 +29,28 @@
             </Setter>
         </Style>
     </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.New" Executed="NewCommand_Executed" CanExecute="NewCommand_CanExecute" />
+        <CommandBinding Command="ApplicationCommands.Save" Executed="SaveCommand_Executed" CanExecute="SaveCommand_CanExecute" />
+        <CommandBinding Command="ApplicationCommands.SaveAs" Executed="SaveAsCommand_Executed" CanExecute="SaveAsCommand_CanExecute" />
+
+        <CommandBinding Command="ApplicationCommands.Undo" Executed="UndoCommand_Executed" CanExecute="UndoCommand_CanExecute" />
+        <CommandBinding Command="ApplicationCommands.Redo" Executed="RedoCommand_Executed" CanExecute="RedoCommand_CanExecute" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Gesture="Control+N" Command="ApplicationCommands.New" />
+        <KeyBinding Gesture="Control+S" Command="ApplicationCommands.Save" />
+        <KeyBinding Gesture="Control+Shift+S" Command="ApplicationCommands.SaveAs" />
+
+        <KeyBinding Gesture="Control+Z" Command="ApplicationCommands.Undo" />
+        <KeyBinding Gesture="Control+Shift+Z" Command="ApplicationCommands.Redo" />
+
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="4px" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
 
@@ -45,18 +64,27 @@
 
         <Menu Grid.ColumnSpan="5">
             <MenuItem Header="File">
-                <MenuItem Header="New..." InputGestureText="Ctrl+N" />
-                <MenuItem Header="Save" InputGestureText="Ctrl+S" Click="SaveMenuItem_Click" />
-                <MenuItem Header="Save As..." InputGestureText="Ctrl+Shift+S" Click="SaveAsMenuItem_Click" />
+                <MenuItem Header="New..." InputGestureText="Ctrl+N" Command="ApplicationCommands.New" />
+                <MenuItem Header="Save" InputGestureText="Ctrl+S" Command="ApplicationCommands.Save" />
+                <MenuItem Header="Save As..." InputGestureText="Ctrl+Shift+S" Command="ApplicationCommands.SaveAs" />
             </MenuItem>
-            <MenuItem Header="Edit" />
+            <MenuItem Header="Edit">
+                <MenuItem Header="Undo" InputGestureText="Ctrl+Z" Command="ApplicationCommands.Undo" />
+                <MenuItem Header="Redo" InputGestureText="Ctrl+Shift+Z" Command="ApplicationCommands.Redo" />
+            </MenuItem>
             <MenuItem Header="View" />
             <MenuItem Header="Help" />
         </Menu>
 
-        <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}" />
+        <ToolBar Grid.Row="1" Grid.ColumnSpan="5" Background="{StaticResource BackgroundBrush}">
+            <Button Content="{StaticResource Save16px}" Command="ApplicationCommands.Save" />
+            <Button Content="{StaticResource Undo16px}" Command="ApplicationCommands.Undo" />
+            <Button Content="{StaticResource Redo16px}" Command="ApplicationCommands.Redo" />
+        </ToolBar>
 
-        <StackPanel Grid.Row="1" Orientation="Vertical">
+        <Border Grid.Row="3" Background="{StaticResource BackgroundBrush}" />
+
+        <StackPanel Grid.Row="3" Orientation="Vertical">
             <RadioButton x:Name="TileToolButton" Content="{StaticResource ToolBrush32px}" ToolTip="Tile Paint Tool" IsChecked="True" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
             <RadioButton x:Name="CollisionToolButton" Content="{StaticResource ToolCollision32px}" ToolTip="Tile Collision Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" Checked="CollisionTool_Checked" Unchecked="CollisionTool_Unchecked" />
             <RadioButton x:Name="EntityToolButton" Content="{StaticResource ToolEntities32px}" ToolTip="Entities" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
@@ -65,7 +93,7 @@
             <RadioButton x:Name="BackgroundToolButton" Content="{StaticResource ToolBackground32px}" ToolTip="Background Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" />
         </StackPanel>
 
-        <Grid Grid.Row="1" Grid.Column="2">
+        <Grid Grid.Row="3" Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="20px" />
@@ -93,9 +121,9 @@
             </Border>
         </Grid>
 
-        <GridSplitter Grid.Row="1" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="4" />
+        <GridSplitter Grid.Row="3" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="4" />
 
-        <Grid Grid.Row="1" Grid.Column="4">
+        <Grid Grid.Row="3" Grid.Column="4">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" />
                 <RowDefinition Height="Auto" />

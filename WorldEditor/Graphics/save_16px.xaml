@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Canvas xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Name="svg8" Width="16" Height="16">
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="Outline" Fill="#FF2D2D30" StrokeThickness="1" StrokeLineJoin="Miter" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat" Data="F1M1,15L1,1 10,1 12.414,1 15,3.586 15,15z"/>
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="Fill" Fill="#FFF1F1F1" StrokeThickness="4" StrokeMiterLimit="4" StrokeLineJoin="Miter" StrokeStartLineCap="Square" StrokeEndLineCap="Square" Data="F1M12,2L11,2 11,7 5,7 5,2 2,2 2,14 14,14 14,4z"/>
+    <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="Fill2" Fill="#FFF1F1F1" StrokeThickness="4" StrokeMiterLimit="4" StrokeLineJoin="Miter" StrokeStartLineCap="Square" StrokeEndLineCap="Square" Data="F1M10,5L8,5 8,2 10,2z"/>
+</Canvas>
