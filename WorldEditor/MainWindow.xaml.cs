@@ -312,7 +312,6 @@ namespace WorldEditor
         {
             e.CanExecute = this.UndoContext.CanRedo;
         }
-        #endregion
 
         private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -333,5 +332,6 @@ namespace WorldEditor
         {
             e.CanExecute = true;
         }
+        #endregion
     }
 }

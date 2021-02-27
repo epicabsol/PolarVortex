@@ -8,7 +8,7 @@
              d:DesignHeight="250" d:DesignWidth="250" SizeChanged="UserControl_SizeChanged">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid>
-            <Image x:Name="PaletteImage" HorizontalAlignment="Stretch" VerticalAlignment="Top" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseEnter="PaletteImage_MouseEnter" MouseLeave="PaletteImage_MouseLeave" MouseMove="PaletteImage_MouseMove" MouseDown="PaletteImage_MouseDown" />
+            <Image x:Name="PaletteImage" HorizontalAlignment="Stretch" Stretch="Uniform" VerticalAlignment="Top" RenderOptions.BitmapScalingMode="NearestNeighbor" MouseEnter="PaletteImage_MouseEnter" MouseLeave="PaletteImage_MouseLeave" MouseMove="PaletteImage_MouseMove" MouseDown="PaletteImage_MouseDown" />
             <Canvas IsHitTestVisible="False">
                 <Rectangle x:Name="HoverRectangle" Fill="{StaticResource HoverBrush}" />
                 <Rectangle x:Name="SelectionRectangle" Stroke="{StaticResource AccentBrush}" StrokeThickness="2" />
