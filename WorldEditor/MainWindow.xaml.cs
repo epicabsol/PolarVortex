@@ -147,11 +147,10 @@ namespace WorldEditor
             {
                 if ((IsLeftMouseDown || IsRightMouseDown) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
                 {
-                    int newTile = (IsLeftMouseDown) ? SelectedTileIndex : -1;
+                    int newTile = IsLeftMouseDown ? SelectedTileIndex : -1;
                     int oldTile = CurrentWorld.Tiles[tileX, tileY].PaletteIndex;
                     if (oldTile != newTile)
                     {
-                        //CurrentWorld.Tiles[tileX, tileY].PaletteIndex = newTile;
                         this.UndoContext.DoAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
                         
                         // HACK
@@ -163,10 +162,13 @@ namespace WorldEditor
             {
                 if ((IsLeftMouseDown || IsRightMouseDown) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
                 {
-                    bool shouldCollide = IsLeftMouseDown;
-                    if (CurrentWorld.Tiles[tileX, tileY].Collides != shouldCollide)
+                    bool oldCollision = this.CurrentWorld.Tiles[tileX, tileY].Collides;
+                    bool newCollision = IsLeftMouseDown ? true : false;
+                    if (newCollision != oldCollision)
                     {
-                        CurrentWorld.Tiles[tileX, tileY].Collides = shouldCollide;
+                        this.UndoContext.DoAction(new Actions.SetTileCollisionAction(tileX, tileY, oldCollision, newCollision));
+
+                        // HACK
                         WorldElement.InvalidateCollisionVisual();
                     }
                 }
@@ -206,11 +208,10 @@ namespace WorldEditor
             int tileY = CurrentWorld.Height - (int)Math.Floor(e.GetPosition(WorldElement).Y / WorldElement.Palette.TileSize) - 1;
             if (TileToolButton.IsChecked ?? false)
             {
-                int newTile = (IsLeftMouseDown) ? SelectedTileIndex : -1;
+                int newTile = IsLeftMouseDown ? SelectedTileIndex : -1;
                 int oldTile = CurrentWorld.Tiles[tileX, tileY].PaletteIndex;
                 if (oldTile != newTile)
                 {
-                    //CurrentWorld.Tiles[tileX, tileY].PaletteIndex = newTile;
                     this.UndoContext.DoAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
 
                     // HACK
@@ -219,8 +220,15 @@ namespace WorldEditor
             }
             else if (CollisionToolButton.IsChecked ?? false)
             {
-                CurrentWorld.Tiles[tileX, tileY].Collides = (e.ChangedButton == MouseButton.Left) ? true : false;
-                WorldElement.InvalidateCollisionVisual();
+                bool oldCollision = this.CurrentWorld.Tiles[tileX, tileY].Collides;
+                bool newCollision = IsLeftMouseDown ? true : false;
+                if (newCollision != oldCollision)
+                {
+                    this.UndoContext.DoAction(new Actions.SetTileCollisionAction(tileX, tileY, oldCollision, newCollision));
+
+                    // HACK
+                    WorldElement.InvalidateCollisionVisual();
+                }
             }
             else if (EntityToolButton.IsChecked ?? false)
             {
@@ -305,6 +313,7 @@ namespace WorldEditor
         {
             this.UndoContext.UndoAction();
             WorldElement.InvalidateTileVisual(); // HACK: Do this automatically when necessary
+            WorldElement.InvalidateCollisionVisual();
         }
 
         private void UndoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -316,6 +325,7 @@ namespace WorldEditor
         {
             this.UndoContext.RedoAction();
             WorldElement.InvalidateTileVisual(); // HACK: Do this automatically when necessary
+            WorldElement.InvalidateCollisionVisual();
         }
 
         private void RedoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
