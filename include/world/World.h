@@ -10,22 +10,15 @@
 
 class Camera;
 class GLTexture;
+class Grid;
 class Object;
-class TilePalette;
 class WorldBlueprint;
-
-struct WorldTile {
-    int16_t PaletteIndex;
-    bool Collides;
-};
 
 class World {
 private:
     Allocator& _Allocator;
-    const TilePalette* _TilePalette;
-    WorldTile* _Tiles;
-    size_t _Width;
-    size_t _Height;
+    size_t _GridCount;
+    Grid* _Grids;
 
     Vector2 _Gravity;
     IterablePoolAllocator<Collider> _ColliderPool;
@@ -49,12 +42,9 @@ public:
     World(Allocator& allocator, const WorldBlueprint* blueprint);
     ~World();
 
-    inline const TilePalette* GetTilePalette() const { return this->_TilePalette; }
-    inline WorldTile& GetTile(size_t x, size_t y) { return this->_Tiles[y * this->_Width + x]; }
-    inline const WorldTile& GetTile(size_t x, size_t y) const { return this->_Tiles[y * this->_Width + x]; }
-    inline size_t GetWidth() const { return this->_Width; }
-    inline size_t GetHeight() const { return this->_Height; }
-    const WorldTile* GetTiles() const { return this->_Tiles; }
+    inline size_t GetGridCount() const { return this->_GridCount; }
+    const Grid* GetGrids() const { return this->_Grids; }
+    Grid* GetGrids() { return this->_Grids; }
 
     Collider* AddCollider(Vector2 center, Vector2 halfSize);
     void RemoveCollider(Collider* collider);

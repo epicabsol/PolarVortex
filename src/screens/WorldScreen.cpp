@@ -10,6 +10,7 @@
 #include "ui/UIDockContainer.h"
 #include "ui/UISprite.h"
 #include "ui/UITextBlock.h"
+#include "world/Grid.h"
 #include "world/TilePalette.h"
 #include "world/Player.h"
 #include "world/World.h"
@@ -30,16 +31,19 @@ void WorldScreen::RenderViewportContents(size_t index) {
 
     this->_World->Render(this->_Viewports[index].GetCamera());
 
-    // Draw the tile mesh
+    // Draw the grid meshes
     glUseProgram(this->_TileShaderProgram->GetProgramHandle());
     Matrix transform = Math_Mat4d(1.0f);
-    unsigned int transformUniform = glGetUniformLocation(this->_TileShaderProgram->GetProgramHandle(), "Transform");
-    glUniformMatrix4fv(transformUniform, 1, GL_FALSE, &transform.Elements[0][0]);
     unsigned int projectionUniform = glGetUniformLocation(this->_TileShaderProgram->GetProgramHandle(), "Projection");
+    unsigned int transformUniform = glGetUniformLocation(this->_TileShaderProgram->GetProgramHandle(), "Transform");
     glUniformMatrix4fv(projectionUniform, 1, GL_FALSE, &Game->GetRenderer().GetProjection().Elements[0][0]);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, this->_World->GetTilePalette()->GetTexture()->GetHandle());
-    Game->GetRenderer().DrawMesh(this->_TileMesh, this->_TileShaderProgram);
+    for (size_t i = 0; i < this->_World->GetGridCount(); i++) {
+        transform = Math_Translate(Vector3(this->_World->GetGrids()[i].GetPosition().X, this->_World->GetGrids()[i].GetPosition().Y, 0.0f));
+        glUniformMatrix4fv(transformUniform, 1, GL_FALSE, &transform.Elements[0][0]);
+        glBindTexture(GL_TEXTURE_2D, this->_GridModels[i].Texture->GetHandle());
+        Game->GetRenderer().DrawMesh(this->_GridModels[i].Mesh, this->_TileShaderProgram);
+    }
 
     Game->GetRenderer().DrawString(Game->GetAssetManager().GetAsset(STRINGHASH("assets/fonts/vortex-body.pvf"))->GetAsset<SpriteFont>(), "CPT. Skytear", this->_Player->GetCollider()->GetBounds().Position.X - 2.35f, this->_Player->GetCollider()->GetBounds().Position.Y + 3.0f, 0.0f, 1.0f / 16.0f, 0.0f);
 
@@ -58,54 +62,58 @@ void WorldScreen::RenderViewportContents(size_t index) {
             x += scale * 1.25f;
         }
     }
-
-
 }
 
 void WorldScreen::RebuildTileMesh() {
-    if (this->_TileMesh != nullptr) {
-        this->_Allocator.Delete(this->_TileMesh);
-    }
+    for (size_t i = 0; i < this->_World->GetGridCount(); i++) {
+        // Delete the old mesh, if there was any
+        if (this->_GridModels[i].Mesh != nullptr) {
+            this->_Allocator.Delete(this->_GridModels[i].Mesh);
+        }
 
-    // Allocate the vertices and indices (allocates for worst-case, usually there will be some memory unused)
-    SpriteVertex* vertices = (SpriteVertex*)this->_Allocator.Allocate(sizeof(SpriteVertex) * this->_World->GetWidth() * this->_World->GetHeight() * 4);
-    size_t vertexCount = 0;
-    uint16_t* indices = (uint16_t*)this->_Allocator.Allocate(sizeof(uint16_t) * this->_World->GetWidth() * this->_World->GetHeight() * 6);
-    size_t indexCount = 0;
+        const Grid* grid = &this->_World->GetGrids()[i];
+        // Allocate the vertices and indices (allocates for worst-case, usually there will be some memory unused)
+        SpriteVertex* vertices = (SpriteVertex*)this->_Allocator.Allocate(sizeof(SpriteVertex) * grid->GetWidth() * grid->GetHeight() * 4);
+        size_t vertexCount = 0;
+        uint16_t* indices = (uint16_t*)this->_Allocator.Allocate(sizeof(uint16_t) * grid->GetWidth() * grid->GetHeight() * 6);
+        size_t indexCount = 0;
 
-    // Generate the vertices and indices
-    for (size_t y = 0; y < this->_World->GetHeight(); y++) {
-        for (size_t x = 0; x < this->_World->GetWidth(); x++) {
-            int16_t index = this->_World->GetTile(x, y).PaletteIndex;
-            if (index >= 0) {
-                float minU = (index % this->_World->GetTilePalette()->GetStride()) * this->_World->GetTilePalette()->GetTileWidth();
-                float minV = (index / this->_World->GetTilePalette()->GetStride()) * this->_World->GetTilePalette()->GetTileHeight();
-                vertices[vertexCount] = { (float)x, (float)y, 0.0f, minU, minV + this->_World->GetTilePalette()->GetTileHeight() }; // Bottom left
-                vertices[vertexCount + 1] = { (float)x + 1.0f, (float)y, 0.0f, minU + this->_World->GetTilePalette()->GetTileWidth(), minV + this->_World->GetTilePalette()->GetTileHeight() }; // Bottom right
-                vertices[vertexCount + 2] = { (float)x + 1.0f, (float)y + 1.0f, 0.0f, minU + this->_World->GetTilePalette()->GetTileWidth(), minV }; // Top right
-                vertices[vertexCount + 3] = { (float)x, (float)y + 1.0f, 0.0f, minU, minV }; // Top left
+        // Generate the vertices and indices
+        for (size_t y = 0; y < grid->GetHeight(); y++) {
+            for (size_t x = 0; x < grid->GetWidth(); x++) {
+                int16_t index = grid->GetTile(x, y).PaletteIndex;
+                if (index >= 0) {
+                    float minU = (index % grid->GetTilePalette()->GetStride()) * grid->GetTilePalette()->GetTileWidth();
+                    float minV = (index / grid->GetTilePalette()->GetStride()) * grid->GetTilePalette()->GetTileHeight();
+                    vertices[vertexCount] = { (float)x, (float)y, 0.0f, minU, minV + grid->GetTilePalette()->GetTileHeight() }; // Bottom left
+                    vertices[vertexCount + 1] = { (float)x + 1.0f, (float)y, 0.0f, minU + grid->GetTilePalette()->GetTileWidth(), minV + grid->GetTilePalette()->GetTileHeight() }; // Bottom right
+                    vertices[vertexCount + 2] = { (float)x + 1.0f, (float)y + 1.0f, 0.0f, minU + grid->GetTilePalette()->GetTileWidth(), minV }; // Top right
+                    vertices[vertexCount + 3] = { (float)x, (float)y + 1.0f, 0.0f, minU, minV }; // Top left
 
-                indices[indexCount] = vertexCount;
-                indices[indexCount + 1] = vertexCount + 2;
-                indices[indexCount + 2] = vertexCount + 1;
-                indices[indexCount + 3] = vertexCount;
-                indices[indexCount + 4] = vertexCount + 3;
-                indices[indexCount + 5] = vertexCount + 2;
+                    indices[indexCount] = vertexCount;
+                    indices[indexCount + 1] = vertexCount + 2;
+                    indices[indexCount + 2] = vertexCount + 1;
+                    indices[indexCount + 3] = vertexCount;
+                    indices[indexCount + 4] = vertexCount + 3;
+                    indices[indexCount + 5] = vertexCount + 2;
 
-                vertexCount += 4;
-                indexCount += 6;
+                    vertexCount += 4;
+                    indexCount += 6;
+                }
             }
         }
+
+        this->_GridModels[i].Mesh = this->_Allocator.New<GLMesh>(SpriteVertexAttributes, SpriteVertexAttributeCount, vertices, vertexCount, indices, sizeof(indices[0]), indexCount);
+        this->_GridModels[i].Texture = grid->GetTilePalette()->GetTexture();
+        this->_Allocator.Free(vertices);
     }
 
-    this->_TileMesh = this->_Allocator.New<GLMesh>(SpriteVertexAttributes, SpriteVertexAttributeCount, vertices, vertexCount, indices, sizeof(indices[0]), indexCount);
-    this->_Allocator.Free(vertices);
 }
 
-WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>(Game->GetAssetManager().GetAsset(STRINGHASH("assets/worlds/bigroom.pvw"))->GetAsset<WorldBlueprint>())), _MainCamera(allocator, 0.0f, 0.0f, 20.0f, 20.0f), _Player(nullptr), _TileMesh(nullptr), _TileShaderProgram(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr), _GridTexture(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/grid.png"))->GetAsset<GLTexture>()) {
+WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(allocator.New<World>(Game->GetAssetManager().GetAsset(STRINGHASH("assets/worlds/bigroom.pvw"))->GetAsset<WorldBlueprint>())), _MainCamera(allocator, 0.0f, 0.0f, 20.0f, 20.0f), _Player(nullptr), _GridModels(nullptr), _TileShaderProgram(nullptr), _HUDContainer(nullptr), _LeftContainer(nullptr), _RightContainer(nullptr), _WeaponSprite(nullptr), _GridTexture(Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/grid.png"))->GetAsset<GLTexture>()) {
     this->_Player = allocator.New<Player>(Game->GetMainWindow().GetInputDevice(0));
     this->_World->AddObject(this->_Player);
-    this->_Player->GetCollider()->GetBounds().Position = Vector2(this->_World->GetWidth() * 0.5f, this->_World->GetHeight() * 0.5f);
+    this->_Player->GetCollider()->GetBounds().Position = Vector2(this->_World->GetGrids()[0].GetWidth() * 0.5f, this->_World->GetGrids()[0].GetHeight() * 0.5f);
 
     const GLTexture* gunTexture = Game->GetAssetManager().GetAsset(STRINGHASH("assets/sprites/weapons/pistol/icon_2x.png"))->GetAsset<GLTexture>();
     this->_WeaponSprite = allocator.New<UISprite>(Sprite(gunTexture));
@@ -138,14 +146,20 @@ WorldScreen::WorldScreen(Allocator& allocator) : Screen(allocator), _World(alloc
     this->_Viewports[0].SetRootUIElement(this->_HUDContainer);
 
     this->_TileShaderProgram = this->_Allocator.New<GLShaderProgram>(STRINGHASH("assets/shaders/TileVertexShader.glsl"), STRINGHASH("assets/shaders/SpritePixelShader.glsl"));
+
+    this->_GridModels = (GridModel*)this->_Allocator.Allocate(sizeof(GridModel) * this->_World->GetGridCount());
+    for (size_t i = 0; i < this->_World->GetGridCount(); i++) {
+        this->_GridModels[i] = { };
+    }
     this->RebuildTileMesh();
 }
 
 WorldScreen::~WorldScreen() {
     this->_Allocator.Delete(this->_TileShaderProgram);
-    if (this->_TileMesh != nullptr) {
-        this->_Allocator.Delete(this->_TileMesh);
+    for (size_t i = 0; i < this->_World->GetGridCount(); i++) {
+        this->_Allocator.Delete(this->_GridModels[i].Mesh);
     }
+    this->_Allocator.Free(this->_GridModels);
     this->_Allocator.Delete(this->_World);
 }
 

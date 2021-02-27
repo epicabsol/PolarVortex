@@ -3,6 +3,7 @@
 #include "../render/Math.h"
 #include "BoundingBox.h"
 
+class Grid;
 class World;
 
 struct Intersection {
@@ -37,5 +38,7 @@ bool LineIntersectsBoundingBox(const Vector2& point1, const Vector2& point2, con
 bool BoundingBoxIntersectsBoundingBox(const BoundingBox& bounds1, const BoundingBox& bounds2, Intersection& intersection);
 bool SweptBoundingBoxIntersectsBoundingBox(const BoundingBox& bounds1, const Vector2& end, const BoundingBox& bounds2, Intersection& intersection);
 
+bool SegmentIntersectsGrid(const Vector2& start, const Vector2& end, const Grid* grid, Intersection& intersection);
 bool SegmentIntersectsWorld(const Vector2& start, const Vector2& end, const World* world, Intersection& intersection);
+bool SweptBoundingBoxIntersectsGrid(const BoundingBox& bounds, const Vector2& end, const Grid* grid, Intersection& intersection);
 bool SweptBoundingBoxIntersectsWorld(const BoundingBox& bounds, const Vector2& end, const World* world, Intersection& intersection);
