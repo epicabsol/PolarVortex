@@ -152,7 +152,7 @@ namespace WorldEditor
                     if (oldTile != newTile)
                     {
                         //CurrentWorld.Tiles[tileX, tileY].PaletteIndex = newTile;
-                        this.UndoContext.ExecuteAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
+                        this.UndoContext.DoAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
                         
                         // HACK
                         WorldElement.InvalidateTileVisual();
@@ -200,6 +200,8 @@ namespace WorldEditor
                 IsRightMouseDown = true;
             }
 
+            this.UndoContext.BeginGroup();
+
             int tileX = (int)Math.Floor(e.GetPosition(WorldElement).X / WorldElement.Palette.TileSize);
             int tileY = CurrentWorld.Height - (int)Math.Floor(e.GetPosition(WorldElement).Y / WorldElement.Palette.TileSize) - 1;
             if (TileToolButton.IsChecked ?? false)
@@ -209,7 +211,7 @@ namespace WorldEditor
                 if (oldTile != newTile)
                 {
                     //CurrentWorld.Tiles[tileX, tileY].PaletteIndex = newTile;
-                    this.UndoContext.ExecuteAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
+                    this.UndoContext.DoAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
 
                     // HACK
                     WorldElement.InvalidateTileVisual();
@@ -240,13 +242,19 @@ namespace WorldEditor
 
         private void WorldView_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left)
+            if (e.ChangedButton == MouseButton.Left && IsLeftMouseDown)
             {
                 IsLeftMouseDown = false;
             }
-            else if (e.ChangedButton == MouseButton.Right)
+            else if (e.ChangedButton == MouseButton.Right && IsRightMouseDown)
             {
                 IsRightMouseDown = false;
+            }
+            else
+            {
+                // Sometimes we get a MouseUp when the click that closed the previous window is released, but before the user has pressed down on this window.
+                // Ignore those.
+                return;
             }
 
             if (TileToolButton.IsChecked ?? false)
@@ -273,6 +281,8 @@ namespace WorldEditor
             {
 
             }
+
+            this.UndoContext.EndGroup();
         }
 
         private void SaveAsMenuItem_Click(object sender, RoutedEventArgs e)
