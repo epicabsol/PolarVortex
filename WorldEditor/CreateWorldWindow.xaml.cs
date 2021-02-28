@@ -66,7 +66,7 @@ namespace WorldEditor
                         dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(System.IO.File.ReadAllText(path));
                         this.PalettePreviewPath = System.IO.Path.Combine(this.BaseDirectory, (string)data.texture);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         this.PalettePreviewPath = "";
                     }
@@ -80,7 +80,7 @@ namespace WorldEditor
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow window = new MainWindow(this.BaseDirectory, new Models.World(this.PalettePath, this.WorldWidth, this.WorldHeight), null);
+            MainWindow window = new MainWindow(this.BaseDirectory, new Models.World(new Models.Grid[] { new Models.Grid(0, 0, this.PalettePath, this.WorldWidth, this.WorldHeight) }), null);
             window.Show();
             Close();
         }

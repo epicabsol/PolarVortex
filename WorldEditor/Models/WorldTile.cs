@@ -31,6 +31,8 @@ namespace WorldEditor.Models
             }
         }
 
+        public bool PropHooked => this.PropertyChanged != null;
+
         public WorldTile(int paletteIndex = EmptyPaletteIndex, bool collides = false)
         {
             this._paletteIndex = paletteIndex;

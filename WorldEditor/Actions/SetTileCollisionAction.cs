@@ -7,13 +7,15 @@ namespace WorldEditor.Actions
 {
     public class SetTileCollisionAction : Action
     {
+        public int GridIndex { get; }
         public int TileX { get; }
         public int TileY { get; }
         public bool OldCollision { get; }
         public bool NewCollision { get; }
 
-        public SetTileCollisionAction(int tileX, int tileY, bool oldCollision, bool newCollision)
+        public SetTileCollisionAction(int gridIndex, int tileX, int tileY, bool oldCollision, bool newCollision)
         {
+            this.GridIndex = gridIndex;
             this.TileX = tileX;
             this.TileY = tileY;
             this.OldCollision = oldCollision;
@@ -22,12 +24,12 @@ namespace WorldEditor.Actions
 
         public override void Execute(World world)
         {
-            world.Tiles[this.TileX, this.TileY].Collides = this.NewCollision;
+            world.Grids[this.GridIndex].Tiles[this.TileX, this.TileY].Collides = this.NewCollision;
         }
 
         public override void Undo(World world)
         {
-            world.Tiles[this.TileX, this.TileY].Collides = this.OldCollision;
+            world.Grids[this.GridIndex].Tiles[this.TileX, this.TileY].Collides = this.OldCollision;
         }
 
         public override string ToString()

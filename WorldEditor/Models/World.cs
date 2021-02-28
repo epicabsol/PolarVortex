@@ -10,120 +10,66 @@ namespace WorldEditor.Models
     {
         public const string DialogFilter = "Polar Vortex Worlds (*.pvw)|*.pvw";
 
-        private string _palettePath = "";
-        public string PalettePath
+        public List<Grid> Grids { get; }
+
+        public World(IEnumerable<Grid> grids)
         {
-            get => this._palettePath;
-            set
-            {
-                this._palettePath = value;
-                this.OnPropertyChanged(nameof(PalettePath));
-            }
-        }
-
-        private int _width;
-        public int Width
-        {
-            get => this._width;
-            private set
-            {
-                this._width = value;
-                this.OnPropertyChanged(nameof(Width));
-            }
-        }
-
-        private int _height;
-        public int Height
-        {
-            get => this._height;
-            private set
-            {
-                this._height = value;
-                this.OnPropertyChanged(nameof(Height));
-            }
-        }
-
-        private WorldTile[,] _tiles;
-        public WorldTile[,] Tiles => _tiles;
-
-        public World(string palettePath, int width, int height)
-        {
-            this._palettePath = palettePath;
-            this._width = width;
-            this._height = height;
-            this._tiles = new WorldTile[this.Width, this.Height];
-
-            for (int x = 0; x < this.Width; x++)
-            {
-                for (int y = 0; y < this.Height; y++)
-                {
-                    this.Tiles[x, y] = new WorldTile();
-                }
-            }
-        }
-
-        public void Resize(int newWidth, int newHeight)
-        {
-            WorldTile[,] newTiles = new WorldTile[newWidth, newHeight];
-            for (int x = 0; x < newWidth; x++)
-            {
-                for (int y = 0; y < newHeight; y++)
-                {
-                    if (x < this.Width && y < this.Height)
-                    {
-                        newTiles[x, y] = this.Tiles[x, y];
-                    }
-                    else
-                    {
-                        newTiles[x, y] = new WorldTile();
-                    }
-                }
-            }
-            this._width = newWidth;
-            this._height = newHeight;
-            this._tiles = newTiles;
-            this.OnPropertyChanged(nameof(Width));
-            this.OnPropertyChanged(nameof(Height));
-            this.OnPropertyChanged(nameof(Tiles));
+            this.Grids = new List<Grid>(grids);
         }
 
         public void WriteToFile(string filename)
         {
             // See https://www.newtonsoft.com/json/help/html/ReadingWritingJSON.htm
-            //throw new NotImplementedException();
             using (System.IO.FileStream stream = new System.IO.FileStream(filename, System.IO.FileMode.Create))
             using (System.IO.StreamWriter textWriter = new System.IO.StreamWriter(stream))
             using (JsonWriter writer = new JsonTextWriter(textWriter))
             {
                 writer.WriteStartObject(); // Start root
 
-                writer.WritePropertyName("palette");
-                writer.WriteValue(this.PalettePath);
+                writer.WritePropertyName("grids");
+                writer.WriteStartArray(); // Start grids
 
-                writer.WritePropertyName("width");
-                writer.WriteValue(this.Width);
-
-                writer.WritePropertyName("height");
-                writer.WriteValue(this.Height);
-
-                writer.WritePropertyName("tiles");
-                writer.WriteStartArray(); // Start tiles
-
-                for (int y = 0; y < this.Height; y++)
+                foreach (Grid grid in this.Grids)
                 {
-                    for (int x = 0; x < this.Width; x++)
+                    writer.WriteStartObject(); // Start grid
+
+                    writer.WritePropertyName("x");
+                    writer.WriteValue(grid.X);
+
+                    writer.WritePropertyName("y");
+                    writer.WriteValue(grid.Y);
+
+                    writer.WritePropertyName("palette");
+                    writer.WriteValue(grid.PalettePath);
+
+                    writer.WritePropertyName("width");
+                    writer.WriteValue(grid.Width);
+
+                    writer.WritePropertyName("height");
+                    writer.WriteValue(grid.Height);
+
+                    writer.WritePropertyName("tiles");
+                    writer.WriteStartArray(); // Start tiles
+
+                    for (int y = 0; y < grid.Height; y++)
                     {
-                        writer.WriteStartObject(); // Start tile
+                        for (int x = 0; x < grid.Width; x++)
+                        {
+                            writer.WriteStartObject(); // Start tile
 
-                        writer.WritePropertyName("index");
-                        writer.WriteValue(this.Tiles[x, y].PaletteIndex);
+                            writer.WritePropertyName("index");
+                            writer.WriteValue(grid.Tiles[x, y].PaletteIndex);
 
-                        writer.WritePropertyName("collides");
-                        writer.WriteValue(this.Tiles[x, y].Collides);
+                            writer.WritePropertyName("collides");
+                            writer.WriteValue(grid.Tiles[x, y].Collides);
 
-                        writer.WriteEndObject(); // End tile
+                            writer.WriteEndObject(); // End tile
+                        }
                     }
+
+                    writer.WriteEndObject(); // End grid
                 }
+                writer.WriteEndArray(); // End grids
 
                 writer.WriteEndArray(); // End tiles
 
@@ -137,31 +83,48 @@ namespace WorldEditor.Models
             using (System.IO.TextReader textReader = new System.IO.StreamReader(stream))
             using (JsonReader reader = new JsonTextReader(textReader))
             {
-                reader.Read();
-                reader.Read();
-                string palettePath = reader.ReadAsString();
-                reader.Read();
-                int width = reader.ReadAsInt32().Value;
-                reader.Read();
-                int height = reader.ReadAsInt32().Value;
-                reader.Read();
-                reader.Read();
-                World result = new World(palettePath, width, height);
-                int i = 0;
-                reader.Read(); // Read the beginning of the object
+                reader.Read(); // Start root object
+                reader.Read(); // grids property
+                reader.Read(); // Begin grids array
+                reader.Read(); // Begin grid object or end of array
+                List<Grid> grids = new List<Grid>();
                 while (reader.TokenType != JsonToken.EndArray)
                 {
-                    reader.Read(); 
-                    int paletteIndex = reader.ReadAsInt32().Value;
+                    reader.Read(); // x property
+                    int x = reader.ReadAsInt32().Value;
+                    reader.Read(); // y property
+                    int y = reader.ReadAsInt32().Value;
+                    reader.Read(); // palettePath property
+                    string palettePath = reader.ReadAsString();
                     reader.Read();
-                    bool collides = reader.ReadAsBoolean().Value; 
-                    reader.Read(); 
-                    reader.Read(); // Read the beginning of the next object or the end of the array
-                    result.Tiles[i % width, i / width] = new WorldTile(paletteIndex, collides);
+                    int width = reader.ReadAsInt32().Value;
+                    reader.Read();
+                    int height = reader.ReadAsInt32().Value;
+                    reader.Read(); // tiles property
+                    reader.Read(); // start array
+                    Grid grid = new Grid(x, y, palettePath, width, height);
+                    int i = 0;
+                    reader.Read(); // Read the beginning of the object
+                    while (reader.TokenType != JsonToken.EndArray)
+                    {
+                        reader.Read(); 
+                        int paletteIndex = reader.ReadAsInt32().Value;
+                        reader.Read();
+                        bool collides = reader.ReadAsBoolean().Value; 
+                        reader.Read(); 
+                        reader.Read(); // Read the beginning of the next object or the end of the array
+                        grid.Tiles[i % width, i / width].PaletteIndex = paletteIndex;
+                        grid.Tiles[i % width, i / width].Collides = collides;
 
-                    i++;
+                        i++;
+                    }
+                    reader.Read(); // End grid object
+                    reader.Read(); // Begin next grid object or end of array
+
+                    grids.Add(grid);
                 }
-                return result;
+
+                return new World(grids);
             }
         }
 
