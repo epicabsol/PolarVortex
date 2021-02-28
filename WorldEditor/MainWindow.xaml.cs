@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,27 @@ using System.Windows.Shapes;
 
 namespace WorldEditor
 {
+    [ValueConversion(typeof(float), typeof(double))]
+    public class GridYConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length == 2 && values[0] is int worldY && values[1] is Models.Grid grid)
+            {
+                return (double)(-worldY - grid.Height);
+            }
+            else
+            {
+                return DependencyProperty.UnsetValue;
+            }
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -56,16 +78,17 @@ namespace WorldEditor
             set
             {
                 _scale = value;
-                if (ZoomLabel != null)
+                if (this.ZoomLabel != null)
                 {
-                    ZoomLabel.Text = $"{Scale}x";
+                    this.ZoomLabel.Text = $"{this.Scale}x";
                 }
                 if (WorldView != null)
                 {
-                    WorldView.LayoutTransform = new ScaleTransform(Scale, Scale);
+                    this.UpdateViewTransform();
                 }
             }
         }
+        private Vector ViewOffset = new Vector();
 
         public MainWindow(string baseDirectory, Models.World world, string worldFilename)
         {
@@ -75,6 +98,9 @@ namespace WorldEditor
             this.UndoContext = new Actions.UndoContext(world);
 
             InitializeComponent();
+
+            this.ViewOffset.Y = 750.0f; // HACK: We should correctly focus on the center of the world bounds, not a hardcoded point.
+            this.Scale = 32.0f;
         }
 
         private bool SaveWorld()
@@ -116,14 +142,36 @@ namespace WorldEditor
             }
         }
 
+        private void UpdateViewTransform()
+        {
+            TransformGroup viewTransform = new TransformGroup();
+            viewTransform.Children.Add(new ScaleTransform(this.Scale, this.Scale));
+            viewTransform.Children.Add(new TranslateTransform((int)this.ViewOffset.X, (int)this.ViewOffset.Y));
+            WorldView.RenderTransform = viewTransform;
+        }
+
+        private void UpdateOffsetForScaleChange(float oldScale, float newScale, Point screenFocalPoint)
+        {
+            float focalX = (float)(screenFocalPoint.X - ViewOffset.X) / oldScale;
+            float focalY = (float)(screenFocalPoint.Y - ViewOffset.Y) / oldScale;
+            ViewOffset.X = -1.0f * (focalX * newScale - (float)screenFocalPoint.X);
+            ViewOffset.Y = -1.0f * (focalY * newScale - (float)screenFocalPoint.Y);
+            if (WorldView != null)
+            {
+                this.UpdateViewTransform();
+            }
+        }
+
         private void ZoomInButton_Click(object sender, RoutedEventArgs e)
         {
-            Scale = Scale * 2.0f;
+            this.UpdateOffsetForScaleChange(this.Scale, this.Scale * 2.0f, new Point((float)WorldViewport.ActualWidth / 2.0f, (float)WorldViewport.ActualHeight / 2.0f));
+            this.Scale *= 2.0f;
         }
 
         private void ZoomOutButton_Click(object sender, RoutedEventArgs e)
         {
-            Scale = Scale * 0.5f;
+            this.UpdateOffsetForScaleChange(this.Scale, this.Scale * 0.5f, new Point((float)WorldViewport.ActualWidth / 2.0f, (float)WorldViewport.ActualHeight / 2.0f));
+            this.Scale *= 0.5f;
         }
 
         private void CollisionTool_Checked(object sender, RoutedEventArgs e)
@@ -138,6 +186,10 @@ namespace WorldEditor
 
         private void GridElement_MouseEnter(object sender, MouseEventArgs e)
         {
+            GridElement element = (GridElement)sender;
+
+            this.SelectedGrid = element.Grid;
+
             TileHoverRectangle.Visibility = Visibility.Visible;
         }
 
@@ -155,7 +207,7 @@ namespace WorldEditor
             int tileX = (int)Math.Floor(e.GetPosition(element).X);
             int tileY = element.Grid.Height - (int)Math.Floor(e.GetPosition(element).Y) - 1;
             Canvas.SetLeft(TileHoverRectangle, tileX + element.Grid.X);
-            Canvas.SetTop(TileHoverRectangle, (element.Grid.Height - (tileY + element.Grid.Y) - 1));
+            Canvas.SetTop(TileHoverRectangle, -tileY + element.Grid.Y - 1);
 
             if (TileToolButton.IsChecked ?? false)
             {
@@ -211,7 +263,6 @@ namespace WorldEditor
             }
 
             GridElement element = (GridElement)sender;
-            this.SelectedGrid = element.Grid;
 
             if (IsLeftMouseDown || IsRightMouseDown)
             {
@@ -352,5 +403,65 @@ namespace WorldEditor
             e.CanExecute = true;
         }
         #endregion
+
+        private bool Panning = false;
+        private Point LastMouse = new Point();
+        private void WorldViewport_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Middle)
+            {
+                this.Panning = true;
+                LastMouse = e.GetPosition(WorldViewport);
+                WorldViewport.CaptureMouse();
+                e.Handled = true;
+            }
+        }
+
+        private void WorldViewport_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (this.Panning)
+            {
+                Point point = e.GetPosition(WorldViewport);
+                if (point != LastMouse)
+                {
+                    this.ViewOffset.X += point.X - LastMouse.X;
+                    this.ViewOffset.Y += point.Y - LastMouse.Y;
+                    this.UpdateViewTransform();
+
+                }
+                LastMouse = point;
+                e.Handled = true;
+            }
+        }
+
+        private void WorldViewport_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Middle && this.Panning)
+            {
+                this.Panning = false;
+                WorldViewport.ReleaseMouseCapture();
+                e.Handled = true;
+            }
+        }
+
+        private float ZoomAccumulator = 0.0f;
+        private void WorldViewport_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            this.ZoomAccumulator += e.Delta / 120.0f;
+            Point point = e.GetPosition(WorldViewport);
+            while (this.ZoomAccumulator >= 1.0f)
+            {
+                this.UpdateOffsetForScaleChange(this.Scale, this.Scale * 2.0f, point);
+                this.Scale *= 2.0f;
+                this.ZoomAccumulator -= 1.0f;
+            }
+            while (this.ZoomAccumulator <= -1.0f)
+            {
+                this.UpdateOffsetForScaleChange(this.Scale, this.Scale * 0.5f, point);
+                this.Scale *= 0.5f;
+                this.ZoomAccumulator += 1.0f;
+            }
+            e.Handled = true;
+        }
     }
 }

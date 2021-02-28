@@ -67,11 +67,11 @@ namespace WorldEditor.Models
                         }
                     }
 
+                    writer.WriteEndArray(); // End tiles
+
                     writer.WriteEndObject(); // End grid
                 }
                 writer.WriteEndArray(); // End grids
-
-                writer.WriteEndArray(); // End tiles
 
                 writer.WriteEndObject(); // End root
             }

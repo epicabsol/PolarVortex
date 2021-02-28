@@ -29,6 +29,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <local:GridYConverter x:Key="gridYConverter" />
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.New" Executed="NewCommand_Executed" CanExecute="NewCommand_CanExecute" />
@@ -130,37 +131,41 @@
                 <RowDefinition Height="20px" />
             </Grid.RowDefinitions>
 
-            <Border Background="{StaticResource BackgroundHeadingBrush}">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <Border x:Name="WorldView" HorizontalAlignment="Left" VerticalAlignment="Top">
-                        <Grid>
+            <Border x:Name="WorldViewport" ClipToBounds="True" Background="{StaticResource BackgroundHeadingBrush}" PreviewMouseDown="WorldViewport_PreviewMouseDown" PreviewMouseMove="WorldViewport_PreviewMouseMove" PreviewMouseUp="WorldViewport_PreviewMouseUp" PreviewMouseWheel="WorldViewport_PreviewMouseWheel">
+                <Border x:Name="WorldView" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Grid>
 
-                            <ItemsControl ItemsSource="{Binding CurrentWorld.Grids}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Canvas />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
+                        <ItemsControl ItemsSource="{Binding CurrentWorld.Grids}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
 
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type models:Grid}">
-                                        <Canvas>
-                                            <Border Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}" Background="{StaticResource BackgroundBrush}" Width="{Binding Width}" Height="{Binding Height}">
-                                                <local:GridElement Grid="{Binding}" ShowCollision="{Binding ShowCollision, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" BaseDirectory="{Binding BaseDirectory, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="GridElement_MouseEnter" MouseLeave="GridElement_MouseLeave" MouseMove="GridElement_MouseMove" MouseDown="GridElement_MouseDown" MouseUp="GridElement_MouseUp" />
-                                            </Border>
-                                        </Canvas>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:Grid}">
+                                    <Canvas>
+                                        <Border Canvas.Left="{Binding X}" Background="{StaticResource BackgroundBrush}" Width="{Binding Width}" Height="{Binding Height}">
+                                            <Canvas.Top>
+                                                <MultiBinding Converter="{StaticResource gridYConverter}">
+                                                    <Binding Path="Y" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </Canvas.Top>
+                                            <local:GridElement Grid="{Binding}" ShowCollision="{Binding ShowCollision, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" BaseDirectory="{Binding BaseDirectory, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="GridElement_MouseEnter" MouseLeave="GridElement_MouseLeave" MouseMove="GridElement_MouseMove" MouseDown="GridElement_MouseDown" MouseUp="GridElement_MouseUp" />
+                                        </Border>
+                                    </Canvas>
               
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                            <Canvas x:Name="WorldCanvas">
-                                <Rectangle x:Name="TileHoverRectangle" Visibility="Hidden" Width="1" Height="1" Fill="{StaticResource HoverBrush}" IsHitTestVisible="False" />
-                            </Canvas>
-                        </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Canvas x:Name="WorldCanvas">
+                            <Rectangle x:Name="TileHoverRectangle" Visibility="Hidden" Width="1" Height="1" Fill="{StaticResource HoverBrush}" IsHitTestVisible="False" />
+                        </Canvas>
+                    </Grid>
                         
                         
-                    </Border>
-                </ScrollViewer>
+                </Border>
             </Border>
 
             <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}">
