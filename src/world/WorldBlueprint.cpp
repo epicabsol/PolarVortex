@@ -3,6 +3,7 @@
 #include "assets/AssetManager.h"
 #include "assets/sajson.h"
 #include "memory/Allocator.h"
+#include "world/GridBlueprint.h"
 #include "world/World.h"
 
 // `sajson` guarantees that the parse buffer will worst-case be 1 word (4 bytes) per input character
@@ -14,25 +15,38 @@ WorldBlueprint::WorldBlueprint(Allocator& allocator, const char* data, size_t da
     const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, dataLength), sajson::mutable_string_view(dataLength, (char*)data));
 
     sajson::value rootObject = doc.get_root();
-    sajson::value palettePath = rootObject.get_value_of_key(sajson::literal("palette"));
-    Hash palettePathHash = HashData(palettePath.as_cstring(), (uint32_t)palettePath.get_string_length());
-    this->_Palette = Game->GetAssetManager().GetAsset(palettePathHash)->GetAsset<TilePalette>();
+    sajson::value gridArray = rootObject.get_value_of_key(sajson::literal("grids"));
+    this->_GridCount = gridArray.get_length();
+    this->_Grids = (GridBlueprint*)allocator.Allocate(sizeof(GridBlueprint) * this->_GridCount);
 
-    this->_Width = (size_t)rootObject.get_value_of_key(sajson::literal("width")).get_integer_value();
-    this->_Height = (size_t)rootObject.get_value_of_key(sajson::literal("height")).get_integer_value();
+    for (size_t j = 0; j < this->_GridCount; j++) {
+        sajson::value gridObject = gridArray.get_array_element(j);
 
-    sajson::value tileArray = rootObject.get_value_of_key(sajson::literal("tiles"));
-    this->_Tiles = (WorldTile*)allocator.Allocate(sizeof(WorldTile) * this->_Width * this->_Height);
-    for (size_t i = 0; i < tileArray.get_length(); i++) {
-        sajson::value tileObject = tileArray.get_array_element(i);
+        float x = gridObject.get_value_of_key(sajson::literal("x")).get_number_value();
+        float y = gridObject.get_value_of_key(sajson::literal("y")).get_number_value();
 
-        this->_Tiles[i].PaletteIndex = tileObject.get_value_of_key(sajson::literal("index")).get_integer_value();
-        this->_Tiles[i].Collides = tileObject.get_value_of_key(sajson::literal("collides")).get_boolean_value();
+        sajson::value palettePath = gridObject.get_value_of_key(sajson::literal("palette"));
+        Hash palettePathHash = HashData(palettePath.as_cstring(), (uint32_t)palettePath.get_string_length());
+        const TilePalette* palette = Game->GetAssetManager().GetAsset(palettePathHash)->GetAsset<TilePalette>();
+
+        size_t width = (size_t)gridObject.get_value_of_key(sajson::literal("width")).get_integer_value();
+        size_t height = (size_t)gridObject.get_value_of_key(sajson::literal("height")).get_integer_value();
+
+        sajson::value tileArray = gridObject.get_value_of_key(sajson::literal("tiles"));
+        WorldTile* tiles = (WorldTile*)allocator.Allocate(sizeof(WorldTile) * width * height);
+        for (size_t i = 0; i < tileArray.get_length(); i++) {
+            sajson::value tileObject = tileArray.get_array_element(i);
+
+            tiles[i].PaletteIndex = tileObject.get_value_of_key(sajson::literal("index")).get_integer_value();
+            tiles[i].Collides = tileObject.get_value_of_key(sajson::literal("collides")).get_boolean_value();
+        }
+
+        new (&this->_Grids[j]) GridBlueprint(allocator, Vector2(x, y), palette, width, height, tiles);
     }
 
     allocator.Free(parseBuffer);
 }
 
 WorldBlueprint::~WorldBlueprint() {
-    this->_Allocator.Free(this->_Tiles);
+    this->_Allocator.Free(this->_Grids);
 }

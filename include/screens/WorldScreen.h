@@ -15,12 +15,17 @@ class World;
 class GLMesh;
 class GLShaderProgram;
 
+struct GridModel {
+    GLMesh* Mesh;
+    const GLTexture* Texture;
+};
+
 class WorldScreen : public Screen {
 private:
     World* _World;
     Camera _MainCamera;
     Player* _Player;
-    GLMesh* _TileMesh;
+    GridModel* _GridModels;
     GLShaderProgram* _TileShaderProgram;
     UIDockContainer* _HUDContainer;
     UIDockContainer* _LeftContainer;

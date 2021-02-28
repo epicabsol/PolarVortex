@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,27 @@ using System.Windows.Shapes;
 
 namespace WorldEditor
 {
+    [ValueConversion(typeof(float), typeof(double))]
+    public class GridYConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (values.Length == 2 && values[0] is int worldY && values[1] is Models.Grid grid)
+            {
+                return (double)(-worldY - grid.Height);
+            }
+            else
+            {
+                return DependencyProperty.UnsetValue;
+            }
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -26,12 +48,27 @@ namespace WorldEditor
 
         public Actions.UndoContext UndoContext { get; }
 
+        public static DependencyProperty SelectedGridProperty = DependencyProperty.Register(nameof(SelectedGrid), typeof(Models.Grid), typeof(MainWindow));
+        public Models.Grid SelectedGrid
+        {
+            get => (Models.Grid)this.GetValue(SelectedGridProperty);
+            set => this.SetValue(SelectedGridProperty, value);
+        }
+
         // Tile tool
         public static DependencyProperty SelectedTileIndexProperty = DependencyProperty.Register(nameof(SelectedTileIndex), typeof(int), typeof(MainWindow));
         public int SelectedTileIndex
         {
             get => (int)this.GetValue(SelectedTileIndexProperty);
             set => this.SetValue(SelectedTileIndexProperty, value);
+        }
+
+        // Collision tool
+        public static DependencyProperty ShowCollisionProperty = DependencyProperty.Register(nameof(ShowCollision), typeof(bool), typeof(MainWindow));
+        public bool ShowCollision
+        {
+            get => (bool)this.GetValue(ShowCollisionProperty);
+            set => this.SetValue(ShowCollisionProperty, value);
         }
 
         private float _scale = 1.0f;
@@ -41,16 +78,17 @@ namespace WorldEditor
             set
             {
                 _scale = value;
-                if (ZoomLabel != null)
+                if (this.ZoomLabel != null)
                 {
-                    ZoomLabel.Text = $"{Scale}x";
+                    this.ZoomLabel.Text = $"{this.Scale}x";
                 }
                 if (WorldView != null)
                 {
-                    WorldView.LayoutTransform = new ScaleTransform(Scale, Scale);
+                    this.UpdateViewTransform();
                 }
             }
         }
+        private Vector ViewOffset = new Vector();
 
         public MainWindow(string baseDirectory, Models.World world, string worldFilename)
         {
@@ -61,8 +99,8 @@ namespace WorldEditor
 
             InitializeComponent();
 
-            TileHoverRectangle.Width = WorldElement.Palette.TileSize;
-            TileHoverRectangle.Height = WorldElement.Palette.TileSize;
+            this.ViewOffset.Y = 750.0f; // HACK: We should correctly focus on the center of the world bounds, not a hardcoded point.
+            this.Scale = 32.0f;
         }
 
         private bool SaveWorld()
@@ -104,72 +142,94 @@ namespace WorldEditor
             }
         }
 
+        private void UpdateViewTransform()
+        {
+            TransformGroup viewTransform = new TransformGroup();
+            viewTransform.Children.Add(new ScaleTransform(this.Scale, this.Scale));
+            viewTransform.Children.Add(new TranslateTransform((int)this.ViewOffset.X, (int)this.ViewOffset.Y));
+            WorldView.RenderTransform = viewTransform;
+        }
+
+        private void UpdateOffsetForScaleChange(float oldScale, float newScale, Point screenFocalPoint)
+        {
+            float focalX = (float)(screenFocalPoint.X - ViewOffset.X) / oldScale;
+            float focalY = (float)(screenFocalPoint.Y - ViewOffset.Y) / oldScale;
+            ViewOffset.X = -1.0f * (focalX * newScale - (float)screenFocalPoint.X);
+            ViewOffset.Y = -1.0f * (focalY * newScale - (float)screenFocalPoint.Y);
+            if (WorldView != null)
+            {
+                this.UpdateViewTransform();
+            }
+        }
+
         private void ZoomInButton_Click(object sender, RoutedEventArgs e)
         {
-            Scale = Scale * 2.0f;
+            this.UpdateOffsetForScaleChange(this.Scale, this.Scale * 2.0f, new Point((float)WorldViewport.ActualWidth / 2.0f, (float)WorldViewport.ActualHeight / 2.0f));
+            this.Scale *= 2.0f;
         }
 
         private void ZoomOutButton_Click(object sender, RoutedEventArgs e)
         {
-            Scale = Scale * 0.5f;
+            this.UpdateOffsetForScaleChange(this.Scale, this.Scale * 0.5f, new Point((float)WorldViewport.ActualWidth / 2.0f, (float)WorldViewport.ActualHeight / 2.0f));
+            this.Scale *= 0.5f;
         }
 
         private void CollisionTool_Checked(object sender, RoutedEventArgs e)
         {
-            WorldElement.ShowCollision = true;
+            this.ShowCollision = true;
         }
 
         private void CollisionTool_Unchecked(object sender, RoutedEventArgs e)
         {
-            WorldElement.ShowCollision = false;
+            this.ShowCollision = false;
         }
 
-        private void WorldView_MouseEnter(object sender, MouseEventArgs e)
+        private void GridElement_MouseEnter(object sender, MouseEventArgs e)
         {
+            GridElement element = (GridElement)sender;
+
+            this.SelectedGrid = element.Grid;
+
             TileHoverRectangle.Visibility = Visibility.Visible;
         }
 
-        private void WorldView_MouseLeave(object sender, MouseEventArgs e)
+        private void GridElement_MouseLeave(object sender, MouseEventArgs e)
         {
             TileHoverRectangle.Visibility = Visibility.Hidden;
         }
 
         private bool IsLeftMouseDown = false;
         private bool IsRightMouseDown = false;
-        private void WorldView_MouseMove(object sender, MouseEventArgs e)
+        private void GridElement_MouseMove(object sender, MouseEventArgs e)
         {
-            int tileX = (int)Math.Floor(e.GetPosition(WorldElement).X / WorldElement.Palette.TileSize);
-            int tileY = CurrentWorld.Height - (int)Math.Floor(e.GetPosition(WorldElement).Y / WorldElement.Palette.TileSize) - 1;
-            Canvas.SetLeft(TileHoverRectangle, tileX * WorldElement.Palette.TileSize);
-            Canvas.SetTop(TileHoverRectangle, (CurrentWorld.Height - tileY - 1) * WorldElement.Palette.TileSize);
+            GridElement element = (GridElement)sender;
+
+            int tileX = (int)Math.Floor(e.GetPosition(element).X);
+            int tileY = element.Grid.Height - (int)Math.Floor(e.GetPosition(element).Y) - 1;
+            Canvas.SetLeft(TileHoverRectangle, tileX + element.Grid.X);
+            Canvas.SetTop(TileHoverRectangle, -tileY + element.Grid.Y - 1);
 
             if (TileToolButton.IsChecked ?? false)
             {
-                if ((IsLeftMouseDown || IsRightMouseDown) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
+                if ((IsLeftMouseDown || IsRightMouseDown) && tileX >= 0 && tileX < element.Grid.Width && tileY >= 0 && tileY < element.Grid.Height)
                 {
                     int newTile = IsLeftMouseDown ? SelectedTileIndex : -1;
-                    int oldTile = CurrentWorld.Tiles[tileX, tileY].PaletteIndex;
+                    int oldTile = element.Grid.Tiles[tileX, tileY].PaletteIndex;
                     if (oldTile != newTile)
                     {
-                        this.UndoContext.DoAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
-                        
-                        // HACK
-                        WorldElement.InvalidateTileVisual();
+                        this.UndoContext.DoAction(new Actions.SetTileAction(this.CurrentWorld.Grids.IndexOf(element.Grid), tileX, tileY, oldTile, newTile));
                     }
                 }
             }
             else if (CollisionToolButton.IsChecked ?? false)
             {
-                if ((IsLeftMouseDown || IsRightMouseDown) && tileX >= 0 && tileX < WorldElement.World.Width && tileY >= 0 && tileY < WorldElement.World.Height)
+                if ((IsLeftMouseDown || IsRightMouseDown) && tileX >= 0 && tileX < element.Grid.Width && tileY >= 0 && tileY < element.Grid.Height)
                 {
-                    bool oldCollision = this.CurrentWorld.Tiles[tileX, tileY].Collides;
+                    bool oldCollision = element.Grid.Tiles[tileX, tileY].Collides;
                     bool newCollision = IsLeftMouseDown ? true : false;
                     if (newCollision != oldCollision)
                     {
-                        this.UndoContext.DoAction(new Actions.SetTileCollisionAction(tileX, tileY, oldCollision, newCollision));
-
-                        // HACK
-                        WorldElement.InvalidateCollisionVisual();
+                        this.UndoContext.DoAction(new Actions.SetTileCollisionAction(this.CurrentWorld.Grids.IndexOf(element.Grid), tileX, tileY, oldCollision, newCollision));
                     }
                 }
             }
@@ -191,7 +251,7 @@ namespace WorldEditor
             }
         }
 
-        private void WorldView_MouseDown(object sender, MouseButtonEventArgs e)
+        private void GridElement_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
             {
@@ -202,32 +262,31 @@ namespace WorldEditor
                 IsRightMouseDown = true;
             }
 
-            this.UndoContext.BeginGroup();
+            GridElement element = (GridElement)sender;
 
-            int tileX = (int)Math.Floor(e.GetPosition(WorldElement).X / WorldElement.Palette.TileSize);
-            int tileY = CurrentWorld.Height - (int)Math.Floor(e.GetPosition(WorldElement).Y / WorldElement.Palette.TileSize) - 1;
+            if (IsLeftMouseDown || IsRightMouseDown)
+            {
+                this.UndoContext.BeginGroup();
+            }
+
+            int tileX = (int)Math.Floor(e.GetPosition(element).X);
+            int tileY = element.Grid.Height - (int)Math.Floor(e.GetPosition(element).Y) - 1;
             if (TileToolButton.IsChecked ?? false)
             {
                 int newTile = IsLeftMouseDown ? SelectedTileIndex : -1;
-                int oldTile = CurrentWorld.Tiles[tileX, tileY].PaletteIndex;
+                int oldTile = element.Grid.Tiles[tileX, tileY].PaletteIndex;
                 if (oldTile != newTile)
                 {
-                    this.UndoContext.DoAction(new Actions.SetTileAction(tileX, tileY, oldTile, newTile));
-
-                    // HACK
-                    WorldElement.InvalidateTileVisual();
+                    this.UndoContext.DoAction(new Actions.SetTileAction(this.CurrentWorld.Grids.IndexOf(element.Grid), tileX, tileY, oldTile, newTile));
                 }
             }
             else if (CollisionToolButton.IsChecked ?? false)
             {
-                bool oldCollision = this.CurrentWorld.Tiles[tileX, tileY].Collides;
+                bool oldCollision = element.Grid.Tiles[tileX, tileY].Collides;
                 bool newCollision = IsLeftMouseDown ? true : false;
                 if (newCollision != oldCollision)
                 {
-                    this.UndoContext.DoAction(new Actions.SetTileCollisionAction(tileX, tileY, oldCollision, newCollision));
-
-                    // HACK
-                    WorldElement.InvalidateCollisionVisual();
+                    this.UndoContext.DoAction(new Actions.SetTileCollisionAction(this.CurrentWorld.Grids.IndexOf(element.Grid), tileX, tileY, oldCollision, newCollision));
                 }
             }
             else if (EntityToolButton.IsChecked ?? false)
@@ -248,7 +307,7 @@ namespace WorldEditor
             }
         }
 
-        private void WorldView_MouseUp(object sender, MouseButtonEventArgs e)
+        private void GridElement_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left && IsLeftMouseDown)
             {
@@ -293,11 +352,6 @@ namespace WorldEditor
             this.UndoContext.EndGroup();
         }
 
-        private void SaveAsMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
         #region Commands
         private void SaveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
@@ -312,8 +366,6 @@ namespace WorldEditor
         private void UndoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.UndoContext.UndoAction();
-            WorldElement.InvalidateTileVisual(); // HACK: Do this automatically when necessary
-            WorldElement.InvalidateCollisionVisual();
         }
 
         private void UndoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -324,8 +376,6 @@ namespace WorldEditor
         private void RedoCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             this.UndoContext.RedoAction();
-            WorldElement.InvalidateTileVisual(); // HACK: Do this automatically when necessary
-            WorldElement.InvalidateCollisionVisual();
         }
 
         private void RedoCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -353,5 +403,65 @@ namespace WorldEditor
             e.CanExecute = true;
         }
         #endregion
+
+        private bool Panning = false;
+        private Point LastMouse = new Point();
+        private void WorldViewport_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Middle)
+            {
+                this.Panning = true;
+                LastMouse = e.GetPosition(WorldViewport);
+                WorldViewport.CaptureMouse();
+                e.Handled = true;
+            }
+        }
+
+        private void WorldViewport_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (this.Panning)
+            {
+                Point point = e.GetPosition(WorldViewport);
+                if (point != LastMouse)
+                {
+                    this.ViewOffset.X += point.X - LastMouse.X;
+                    this.ViewOffset.Y += point.Y - LastMouse.Y;
+                    this.UpdateViewTransform();
+
+                }
+                LastMouse = point;
+                e.Handled = true;
+            }
+        }
+
+        private void WorldViewport_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Middle && this.Panning)
+            {
+                this.Panning = false;
+                WorldViewport.ReleaseMouseCapture();
+                e.Handled = true;
+            }
+        }
+
+        private float ZoomAccumulator = 0.0f;
+        private void WorldViewport_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            this.ZoomAccumulator += e.Delta / 120.0f;
+            Point point = e.GetPosition(WorldViewport);
+            while (this.ZoomAccumulator >= 1.0f)
+            {
+                this.UpdateOffsetForScaleChange(this.Scale, this.Scale * 2.0f, point);
+                this.Scale *= 2.0f;
+                this.ZoomAccumulator -= 1.0f;
+            }
+            while (this.ZoomAccumulator <= -1.0f)
+            {
+                this.UpdateOffsetForScaleChange(this.Scale, this.Scale * 0.5f, point);
+                this.Scale *= 0.5f;
+                this.ZoomAccumulator += 1.0f;
+            }
+            e.Handled = true;
+        }
     }
 }

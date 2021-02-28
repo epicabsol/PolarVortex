@@ -1,7 +1,8 @@
 #include "world/Collision.h"
-#include "world/World.h"
 
 #include <math.h>
+#include "world/Grid.h"
+#include "world/World.h"
 
 bool PointIntersectsBoundingBox(const Vector2& point, const BoundingBox& bounds, Intersection& intersection) {
     // Adapted from https://noonat.github.io/intersect/
@@ -36,6 +37,12 @@ bool PointIntersectsBoundingBox(const Vector2& point, const BoundingBox& bounds,
 }
 
 bool LineIntersectsBoundingBox(const Vector2& point1, const Vector2& point2, const BoundingBox& bounds, Intersection& intersection) {
+    // If we are starting inside the bounding box, then the line intersects.
+    if (PointIntersectsBoundingBox(point1, bounds, intersection)) {
+        intersection.Time = 0.0f;
+        return true;
+    }
+
     Vector2 delta = point2 - point1;
     float scaleX = 1.0f / delta.X;
     float scaleY = 1.0f / delta.Y;
@@ -129,39 +136,47 @@ bool SweptBoundingBoxIntersectsBoundingBox(const BoundingBox& bounds1, const Vec
     }
 }
 
-bool SegmentIntersectsWorld(const Vector2& start, const Vector2& end, const World* world, Intersection& intersection) {
+bool SegmentIntersectsGrid(const Vector2& start, const Vector2& end, const Grid* grid, Intersection& intersection) {
 
-    int cellX = (int)floorf(start.X);
-    int cellY = (int)floorf(start.Y);
+    // If the segment doesn't intersect the grid bounds, then we can skip checking the grid tiles
+    if (!LineIntersectsBoundingBox(start, end, BoundingBox(grid->GetPosition() + Vector2((float)grid->GetWidth(), (float)grid->GetHeight()) * 0.5f, Vector2((float)grid->GetWidth(), (float)grid->GetHeight()) * 0.5f), intersection)) {
+        return false;
+    }
+
+    Vector2 startRelative = start - grid->GetPosition();
+    Vector2 endRelative = end - grid->GetPosition();
+
+    int cellX = (int)floorf(startRelative.X);
+    int cellY = (int)floorf(startRelative.Y);
 
     // Test the starting cell
-    if (cellX >= 0 && cellX < world->GetWidth()
-        && cellY >= 0 && cellY < world->GetHeight()
-        && world->GetTile(cellX, cellY).Collides) {
+    if (cellX >= 0 && cellX < grid->GetWidth()
+        && cellY >= 0 && cellY < grid->GetHeight()
+        && grid->GetTile(cellX, cellY).Collides) {
 
         // We are colliding with the initial cell
-        PointIntersectsBoundingBox(start, BoundingBox(Vector2(cellX + 0.5f, cellY + 0.5f), Vector2(0.5f, 0.5f)), intersection);
+        PointIntersectsBoundingBox(startRelative, BoundingBox(Vector2(cellX + 0.5f, cellY + 0.5f), Vector2(0.5f, 0.5f)), intersection);
         return true;
     }
 
-    float x = start.X;
-    float y = start.Y;
-    int endCellX = (int)floorf(end.X);
-    int endCellY = (int)floorf(end.Y);
-    int xdir = (end.X - start.X >= 0) ? 1 : -1;
-    int ydir = (end.Y - start.Y >= 0) ? 1 : -1;
+    float x = startRelative.X;
+    float y = startRelative.Y;
+    int endCellX = (int)floorf(endRelative.X);
+    int endCellY = (int)floorf(endRelative.Y);
+    int xdir = (endRelative.X - startRelative.X >= 0) ? 1 : -1;
+    int ydir = (endRelative.Y - startRelative.Y >= 0) ? 1 : -1;
 
     float dy; // The slope, or, how far in the y we move for each 1 unit of x
-    if (end.X != start.X) {
-        dy = (end.Y - start.Y) / (end.X - start.X);
+    if (endRelative.X != startRelative.X) {
+        dy = (endRelative.Y - startRelative.Y) / (endRelative.X - startRelative.X);
     }
     else {
         dy = INFINITY;
     }
 
     float dx; // How far in the x we move for each 1 unit of y
-    if (end.Y != start.Y) {
-        dx = (end.X - start.X) / (end.Y - start.Y);
+    if (endRelative.Y != startRelative.Y) {
+        dx = (endRelative.X - startRelative.X) / (endRelative.Y - startRelative.Y);
     }
     else {
         dx = INFINITY;
@@ -220,25 +235,24 @@ bool SegmentIntersectsWorld(const Vector2& start, const Vector2& end, const Worl
         }
 
         // Check whether the cell we arrived at is in the grid
-        if (cellX >= 0 && cellX < world->GetWidth()
-            && cellY >= 0 && cellY < world->GetHeight()) {
+        if (cellX >= 0 && cellX < grid->GetWidth()
+            && cellY >= 0 && cellY < grid->GetHeight()) {
             // Check whether it should end this test
-            if (world->GetTile(cellX, cellY).Collides) {
+            if (grid->GetTile(cellX, cellY).Collides) {
                 // end position, overlap, contact point
-                intersection.EndPosition.X = x;
-                intersection.EndPosition.Y = y;
+                intersection.EndPosition = Vector2(x, y) + grid->GetPosition();
                 intersection.Overlap = Vector2();
                 intersection.ContactPoint = intersection.EndPosition;
                 intersection.Normal = hitNormal;
-                float total = sqrtf((end.X - start.X) * (end.X - start.X) + (end.Y - start.Y) * (end.Y - start.Y));
-                float distance = sqrtf((x - start.X) * (x - start.X) + (y - start.Y) * (y - start.Y));
+                float total = sqrtf((endRelative.X - startRelative.X) * (endRelative.X - startRelative.X) + (endRelative.Y - startRelative.Y) * (endRelative.Y - startRelative.Y));
+                float distance = sqrtf((x - startRelative.X) * (x - startRelative.X) + (y - startRelative.Y) * (y - startRelative.Y));
                 intersection.Time = distance / total;
                 return true;
             }
         }
-        else if (xdir > 0 && cellX >= world->GetWidth()
+        else if (xdir > 0 && cellX >= grid->GetWidth()
             || xdir < 0 && cellX < 0
-            || ydir > 0 && cellY >= world->GetHeight()
+            || ydir > 0 && cellY >= grid->GetHeight()
             || ydir < 0 && cellY < 0) {
             // The segment is off the grid and travelling away from the grid
             // so it will never collide.
@@ -250,20 +264,45 @@ bool SegmentIntersectsWorld(const Vector2& start, const Vector2& end, const Worl
     return false;
 }
 
-bool SweptBoundingBoxIntersectsWorld(const BoundingBox& bounds, const Vector2& end, const World* world, Intersection& intersection) {
-    Vector2 delta = end - bounds.Position;
+bool SegmentIntersectsWorld(const Vector2& start, const Vector2& end, const World* world, Intersection& intersection) {
+    float nearestTime = 100.0f; // Anything larger than 1.0 works
+    bool didIntersect = false;
+    for (size_t i = 0; i < world->GetGridCount(); i++) {
+        Intersection gridIntersection = { };
+        if (SegmentIntersectsGrid(start, end, &world->GetGrids()[i], gridIntersection)) {
+            didIntersect = true;
+            if (gridIntersection.Time < nearestTime) {
+                nearestTime = gridIntersection.Time;
+                intersection = gridIntersection;
+            }
+        }
+    }
+    return didIntersect;
+}
+
+bool SweptBoundingBoxIntersectsGrid(const BoundingBox& bounds, const Vector2& end, const Grid* grid, Intersection& intersection) {
+
+    // If the bounding box doesn't intersect the grid bounds, then we can skip checking the grid tiles
+    if (!SweptBoundingBoxIntersectsBoundingBox(bounds, end, BoundingBox(Vector2(grid->GetPosition() + Vector2((float)grid->GetWidth(), (float)grid->GetHeight()) * 0.5f), Vector2((float)grid->GetWidth(), (float)grid->GetHeight()) * 0.5f), intersection)) {
+        return false;
+    }
+
+    BoundingBox boundsRelative = BoundingBox(bounds.Position - grid->GetPosition(), bounds.HalfSize);
+    Vector2 endRelative = end - grid->GetPosition();
+
+    Vector2 delta = end - boundsRelative.Position;
     int xdir = (delta.X >= 0) ? 1 : -1;
     int ydir = (delta.Y >= 0) ? 1 : -1;
 
     // Test the starting location
     // NOTE: This can be skipped if you assume that the box's starting position has already been checked
     // For example, when moving a character, we might assume that the last known position was not colliding
-    for (int cellY = (int)floorf(bounds.Position.Y - bounds.HalfSize.Y); cellY <= (int)floorf(bounds.Position.Y + bounds.HalfSize.Y); cellY++) {
-        if (cellY >= 0 && cellY < world->GetHeight()) {
-            for (int cellX = (int)floorf(bounds.Position.X - bounds.HalfSize.X); cellX <= (int)floorf(bounds.Position.X + bounds.HalfSize.X); cellX++) {
-                if (cellX >= 0 && cellX < world->GetWidth() && world->GetTile(cellX, cellY).Collides) {
+    for (int cellY = (int)floorf(boundsRelative.Position.Y - boundsRelative.HalfSize.Y); cellY <= (int)floorf(boundsRelative.Position.Y + boundsRelative.HalfSize.Y); cellY++) {
+        if (cellY >= 0 && cellY < grid->GetHeight()) {
+            for (int cellX = (int)floorf(boundsRelative.Position.X - boundsRelative.HalfSize.X); cellX <= (int)floorf(boundsRelative.Position.X + boundsRelative.HalfSize.X); cellX++) {
+                if (cellX >= 0 && cellX < grid->GetWidth() && grid->GetTile(cellX, cellY).Collides) {
                     // We collide
-                    intersection.EndPosition = bounds.Position;
+                    intersection.EndPosition = boundsRelative.Position;
                     intersection.Overlap = Vector2();
                     intersection.Time = 0.0f;
                     intersection.Normal = Vector2();
@@ -275,16 +314,16 @@ bool SweptBoundingBoxIntersectsWorld(const BoundingBox& bounds, const Vector2& e
                     }
 
                     Vector2 tileCenter = Vector2((float)cellX + 0.5f, (float)cellY + 0.5f);
-                    Vector2 toBounds = bounds.Position - tileCenter;
-                    if (toBounds.X > bounds.HalfSize.X)
-                        toBounds.X = bounds.HalfSize.X;
-                    else if (toBounds.X < -bounds.HalfSize.X)
-                        toBounds.X = -bounds.HalfSize.X;
+                    Vector2 toBounds = boundsRelative.Position - tileCenter;
+                    if (toBounds.X > boundsRelative.HalfSize.X)
+                        toBounds.X = boundsRelative.HalfSize.X;
+                    else if (toBounds.X < -boundsRelative.HalfSize.X)
+                        toBounds.X = -boundsRelative.HalfSize.X;
 
-                    if (toBounds.Y > bounds.HalfSize.Y)
-                        toBounds.Y = bounds.HalfSize.Y;
-                    else if (toBounds.Y < -bounds.HalfSize.Y)
-                        toBounds.Y = -bounds.HalfSize.Y;
+                    if (toBounds.Y > boundsRelative.HalfSize.Y)
+                        toBounds.Y = boundsRelative.HalfSize.Y;
+                    else if (toBounds.Y < -boundsRelative.HalfSize.Y)
+                        toBounds.Y = -boundsRelative.HalfSize.Y;
 
                     intersection.ContactPoint = tileCenter + toBounds;
                     return true;
@@ -293,24 +332,24 @@ bool SweptBoundingBoxIntersectsWorld(const BoundingBox& bounds, const Vector2& e
         }
     }
 
-    float cornerX = bounds.Position.X + bounds.HalfSize.X * xdir;
-    float cornerY = bounds.Position.Y + bounds.HalfSize.Y * ydir;
+    float cornerX = boundsRelative.Position.X + boundsRelative.HalfSize.X * xdir;
+    float cornerY = boundsRelative.Position.Y + boundsRelative.HalfSize.Y * ydir;
     int cornerCellX = (int)floorf(cornerX);
     int cornerCellY = (int)floorf(cornerY);
-    int endCellX = (int)floorf(end.X + bounds.HalfSize.X * xdir);
-    int endCellY = (int)floorf(end.Y + bounds.HalfSize.Y * ydir);
+    int endCellX = (int)floorf(endRelative.X + boundsRelative.HalfSize.X * xdir);
+    int endCellY = (int)floorf(endRelative.Y + boundsRelative.HalfSize.Y * ydir);
 
     float dy; // The slope, or, how far in the y we move for each 1 unit of x
-    if (end.X != bounds.Position.X) {
-        dy = (end.Y - bounds.Position.Y) / (end.X - bounds.Position.X);
+    if (endRelative.X != boundsRelative.Position.X) {
+        dy = (endRelative.Y - boundsRelative.Position.Y) / (endRelative.X - boundsRelative.Position.X);
     }
     else {
         dy = INFINITY;
     }
 
     float dx; // How far in the x we move for each 1 unit of y
-    if (end.Y != bounds.Position.Y) {
-        dx = (end.X - bounds.Position.X) / (end.Y - bounds.Position.Y);
+    if (endRelative.Y != boundsRelative.Position.Y) {
+        dx = (endRelative.X - boundsRelative.Position.X) / (endRelative.Y - boundsRelative.Position.Y);
     }
     else {
         dx = INFINITY;
@@ -347,36 +386,39 @@ bool SweptBoundingBoxIntersectsWorld(const BoundingBox& bounds, const Vector2& e
             toNextX = xIncrement;
 
             // Check the newly-occupied column of cells for collision
-            int cellCount = cornerCellY - (int)floorf(cornerY - bounds.HalfSize.Y * 2.0f * ydir);
+            int cellCount = cornerCellY - (int)floorf(cornerY - boundsRelative.HalfSize.Y * 2.0f * ydir);
             cellCount = 1 + HMM_ABS(cellCount);
             for (int i = 0; i < cellCount; i++) {
                 int y = cornerCellY - i * ydir;
-                if (cornerCellX >= 0 && cornerCellX < world->GetWidth()
-                    && y >= 0 && y < world->GetHeight()
-                    && world->GetTile(cornerCellX, y).Collides) {
+                if (cornerCellX >= 0 && cornerCellX < grid->GetWidth()
+                    && y >= 0 && y < grid->GetHeight()
+                    && grid->GetTile(cornerCellX, y).Collides) {
 
                     // We collide
-                    intersection.EndPosition.X = cornerX - bounds.HalfSize.X * xdir;
-                    intersection.EndPosition.Y = cornerY - bounds.HalfSize.Y * ydir;
+                    intersection.EndPosition.X = cornerX - boundsRelative.HalfSize.X * xdir;
+                    intersection.EndPosition.Y = cornerY - boundsRelative.HalfSize.Y * ydir;
                     intersection.Overlap = Vector2();
                     intersection.Normal = Vector2((float)-xdir, 0.0f);
 
                     Vector2 tileCenter = Vector2((float)cornerCellX + 0.5f, (float)y + 0.5f);
-                    Vector2 toBounds = bounds.Position - tileCenter;
-                    if (toBounds.X > bounds.HalfSize.X)
-                        toBounds.X = bounds.HalfSize.X;
-                    else if (toBounds.X < -bounds.HalfSize.X)
-                        toBounds.X = -bounds.HalfSize.X;
+                    Vector2 toBounds = boundsRelative.Position - tileCenter;
+                    if (toBounds.X > boundsRelative.HalfSize.X)
+                        toBounds.X = boundsRelative.HalfSize.X;
+                    else if (toBounds.X < -boundsRelative.HalfSize.X)
+                        toBounds.X = -boundsRelative.HalfSize.X;
 
-                    if (toBounds.Y > bounds.HalfSize.Y)
-                        toBounds.Y = bounds.HalfSize.Y;
-                    else if (toBounds.Y < -bounds.HalfSize.Y)
-                        toBounds.Y = -bounds.HalfSize.Y;
+                    if (toBounds.Y > boundsRelative.HalfSize.Y)
+                        toBounds.Y = boundsRelative.HalfSize.Y;
+                    else if (toBounds.Y < -boundsRelative.HalfSize.Y)
+                        toBounds.Y = -boundsRelative.HalfSize.Y;
 
                     intersection.ContactPoint = tileCenter + toBounds;
-                    float total = sqrtf((end.X - bounds.Position.X) * (end.X - bounds.Position.X) + (end.Y - bounds.Position.Y) * (end.Y - bounds.Position.Y));
-                    float distance = sqrtf((intersection.EndPosition.X - bounds.Position.X) * (intersection.EndPosition.X - bounds.Position.X) + (intersection.EndPosition.Y - bounds.Position.Y) * (intersection.EndPosition.Y - bounds.Position.Y));
+                    float total = sqrtf((endRelative.X - boundsRelative.Position.X) * (endRelative.X - boundsRelative.Position.X) + (endRelative.Y - boundsRelative.Position.Y) * (endRelative.Y - boundsRelative.Position.Y));
+                    float distance = sqrtf((intersection.EndPosition.X - boundsRelative.Position.X) * (intersection.EndPosition.X - boundsRelative.Position.X) + (intersection.EndPosition.Y - boundsRelative.Position.Y) * (intersection.EndPosition.Y - boundsRelative.Position.Y));
                     intersection.Time = distance / total;
+
+                    intersection.EndPosition += grid->GetPosition();
+                    intersection.ContactPoint += grid->GetPosition();
 
                     return true;
                 }
@@ -398,36 +440,39 @@ bool SweptBoundingBoxIntersectsWorld(const BoundingBox& bounds, const Vector2& e
             toNextY = yIncrement;
 
             // Check the newly-occupied row of cells for collision
-            int cellCount = cornerCellX - (int)floorf(cornerX - bounds.HalfSize.X * 2.0f * xdir);
+            int cellCount = cornerCellX - (int)floorf(cornerX - boundsRelative.HalfSize.X * 2.0f * xdir);
             cellCount = 1 + HMM_ABS(cellCount);
             for (int i = 0; i < cellCount; i++) {
                 int x = cornerCellX - i * xdir;
-                if (cornerCellY >= 0 && cornerCellY < world->GetHeight()
-                    && x >= 0 && x < world->GetWidth()
-                    && world->GetTile(x, cornerCellY).Collides) {
+                if (cornerCellY >= 0 && cornerCellY < grid->GetHeight()
+                    && x >= 0 && x < grid->GetWidth()
+                    && grid->GetTile(x, cornerCellY).Collides) {
 
                     // We collide
-                    intersection.EndPosition.X = cornerX - bounds.HalfSize.X * xdir;
-                    intersection.EndPosition.Y = cornerY - bounds.HalfSize.Y * ydir;
+                    intersection.EndPosition.X = cornerX - boundsRelative.HalfSize.X * xdir;
+                    intersection.EndPosition.Y = cornerY - boundsRelative.HalfSize.Y * ydir;
                     intersection.Overlap = Vector2();
                     intersection.Normal = Vector2(0.0f, (float)-ydir);
 
                     Vector2 tileCenter = Vector2((float)x + 0.5f, (float)cornerCellY + 0.5f);
-                    Vector2 toBounds = bounds.Position - tileCenter;
-                    if (toBounds.X > bounds.HalfSize.X)
-                        toBounds.X = bounds.HalfSize.X;
-                    else if (toBounds.X < -bounds.HalfSize.X)
-                        toBounds.X = -bounds.HalfSize.X;
+                    Vector2 toBounds = boundsRelative.Position - tileCenter;
+                    if (toBounds.X > boundsRelative.HalfSize.X)
+                        toBounds.X = boundsRelative.HalfSize.X;
+                    else if (toBounds.X < -boundsRelative.HalfSize.X)
+                        toBounds.X = -boundsRelative.HalfSize.X;
 
-                    if (toBounds.Y > bounds.HalfSize.Y)
-                        toBounds.Y = bounds.HalfSize.Y;
-                    else if (toBounds.Y < -bounds.HalfSize.Y)
-                        toBounds.Y = -bounds.HalfSize.Y;
+                    if (toBounds.Y > boundsRelative.HalfSize.Y)
+                        toBounds.Y = boundsRelative.HalfSize.Y;
+                    else if (toBounds.Y < -boundsRelative.HalfSize.Y)
+                        toBounds.Y = -boundsRelative.HalfSize.Y;
 
                     intersection.ContactPoint = tileCenter + toBounds;
-                    float total = sqrtf((end.X - bounds.Position.X) * (end.X - bounds.Position.X) + (end.Y - bounds.Position.Y) * (end.Y - bounds.Position.Y));
-                    float distance = sqrtf((intersection.EndPosition.X - bounds.Position.X) * (intersection.EndPosition.X - bounds.Position.X) + (intersection.EndPosition.Y - bounds.Position.Y) * (intersection.EndPosition.Y - bounds.Position.Y));
+                    float total = sqrtf((endRelative.X - boundsRelative.Position.X) * (endRelative.X - boundsRelative.Position.X) + (endRelative.Y - boundsRelative.Position.Y) * (endRelative.Y - boundsRelative.Position.Y));
+                    float distance = sqrtf((intersection.EndPosition.X - boundsRelative.Position.X) * (intersection.EndPosition.X - boundsRelative.Position.X) + (intersection.EndPosition.Y - boundsRelative.Position.Y) * (intersection.EndPosition.Y - boundsRelative.Position.Y));
                     intersection.Time = distance / total;
+
+                    intersection.EndPosition += grid->GetPosition();
+                    intersection.ContactPoint += grid->GetPosition();
 
                     return true;
                 }
@@ -437,4 +482,20 @@ bool SweptBoundingBoxIntersectsWorld(const BoundingBox& bounds, const Vector2& e
 
     // If we reach here, no cells were hit
     return false;
+}
+
+bool SweptBoundingBoxIntersectsWorld(const BoundingBox& bounds, const Vector2& end, const World* world, Intersection& intersection) {
+    float nearestTime = 100.0f; // Anything larger than 1.0 works
+    bool didIntersect = false;
+    for (size_t i = 0; i < world->GetGridCount(); i++) {
+        Intersection gridIntersection = { };
+        if (SweptBoundingBoxIntersectsGrid(bounds, end, &world->GetGrids()[i], gridIntersection)) {
+            didIntersect = true;
+            if (gridIntersection.Time < nearestTime) {
+                nearestTime = gridIntersection.Time;
+                intersection = gridIntersection;
+            }
+        }
+    }
+    return didIntersect;
 }

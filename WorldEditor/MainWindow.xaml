@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WorldEditor"
+        xmlns:models="clr-namespace:WorldEditor.Models"
         mc:Ignorable="d"
         Title="Polar Vortex World Editor" Height="450" Width="800" Style="{StaticResource ResourceKey={x:Type Window}}" DataContext="{Binding RelativeSource={RelativeSource Self}}">
     <Window.Resources>
@@ -28,6 +29,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <local:GridYConverter x:Key="gridYConverter" />
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.New" Executed="NewCommand_Executed" CanExecute="NewCommand_CanExecute" />
@@ -129,17 +131,41 @@
                 <RowDefinition Height="20px" />
             </Grid.RowDefinitions>
 
-            <Border Background="{StaticResource BackgroundHeadingBrush}">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-                    <Border x:Name="WorldView" Background="{StaticResource BackgroundBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="WorldView_MouseEnter" MouseLeave="WorldView_MouseLeave" MouseMove="WorldView_MouseMove" MouseDown="WorldView_MouseDown" MouseUp="WorldView_MouseUp">
-                        <Grid>
-                            <local:WorldElement x:Name="WorldElement" World="{Binding CurrentWorld}" BaseDirectory="{Binding BaseDirectory}" HorizontalAlignment="Left" VerticalAlignment="Top" />
-                            <Canvas x:Name="WorldCanvas">
-                                <Rectangle x:Name="TileHoverRectangle" Visibility="Hidden" Fill="{StaticResource HoverBrush}" IsHitTestVisible="False" />
-                            </Canvas>
-                        </Grid>
-                    </Border>
-                </ScrollViewer>
+            <Border x:Name="WorldViewport" ClipToBounds="True" Background="{StaticResource BackgroundHeadingBrush}" PreviewMouseDown="WorldViewport_PreviewMouseDown" PreviewMouseMove="WorldViewport_PreviewMouseMove" PreviewMouseUp="WorldViewport_PreviewMouseUp" PreviewMouseWheel="WorldViewport_PreviewMouseWheel">
+                <Border x:Name="WorldView" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Grid>
+
+                        <ItemsControl ItemsSource="{Binding CurrentWorld.Grids}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:Grid}">
+                                    <Canvas>
+                                        <Border Canvas.Left="{Binding X}" Background="{StaticResource BackgroundBrush}" Width="{Binding Width}" Height="{Binding Height}">
+                                            <Canvas.Top>
+                                                <MultiBinding Converter="{StaticResource gridYConverter}">
+                                                    <Binding Path="Y" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </Canvas.Top>
+                                            <local:GridElement Grid="{Binding}" ShowCollision="{Binding ShowCollision, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" BaseDirectory="{Binding BaseDirectory, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="GridElement_MouseEnter" MouseLeave="GridElement_MouseLeave" MouseMove="GridElement_MouseMove" MouseDown="GridElement_MouseDown" MouseUp="GridElement_MouseUp" />
+                                        </Border>
+                                    </Canvas>
+              
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Canvas x:Name="WorldCanvas">
+                            <Rectangle x:Name="TileHoverRectangle" Visibility="Hidden" Width="1" Height="1" Fill="{StaticResource HoverBrush}" IsHitTestVisible="False" />
+                        </Canvas>
+                    </Grid>
+                        
+                        
+                </Border>
             </Border>
 
             <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}">
@@ -173,11 +199,11 @@
 
                 <Border Grid.RowSpan="2" Background="{StaticResource BackgroundBrush}" />
                 <Border Grid.Row="2" Background="{StaticResource BackgroundHeadingBrush}">
-                    <local:TilePicker PalettePath="{Binding CurrentWorld.PalettePath}" BaseDirectory="{Binding BaseDirectory}" SelectedIndex="{Binding SelectedTileIndex, Mode=TwoWay}" />
+                    <local:TilePicker PalettePath="{Binding SelectedGrid.PalettePath}" BaseDirectory="{Binding BaseDirectory}" SelectedIndex="{Binding SelectedTileIndex, Mode=TwoWay}" />
                 </Border>
 
                 <TextBlock Text="Palette" VerticalAlignment="Center" Margin="5 0" FontSize="14" />
-                <TextBlock Grid.Row="1" Text="{Binding CurrentWorld.PalettePath}" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrushh}" />
+                <TextBlock Grid.Row="1" Text="{Binding SelectedGrid.PalettePath}" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrushh}" />
             </Grid>
 
             <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Height="4" />
