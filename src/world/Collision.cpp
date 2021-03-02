@@ -290,7 +290,7 @@ bool SweptBoundingBoxIntersectsGrid(const BoundingBox& bounds, const Vector2& en
     BoundingBox boundsRelative = BoundingBox(bounds.Position - grid->GetPosition(), bounds.HalfSize);
     Vector2 endRelative = end - grid->GetPosition();
 
-    Vector2 delta = end - boundsRelative.Position;
+    Vector2 delta = endRelative - boundsRelative.Position;
     int xdir = (delta.X >= 0) ? 1 : -1;
     int ydir = (delta.Y >= 0) ? 1 : -1;
 
@@ -302,7 +302,7 @@ bool SweptBoundingBoxIntersectsGrid(const BoundingBox& bounds, const Vector2& en
             for (int cellX = (int)floorf(boundsRelative.Position.X - boundsRelative.HalfSize.X); cellX <= (int)floorf(boundsRelative.Position.X + boundsRelative.HalfSize.X); cellX++) {
                 if (cellX >= 0 && cellX < grid->GetWidth() && grid->GetTile(cellX, cellY).Collides) {
                     // We collide
-                    intersection.EndPosition = boundsRelative.Position;
+                    intersection.EndPosition = bounds.Position;
                     intersection.Overlap = Vector2();
                     intersection.Time = 0.0f;
                     intersection.Normal = Vector2();
@@ -325,7 +325,8 @@ bool SweptBoundingBoxIntersectsGrid(const BoundingBox& bounds, const Vector2& en
                     else if (toBounds.Y < -boundsRelative.HalfSize.Y)
                         toBounds.Y = -boundsRelative.HalfSize.Y;
 
-                    intersection.ContactPoint = tileCenter + toBounds;
+                    intersection.ContactPoint = tileCenter + toBounds + grid->GetPosition();
+
                     return true;
                 }
             }
