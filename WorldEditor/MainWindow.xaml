@@ -108,7 +108,7 @@
             <RadioButton x:Name="TileToolButton" ToolTip="Tile Paint Tool" IsChecked="True" Style="{StaticResource ResourceKey=ToolButtonStyle}">
                 <Image Source="{StaticResource ToolBrush32px}" />
             </RadioButton>
-            <RadioButton x:Name="CollisionToolButton" ToolTip="Tile Collision Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" Checked="CollisionTool_Checked" Unchecked="CollisionTool_Unchecked">
+            <RadioButton x:Name="CollisionToolButton" ToolTip="Tile Collision Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" Checked="CollisionToolButton_Checked" Unchecked="CollisionToolButton_Unchecked">
                 <Image Source="{StaticResource ToolCollision32px}" />
             </RadioButton>
             <RadioButton x:Name="EntityToolButton" ToolTip="Entities" Style="{StaticResource ResourceKey=ToolButtonStyle}">
@@ -117,7 +117,7 @@
             <RadioButton x:Name="DecorToolButton" ToolTip="Decor Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}">
                 <Image Source="{StaticResource ToolDecor32px}" />
             </RadioButton>
-            <RadioButton x:Name="GridsToolButton" ToolTip="Grids Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}">
+            <RadioButton x:Name="GridsToolButton" ToolTip="Grids Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}" Checked="GridsToolButton_Checked" Unchecked="GridsToolButton_Unchecked">
                 <Image Source="{StaticResource ToolGrids32px}" />
             </RadioButton>
             <RadioButton x:Name="BackgroundToolButton" ToolTip="Background Tool" Style="{StaticResource ResourceKey=ToolButtonStyle}">
@@ -152,7 +152,39 @@
                                                     <Binding />
                                                 </MultiBinding>
                                             </Canvas.Top>
-                                            <local:GridElement Grid="{Binding}" ShowCollision="{Binding ShowCollision, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" BaseDirectory="{Binding BaseDirectory, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="GridElement_MouseEnter" MouseLeave="GridElement_MouseLeave" MouseMove="GridElement_MouseMove" MouseDown="GridElement_MouseDown" MouseUp="GridElement_MouseUp" />
+                                            <Grid>
+                                                <local:GridElement Grid="{Binding}" ShowCollision="{Binding ShowCollision, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" ShowBorders="{Binding ShowBorders, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" BaseDirectory="{Binding BaseDirectory, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="GridElement_MouseEnter" MouseLeave="GridElement_MouseLeave" MouseMove="GridElement_MouseMove" MouseDown="GridElement_MouseDown" MouseUp="GridElement_MouseUp" />
+                                                <Canvas>
+                                                    <Canvas.Style>
+                                                        <Style TargetType="{x:Type Canvas}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ShowBorders, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="False">
+                                                                    <Setter Property="Visibility" Value="Hidden" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Canvas.Style>
+                                                    <StackPanel Orientation="Horizontal" TextBlock.FontSize="0.4" Canvas.Left="0.125" Canvas.Top="-0.6" SnapsToDevicePixels="True">
+                                                        <TextBlock Text="Grid " />
+                                                        <TextBlock Text="{Binding Width}" />
+                                                        <TextBlock Text="×" />
+                                                        <TextBlock Text="{Binding Height}" />
+                                                    </StackPanel>
+                                                    <Rectangle Cursor="SizeAll" Width="{Binding Width}" Height="{Binding Height}" MouseDown="MoveRectangle_MouseDown" MouseMove="MoveRectangle_MouseMove" MouseUp="MoveRectangle_MouseUp">
+                                                        <Rectangle.Style>
+                                                            <Style TargetType="{x:Type Rectangle}">
+                                                                <Setter Property="Fill" Value="Transparent" />
+                                                                <Style.Triggers>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter Property="Fill" Value="{StaticResource HoverBrush}" />
+                                                                    </Trigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Rectangle.Style>
+                                                    </Rectangle>
+                                                    <Polyline Cursor="SizeNESW" Points="-0.75,-0.25 0.25,-0.25 0.25,0.75" Canvas.Left="{Binding Width}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
+                                                </Canvas>
+                                            </Grid>
                                         </Border>
                                     </Canvas>
               
@@ -203,7 +235,7 @@
                 </Border>
 
                 <TextBlock Text="Palette" VerticalAlignment="Center" Margin="5 0" FontSize="14" />
-                <TextBlock Grid.Row="1" Text="{Binding SelectedGrid.PalettePath}" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrushh}" />
+                <TextBlock Grid.Row="1" Text="{Binding SelectedGrid.PalettePath}" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrush}" />
             </Grid>
 
             <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Height="4" />
@@ -219,7 +251,7 @@
                 <Border Grid.Row="2" Background="{StaticResource BackgroundHeadingBrush}" />
 
                 <TextBlock Text="Properties" VerticalAlignment="Center" Margin="5 0" FontSize="14" />
-                <TextBlock Grid.Row="1" Text="No selection" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrushh}" />
+                <TextBlock Grid.Row="1" Text="No selection" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrush}" />
 
             </Grid>
         </Grid>

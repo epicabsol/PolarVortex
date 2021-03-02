@@ -31,10 +31,18 @@ namespace WorldEditor
             set => this.SetValue(ShowCollisionProperty, value);
         }
 
+        public static DependencyProperty ShowBordersProperty = DependencyProperty.Register(nameof(ShowBorders), typeof(bool), typeof(GridElement), new PropertyMetadata(ShowBordersPropertyChanged));
+        public bool ShowBorders
+        {
+            get => (bool)this.GetValue(ShowBordersProperty);
+            set => this.SetValue(ShowBordersProperty, value);
+        }
+
         private BitmapSource PaletteImage = null;
         public TilePalette Palette { get; private set; } = null;
         private DrawingVisual TileVisual = new DrawingVisual();
         private DrawingVisual CollisionVisual = new DrawingVisual();
+        private DrawingVisual BordersVisual = new DrawingVisual();
         private VisualCollection ChildVisuals;
 
         protected override int VisualChildrenCount => ChildVisuals?.Count ?? 0;
@@ -123,6 +131,36 @@ namespace WorldEditor
             this.InvalidateVisual();
         }
 
+        private const float BorderLineWidth = 1.0f / 16.0f;
+        public void InvalidateBordersVisual()
+        {
+            DrawingContext drawingContext = this.BordersVisual.RenderOpen();
+
+            if (this.Grid != null)
+            {
+                Brush foregroundPrimaryBrush = (Brush)this.FindResource("ForegroundPrimaryBrush");
+                Pen foregroundPrimaryPen = new Pen(foregroundPrimaryBrush, BorderLineWidth);
+                Brush foregroundSecondaryBrush = (Brush)this.FindResource("ForegroundSecondaryBrush");
+                Pen foregroundSecondaryPen = new Pen(foregroundSecondaryBrush, BorderLineWidth);
+                Brush hoverBrush = (Brush)this.FindResource("HoverBrush");
+                Pen hoverPen = new Pen(hoverBrush, BorderLineWidth);
+
+                for (int x = 1; x < this.Grid.Width; x++)
+                {
+                    drawingContext.DrawLine(hoverPen, new Point(x, BorderLineWidth), new Point(x, this.Grid.Height - BorderLineWidth));
+                }
+                for (int y = 1; y < this.Grid.Height; y++)
+                {
+                    drawingContext.DrawLine(hoverPen, new Point(BorderLineWidth, y), new Point(this.Grid.Width - BorderLineWidth, y));
+                }
+
+                drawingContext.DrawRectangle(null, foregroundPrimaryPen, new Rect(BorderLineWidth / 2.0f, BorderLineWidth / 2.0f, this.Grid.Width - BorderLineWidth, this.Grid.Height - BorderLineWidth));
+            }
+
+            drawingContext.Close();
+            this.InvalidateVisual();
+        }
+
         private void ReloadPaletteImage()
         {
             if (!String.IsNullOrEmpty(this.BaseDirectory) && this.Grid != null)
@@ -157,7 +195,16 @@ namespace WorldEditor
 
             ReloadPaletteImage();
 
-            this.Grid.PropertyChanged += Grid_PropertyChanged;
+            this.InvalidateBordersVisual();
+
+            if (e.OldValue is Grid oldGrid)
+            {
+                oldGrid.PropertyChanged -= Grid_PropertyChanged;
+            }
+            if (e.NewValue is Grid newGrid)
+            {
+                newGrid.PropertyChanged += Grid_PropertyChanged;
+            }
         }
 
         protected virtual void OnBaseDirectoryChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -167,13 +214,25 @@ namespace WorldEditor
 
         protected virtual void OnShowCollisionChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (this.ShowCollision && !ChildVisuals.Contains(CollisionVisual))
+            if (this.ShowCollision && !ChildVisuals.Contains(this.CollisionVisual))
             {
-                ChildVisuals.Add(CollisionVisual);
+                this.ChildVisuals.Add(this.CollisionVisual);
             }
-            else if (!this.ShowCollision && ChildVisuals.Contains(CollisionVisual))
+            else if (!this.ShowCollision && this.ChildVisuals.Contains(this.CollisionVisual))
             {
-                ChildVisuals.Remove(CollisionVisual);
+                this.ChildVisuals.Remove(this.CollisionVisual);
+            }
+        }
+
+        protected virtual void OnShowBordersChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (this.ShowBorders && !this.ChildVisuals.Contains(this.BordersVisual))
+            {
+                this.ChildVisuals.Add(this.BordersVisual);
+            }
+            else if (!this.ShowBorders && this.ChildVisuals.Contains(this.BordersVisual))
+            {
+                this.ChildVisuals.Remove(this.BordersVisual);
             }
         }
 
@@ -198,6 +257,14 @@ namespace WorldEditor
             if (dp is GridElement gridElement)
             {
                 gridElement.OnShowCollisionChanged(gridElement, e);
+            }
+        }
+
+        private static void ShowBordersPropertyChanged(DependencyObject dp, DependencyPropertyChangedEventArgs e)
+        {
+            if (dp is GridElement gridElement)
+            {
+                gridElement.OnShowBordersChanged(gridElement, e);
             }
         }
     }

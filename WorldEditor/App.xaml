@@ -13,7 +13,7 @@
         <Color x:Key="Accent">#DD22AA</Color>
         <Color x:Key="Collision">#B0CC3322</Color>
         <Color x:Key="ForegroundPrimary">#F1F1F1</Color>
-        <Color x:Key="ForegroundSecondary">#C8C8C8</Color>
+        <Color x:Key="ForegroundSecondary">#C3C3C3</Color>
 
         <!-- Brushes -->
         <SolidColorBrush x:Key="HoverBrush" Color="{StaticResource Hover}" />
@@ -23,7 +23,7 @@
         <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource Accent}" />
         <SolidColorBrush x:Key="CollisionBrush" Color="{StaticResource Collision}" />
         <SolidColorBrush x:Key="ForegroundPrimaryBrush" Color="{StaticResource ForegroundPrimary}" />
-        <SolidColorBrush x:Key="ForegroundSecondaryBrushh" Color="{StaticResource ForegroundSecondary}" />
+        <SolidColorBrush x:Key="ForegroundSecondaryBrush" Color="{StaticResource ForegroundSecondary}" />
 
         <!-- Icons -->
         <DrawingImage x:Key="ToolBrush32px">

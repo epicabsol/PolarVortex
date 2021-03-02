@@ -71,6 +71,14 @@ namespace WorldEditor
             set => this.SetValue(ShowCollisionProperty, value);
         }
 
+        // Grids tool
+        public static DependencyProperty ShowBordersProperty = DependencyProperty.Register(nameof(ShowBorders), typeof(bool), typeof(MainWindow));
+        public bool ShowBorders
+        {
+            get => (bool)this.GetValue(ShowBordersProperty);
+            set => this.SetValue(ShowBordersProperty, value);
+        }
+
         private float _scale = 1.0f;
         public float Scale
         {
@@ -174,14 +182,24 @@ namespace WorldEditor
             this.Scale *= 0.5f;
         }
 
-        private void CollisionTool_Checked(object sender, RoutedEventArgs e)
+        private void CollisionToolButton_Checked(object sender, RoutedEventArgs e)
         {
             this.ShowCollision = true;
         }
 
-        private void CollisionTool_Unchecked(object sender, RoutedEventArgs e)
+        private void CollisionToolButton_Unchecked(object sender, RoutedEventArgs e)
         {
             this.ShowCollision = false;
+        }
+
+        private void GridsToolButton_Checked(object sender, RoutedEventArgs e)
+        {
+            this.ShowBorders = true;
+        }
+
+        private void GridsToolButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.ShowBorders = false;
         }
 
         private void GridElement_MouseEnter(object sender, MouseEventArgs e)
@@ -207,7 +225,7 @@ namespace WorldEditor
             int tileX = (int)Math.Floor(e.GetPosition(element).X);
             int tileY = element.Grid.Height - (int)Math.Floor(e.GetPosition(element).Y) - 1;
             Canvas.SetLeft(TileHoverRectangle, tileX + element.Grid.X);
-            Canvas.SetTop(TileHoverRectangle, -tileY + element.Grid.Y - 1);
+            Canvas.SetTop(TileHoverRectangle, -tileY - element.Grid.Y - 1);
 
             if (TileToolButton.IsChecked ?? false)
             {
@@ -462,6 +480,54 @@ namespace WorldEditor
                 this.ZoomAccumulator += 1.0f;
             }
             e.Handled = true;
+        }
+
+        private Point MoveReferencePoint;
+        private Models.Grid DragGrid;
+        private int DragStartX;
+        private int DragStartY;
+        private void MoveRectangle_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is Rectangle moveRectangle && moveRectangle.DataContext is Models.Grid grid)
+            {
+                this.MoveReferencePoint = e.GetPosition(moveRectangle);
+                moveRectangle.CaptureMouse();
+                this.DragGrid = grid;
+                this.DragStartX = grid.X;
+                this.DragStartY = grid.Y;
+            }
+        }
+
+        private void MoveRectangle_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Source is Rectangle moveRectangle && moveRectangle.DataContext is Models.Grid grid && grid == this.DragGrid)
+            {
+                Point point = e.GetPosition(moveRectangle);
+                Vector delta = new Vector(point.X - this.MoveReferencePoint.X, point.Y - this.MoveReferencePoint.Y);
+                int dX = (int)Math.Truncate(delta.X);
+                int dY = (int)Math.Truncate(delta.Y);
+                if (grid.X != this.DragStartX + dX || grid.Y != this.DragStartY - dY)
+                {
+                    MoveReferencePoint.X += (grid.X - (this.DragStartX + dX));
+                    MoveReferencePoint.Y -= (grid.Y - (this.DragStartY - dY));
+                    grid.X = this.DragStartX + dX;
+                    grid.Y = this.DragStartY - dY;
+                }
+            }
+        }
+
+        private void MoveRectangle_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is Rectangle moveRectangle && moveRectangle.DataContext is Models.Grid grid && grid == this.DragGrid)
+            {
+                moveRectangle.ReleaseMouseCapture();
+
+                if (grid.X != this.DragStartX || grid.Y != this.DragStartY)
+                {
+                    this.UndoContext.DoAction(new Actions.MoveGridAction(this.CurrentWorld.Grids.IndexOf(grid), grid.X, grid.Y, this.DragStartX, this.DragStartY), false);
+                }
+            }
+            this.DragGrid = null;
         }
     }
 }
