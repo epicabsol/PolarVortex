@@ -145,7 +145,41 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type models:Grid}">
                                     <Canvas>
-                                        <Border Canvas.Left="{Binding X}" Background="{StaticResource BackgroundBrush}" Width="{Binding Width}" Height="{Binding Height}">
+                                        <Border Background="{StaticResource BackgroundWellBrush}" Canvas.Left="{Binding X}" Width="{Binding Width}" Height="{Binding Height}">
+                                            <Canvas.Top>
+                                                <MultiBinding Converter="{StaticResource gridYConverter}">
+                                                    <Binding Path="Y" />
+                                                    <Binding />
+                                                </MultiBinding>
+                                            </Canvas.Top>
+                                            <Border BorderBrush="{StaticResource BackgroundWellBrush}" BorderThickness="0.0625" Margin="-0.0625">
+                                                <Border.Style>
+                                                    <Style TargetType="{x:Type Border}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ShowBorders, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" Value="False">
+                                                                <Setter Property="Visibility" Value="Hidden" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Border.Style>
+                                            </Border>
+                                        </Border>
+                                    </Canvas>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <ItemsControl ItemsSource="{Binding CurrentWorld.Grids}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:Grid}">
+                                    <Canvas>
+                                        <Border Canvas.Left="{Binding X}" Background="Transparent" Width="{Binding Width}" Height="{Binding Height}">
                                             <Canvas.Top>
                                                 <MultiBinding Converter="{StaticResource gridYConverter}">
                                                     <Binding Path="Y" />
@@ -164,12 +198,14 @@
                                                             </Style.Triggers>
                                                         </Style>
                                                     </Canvas.Style>
-                                                    <StackPanel Orientation="Horizontal" TextBlock.FontSize="0.4" Canvas.Left="0.125" Canvas.Top="-0.6" SnapsToDevicePixels="True">
-                                                        <TextBlock Text="Grid " />
-                                                        <TextBlock Text="{Binding Width}" />
-                                                        <TextBlock Text="×" />
-                                                        <TextBlock Text="{Binding Height}" />
-                                                    </StackPanel>
+                                                    <Border Canvas.Left="-0.0625" Canvas.Top="-0.95" SnapsToDevicePixels="True" Background="{StaticResource BackgroundWellBrush}" Padding="0.125 0" Height="0.95">
+                                                        <StackPanel Orientation="Horizontal" TextBlock.FontSize="0.4">
+                                                            <TextBlock Text="Grid " />
+                                                            <TextBlock Text="{Binding Width}" />
+                                                            <TextBlock Text="×" />
+                                                            <TextBlock Text="{Binding Height}" />
+                                                        </StackPanel>
+                                                    </Border>
                                                     <Rectangle Cursor="SizeAll" Width="{Binding Width}" Height="{Binding Height}" MouseDown="MoveRectangle_MouseDown" MouseMove="MoveRectangle_MouseMove" MouseUp="MoveRectangle_MouseUp">
                                                         <Rectangle.Style>
                                                             <Style TargetType="{x:Type Rectangle}">
@@ -182,7 +218,15 @@
                                                             </Style>
                                                         </Rectangle.Style>
                                                     </Rectangle>
-                                                    <Polyline Cursor="SizeNESW" Points="-0.75,-0.25 0.25,-0.25 0.25,0.75" Canvas.Left="{Binding Width}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
+                                                    <Polyline Points="-0.8125,-0.1875 0.1875,-0.1875 0.1875,0.8125" Canvas.Left="{Binding Width}" Stroke="{StaticResource BackgroundWellBrush}" StrokeThickness="0.375" />
+                                                    <Polyline Points="-0.1875,0.8125 -0.1875,-0.1875 0.8125, -0.1875" Stroke="{StaticResource BackgroundWellBrush}" StrokeThickness="0.375" />
+                                                    <Polyline Points="-0.1875,-0.8125 -0.1875,0.1875 0.8125,0.1875" Canvas.Top="{Binding Height}" Stroke="{StaticResource BackgroundWellBrush}" StrokeThickness="0.375" />
+                                                    <Polyline Points="0.1875,-0.8125 0.1875,0.1875 -0.8125,0.1875" Canvas.Left="{Binding Width}" Canvas.Top="{Binding Height}" Stroke="{StaticResource BackgroundWellBrush}" StrokeThickness="0.375" />
+
+                                                    <Polyline Cursor="SizeNESW" Points="-0.75,-0.1875 0.1875,-0.1875 0.1875,0.75" Canvas.Left="{Binding Width}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
+                                                    <Polyline Cursor="SizeNWSE" Points="-0.1875,0.75 -0.1875,-0.1875 0.75,-0.1875" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
+                                                    <Polyline Cursor="SizeNESW" Points="-0.1875,-0.75 -0.1875,0.1875 0.75,0.1875" Canvas.Top="{Binding Height}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
+                                                    <Polyline Cursor="SizeNWSE" Points="0.1875,-0.75 0.1875,0.1875 -0.75,0.1875" Canvas.Left="{Binding Width}" Canvas.Top="{Binding Height}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
                                                 </Canvas>
                                             </Grid>
                                         </Border>
