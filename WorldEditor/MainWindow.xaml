@@ -149,7 +149,7 @@
                                             <Canvas.Top>
                                                 <MultiBinding Converter="{StaticResource gridYConverter}">
                                                     <Binding Path="Y" />
-                                                    <Binding />
+                                                    <Binding Path="Height" />
                                                 </MultiBinding>
                                             </Canvas.Top>
                                             <Border BorderBrush="{StaticResource BackgroundWellBrush}" BorderThickness="0.0625" Margin="-0.0625">
@@ -183,7 +183,7 @@
                                             <Canvas.Top>
                                                 <MultiBinding Converter="{StaticResource gridYConverter}">
                                                     <Binding Path="Y" />
-                                                    <Binding />
+                                                    <Binding Path="Height" />
                                                 </MultiBinding>
                                             </Canvas.Top>
                                             <Grid>
@@ -223,10 +223,10 @@
                                                     <Polyline Points="-0.1875,-0.8125 -0.1875,0.1875 0.8125,0.1875" Canvas.Top="{Binding Height}" Stroke="{StaticResource BackgroundWellBrush}" StrokeThickness="0.375" />
                                                     <Polyline Points="0.1875,-0.8125 0.1875,0.1875 -0.8125,0.1875" Canvas.Left="{Binding Width}" Canvas.Top="{Binding Height}" Stroke="{StaticResource BackgroundWellBrush}" StrokeThickness="0.375" />
 
-                                                    <Polyline Cursor="SizeNESW" Points="-0.75,-0.1875 0.1875,-0.1875 0.1875,0.75" Canvas.Left="{Binding Width}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
-                                                    <Polyline Cursor="SizeNWSE" Points="-0.1875,0.75 -0.1875,-0.1875 0.75,-0.1875" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
-                                                    <Polyline Cursor="SizeNESW" Points="-0.1875,-0.75 -0.1875,0.1875 0.75,0.1875" Canvas.Top="{Binding Height}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
-                                                    <Polyline Cursor="SizeNWSE" Points="0.1875,-0.75 0.1875,0.1875 -0.75,0.1875" Canvas.Left="{Binding Width}" Canvas.Top="{Binding Height}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" />
+                                                    <Polyline Cursor="SizeNESW" Points="-0.75,-0.1875 0.1875,-0.1875 0.1875,0.75" Canvas.Left="{Binding Width}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" MouseDown="GridTopRightCorner_MouseDown" MouseMove="GridCorner_MouseMove" MouseUp="GridCorner_MouseUp" />
+                                                    <Polyline Cursor="SizeNWSE" Points="-0.1875,0.75 -0.1875,-0.1875 0.75,-0.1875" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" MouseDown="GridTopLeftCorner_MouseDown" MouseMove="GridCorner_MouseMove" MouseUp="GridCorner_MouseUp" />
+                                                    <Polyline Cursor="SizeNESW" Points="-0.1875,-0.75 -0.1875,0.1875 0.75,0.1875" Canvas.Top="{Binding Height}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" MouseDown="GridBottomLeftCorner_MouseDown" MouseMove="GridCorner_MouseMove" MouseUp="GridCorner_MouseUp" />
+                                                    <Polyline Cursor="SizeNWSE" Points="0.1875,-0.75 0.1875,0.1875 -0.75,0.1875" Canvas.Left="{Binding Width}" Canvas.Top="{Binding Height}" Stroke="{StaticResource ForegroundPrimaryBrush}" StrokeThickness="0.25" MouseDown="GridBottomRightCorner_MouseDown" MouseMove="GridCorner_MouseMove" MouseUp="GridCorner_MouseUp" />
                                                 </Canvas>
                                             </Grid>
                                         </Border>

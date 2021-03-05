@@ -113,7 +113,7 @@ namespace WorldEditor.Models
                     {
                         newTiles[x, y] = new WorldTile();
                     }
-                    this.Tiles[x, y].PropertyChanged += Tile_PropertyChanged;
+                    newTiles[x, y].PropertyChanged += Tile_PropertyChanged;
                 }
             }
             this._width = newWidth;

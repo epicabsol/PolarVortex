@@ -183,6 +183,10 @@ namespace WorldEditor
                 this.InvalidateTileVisual();
                 this.InvalidateCollisionVisual();
             }
+            else if (e.PropertyName == nameof(Grid.Width) || e.PropertyName == nameof(Grid.Height))
+            {
+                this.InvalidateBordersVisual();
+            }
             else if (e.PropertyName == nameof(Grid.PalettePath))
             {
                 this.ReloadPaletteImage();

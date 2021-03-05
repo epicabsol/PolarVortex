@@ -21,9 +21,9 @@ namespace WorldEditor
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Length == 2 && values[0] is int worldY && values[1] is Models.Grid grid)
+            if (values.Length == 2 && values[0] is int y && values[1] is int height)
             {
-                return (double)(-worldY - grid.Height);
+                return (double)(-y - height);
             }
             else
             {
@@ -42,6 +42,24 @@ namespace WorldEditor
     /// </summary>
     public partial class MainWindow : Window
     {
+        private class GridResizeConfig
+        {
+            public Models.Grid Grid { get; }
+            public int XFactor { get; }
+            public int YFactor { get; }
+            public int WidthFactor { get; }
+            public int HeightFactor { get; }
+
+            public GridResizeConfig(Models.Grid grid, int xFactor, int yFactor, int widthFactor, int heightFactor)
+            {
+                this.Grid = grid;
+                this.XFactor = xFactor;
+                this.YFactor = yFactor;
+                this.WidthFactor = widthFactor;
+                this.HeightFactor = heightFactor;
+            }
+        }
+
         public string BaseDirectory { get; }
         public Models.World CurrentWorld { get; }
         public string WorldFilename { get; set; } = null; // `null` means unsaved
@@ -482,10 +500,13 @@ namespace WorldEditor
             e.Handled = true;
         }
 
+        #region Grid moving and resizing
         private Point MoveReferencePoint;
         private Models.Grid DragGrid;
         private int DragStartX;
         private int DragStartY;
+        private int DragStartWidth;
+        private int DragStartHeight;
         private void MoveRectangle_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.Source is Rectangle moveRectangle && moveRectangle.DataContext is Models.Grid grid)
@@ -528,6 +549,86 @@ namespace WorldEditor
                 }
             }
             this.DragGrid = null;
+        }
+
+        private GridResizeConfig CurrentResize = null;
+        #endregion
+
+        private void GridTopRightCorner_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is Polyline corner && corner.DataContext is Models.Grid grid)
+            {
+                GridCorner_MouseDown(corner, grid, 0, 0, 1, 1, e);
+            }
+        }
+
+        private void GridTopLeftCorner_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is Polyline corner && corner.DataContext is Models.Grid grid)
+            {
+                GridCorner_MouseDown(corner, grid, 1, 0, -1, 1, e);
+            }
+        }
+
+        private void GridBottomLeftCorner_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is Polyline corner && corner.DataContext is Models.Grid grid)
+            {
+                GridCorner_MouseDown(corner, grid, 1, 1, -1, -1, e);
+            }
+        }
+
+        private void GridBottomRightCorner_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is Polyline corner && corner.DataContext is Models.Grid grid)
+            {
+                GridCorner_MouseDown(corner, grid, 0, 1, 1, -1, e);
+            }
+        }
+
+        private void GridCorner_MouseDown(Polyline corner, Models.Grid grid, int xFactor, int yFactor, int widthFactor, int heightFactor, MouseButtonEventArgs e)
+        {
+            this.CurrentResize = new GridResizeConfig(grid, xFactor, yFactor, widthFactor, heightFactor);
+            this.MoveReferencePoint = e.GetPosition(corner);
+            corner.CaptureMouse();
+            this.DragStartX = grid.X;
+            this.DragStartY = grid.Y;
+            this.DragStartWidth = grid.Width;
+            this.DragStartHeight = grid.Height;
+        }
+
+        private void GridCorner_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Source is Polyline corner && corner.DataContext is Models.Grid grid && grid == this.CurrentResize?.Grid)
+            {
+                Point point = e.GetPosition(corner);
+                Vector delta = new Vector(point.X - this.MoveReferencePoint.X, point.Y - this.MoveReferencePoint.Y);
+                int dX = (int)Math.Truncate(delta.X);
+                int dY = (int)Math.Truncate(delta.Y);
+
+                int newX = this.DragStartX + (dX * this.CurrentResize.XFactor);
+                int newY = this.DragStartY - (dY * this.CurrentResize.YFactor);
+                int newWidth = this.DragStartWidth + (dX * this.CurrentResize.WidthFactor);
+                int newHeight = this.DragStartHeight - (dY * this.CurrentResize.HeightFactor);
+                if (grid.X != newX || grid.Y != newY || grid.Width != newWidth || grid.Height != newHeight)
+                {
+                    MoveReferencePoint.X += (grid.X - newX) * this.CurrentResize.XFactor + (grid.Width - newWidth) * (this.CurrentResize.XFactor + this.CurrentResize.WidthFactor);
+                    MoveReferencePoint.Y -= (grid.Y - newY) * this.CurrentResize.YFactor + (grid.Height - newHeight) * (this.CurrentResize.YFactor + this.CurrentResize.HeightFactor);
+                    grid.X = newX;
+                    grid.Y = newY;
+                    grid.Resize(newWidth, newHeight);
+                }
+            }
+        }
+
+        private void GridCorner_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is Polyline corner && corner.DataContext is Models.Grid grid)
+            {
+                corner.ReleaseMouseCapture();
+                // TODO: Submit the Action for the resize
+            }
+            this.CurrentResize = null;
         }
     }
 }
