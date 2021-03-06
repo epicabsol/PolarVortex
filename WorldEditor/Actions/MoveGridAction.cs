@@ -8,35 +8,31 @@ namespace WorldEditor.Actions
     public class MoveGridAction : Action
     {
         public int GridIndex { get; }
-        public int NewX { get; }
-        public int NewY { get; }
-        public int OldX { get; }
-        public int OldY { get; }
+        public int XChange { get; }
+        public int YChange { get; }
 
-        public MoveGridAction(int gridIndex, int newX, int newY, int oldX, int oldY)
+        public MoveGridAction(int gridIndex, int xChange, int yChange)
         {
             this.GridIndex = gridIndex;
-            this.NewX = newX;
-            this.NewY = newY;
-            this.OldX = oldX;
-            this.OldY = oldY;
+            this.XChange = xChange;
+            this.YChange = yChange;
         }
 
         public override void Execute(World world)
         {
-            world.Grids[this.GridIndex].X = this.NewX;
-            world.Grids[this.GridIndex].Y = this.NewY;
+            world.Grids[this.GridIndex].X += this.XChange;
+            world.Grids[this.GridIndex].Y += this.YChange;
         }
 
         public override void Undo(World world)
         {
-            world.Grids[this.GridIndex].X = this.OldX;
-            world.Grids[this.GridIndex].Y = this.OldY;
+            world.Grids[this.GridIndex].X -= this.XChange;
+            world.Grids[this.GridIndex].Y -= this.YChange;
         }
 
         public override string ToString()
         {
-            return $"move grid {this.GridIndex} to {this.NewX}, {this.NewY}";
+            return $"move grid {this.GridIndex} by {this.XChange}, {this.YChange}";
         }
     }
 }

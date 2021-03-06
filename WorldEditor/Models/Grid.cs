@@ -87,10 +87,17 @@ namespace WorldEditor.Models
         private void Tile_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             WorldTile tile = (WorldTile)sender;
-            OnPropertyChanged(nameof(Tiles));
+            if (this.IsInBatchChanges)
+            {
+                this._haveTilesChanged = true;
+            }
+            else
+            {
+                OnPropertyChanged(nameof(Tiles));
+            }
         }
 
-        public void Resize(int newWidth, int newHeight)
+        public void Resize(int newWidth, int newHeight, int xShift = 0, int yShift = 0)
         {
             for (int x = 0; x < this.Width; x++)
             {
@@ -105,9 +112,9 @@ namespace WorldEditor.Models
             {
                 for (int y = 0; y < newHeight; y++)
                 {
-                    if (x < this.Width && y < this.Height)
+                    if (x - xShift >= 0 && x - xShift < this.Width && y - yShift >= 0 && y - yShift < this.Height)
                     {
-                        newTiles[x, y] = this.Tiles[x, y];
+                        newTiles[x, y] = this.Tiles[x - xShift, y - yShift];
                     }
                     else
                     {
@@ -124,11 +131,78 @@ namespace WorldEditor.Models
             this.OnPropertyChanged(nameof(Tiles));
         }
 
+        /// <summary>
+        /// Generates a copy of each of the tiles in this Grid.
+        /// </summary>
+        /// <returns></returns>
+        public WorldTile[,] CloneTiles()
+        {
+            WorldTile[,] result = new WorldTile[this.Width, this.Height];
+            for (int x = 0; x < this.Width; x++)
+            {
+                for (int y = 0; y < this.Height; y++)
+                {
+                    result[x, y] = new WorldTile(this.Tiles[x, y].PaletteIndex, this.Tiles[x, y].Collides);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Copies the given patch of tiles into this Grid at the given position.
+        /// </summary>
+        /// <param name="tiles"></param>
+        public void UpdateTiles(WorldTile[,] tiles, int offsetX, int offsetY)
+        {
+            /*if (tiles.GetLength(0) != this.Tiles.GetLength(0) || tiles.GetLength(1) != this.Tiles.GetLength(1))
+            {
+                throw new ArgumentException("Mismatched array size. `tiles` should have the same dimensions as this Grid.");
+            }*/
+
+            int startX = offsetX > 0 ? offsetX : 0;
+            int startY = offsetY > 0 ? offsetY : 0;
+            int endX = this.Width < (tiles.GetLength(0) + offsetX) ? this.Width : (tiles.GetLength(0) + offsetX);
+            int endY = this.Height < (tiles.GetLength(1) + offsetY) ? this.Height : (tiles.GetLength(1) + offsetY);
+
+            this.BeginBatchChanges();
+            for (int x = startX; x < endX; x++)
+            {
+                for (int y = startY; y < endY; y++)
+                {
+                    this.Tiles[x, y].PaletteIndex = tiles[x - offsetX, y - offsetY].PaletteIndex;
+                    this.Tiles[x, y].Collides = tiles[x - offsetX, y - offsetY].Collides;
+                }
+            }
+            this.EndBatchChanges();
+        }
+
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private bool _haveTilesChanged = false;
+        private int _batchChangeLevel = 0;
+        public bool IsInBatchChanges => this._batchChangeLevel > 0;
+
+        public void BeginBatchChanges()
+        {
+            if (this._batchChangeLevel == 0)
+            {
+                this._haveTilesChanged = false;
+            }
+            this._batchChangeLevel += 1;
+        }
+
+        public void EndBatchChanges()
+        {
+            this._batchChangeLevel -= 1;
+            if (this._haveTilesChanged)
+            {
+                this.OnPropertyChanged(nameof(Tiles));
+            }
         }
         #endregion
     }

@@ -45,6 +45,7 @@ namespace WorldEditor
         private class GridResizeConfig
         {
             public Models.Grid Grid { get; }
+            public Models.WorldTile[,] StartTiles { get; }
             public int XFactor { get; }
             public int YFactor { get; }
             public int WidthFactor { get; }
@@ -53,6 +54,7 @@ namespace WorldEditor
             public GridResizeConfig(Models.Grid grid, int xFactor, int yFactor, int widthFactor, int heightFactor)
             {
                 this.Grid = grid;
+                this.StartTiles = grid.CloneTiles();
                 this.XFactor = xFactor;
                 this.YFactor = yFactor;
                 this.WidthFactor = widthFactor;
@@ -545,7 +547,7 @@ namespace WorldEditor
 
                 if (grid.X != this.DragStartX || grid.Y != this.DragStartY)
                 {
-                    this.UndoContext.DoAction(new Actions.MoveGridAction(this.CurrentWorld.Grids.IndexOf(grid), grid.X, grid.Y, this.DragStartX, this.DragStartY), false);
+                    this.UndoContext.DoAction(new Actions.MoveGridAction(this.CurrentWorld.Grids.IndexOf(grid), grid.X - this.DragStartX, grid.Y - this.DragStartY), false);
                 }
             }
             this.DragGrid = null;
@@ -614,9 +616,10 @@ namespace WorldEditor
                 {
                     MoveReferencePoint.X += (grid.X - newX) * this.CurrentResize.XFactor + (grid.Width - newWidth) * (this.CurrentResize.XFactor + this.CurrentResize.WidthFactor);
                     MoveReferencePoint.Y -= (grid.Y - newY) * this.CurrentResize.YFactor + (grid.Height - newHeight) * (this.CurrentResize.YFactor + this.CurrentResize.HeightFactor);
+                    grid.Resize(newWidth, newHeight, grid.X - newX, grid.Y - newY);
+                    grid.UpdateTiles(this.CurrentResize.StartTiles, this.DragStartX - newX, this.DragStartY - newY);
                     grid.X = newX;
                     grid.Y = newY;
-                    grid.Resize(newWidth, newHeight);
                 }
             }
         }
@@ -626,7 +629,10 @@ namespace WorldEditor
             if (e.Source is Polyline corner && corner.DataContext is Models.Grid grid)
             {
                 corner.ReleaseMouseCapture();
-                // TODO: Submit the Action for the resize
+                if (grid.X != this.DragStartX || grid.Y != this.DragStartY || grid.Width != this.DragStartWidth || grid.Height != this.DragStartHeight)
+                {
+                    this.UndoContext.DoAction(new Actions.ResizeGridAction(this.CurrentWorld.Grids.IndexOf(grid), grid.X - this.DragStartX, grid.Y - this.DragStartY, grid.Width - this.DragStartWidth, grid.Height - this.DragStartHeight, this.CurrentResize.StartTiles), false);
+                }
             }
             this.CurrentResize = null;
         }

@@ -15,8 +15,11 @@ namespace WorldEditor.Models
             get => this._paletteIndex;
             set
             {
-                this._paletteIndex = value;
-                this.OnPropertyChanged(nameof(PaletteIndex));
+                if (value != this._paletteIndex)
+                {
+                    this._paletteIndex = value;
+                    this.OnPropertyChanged(nameof(PaletteIndex));
+                }
             }
         }
 
@@ -26,12 +29,13 @@ namespace WorldEditor.Models
             get => this._collides;
             set
             {
-                this._collides = value;
-                this.OnPropertyChanged(nameof(Collides));
+                if (value != this._collides)
+                {
+                    this._collides = value;
+                    this.OnPropertyChanged(nameof(Collides));
+                }
             }
         }
-
-        public bool PropHooked => this.PropertyChanged != null;
 
         public WorldTile(int paletteIndex = EmptyPaletteIndex, bool collides = false)
         {
