@@ -215,11 +215,13 @@ namespace WorldEditor
         private void GridsToolButton_Checked(object sender, RoutedEventArgs e)
         {
             this.ShowBorders = true;
+            this.GridsToolBar.Visibility = Visibility.Visible;
         }
 
         private void GridsToolButton_Unchecked(object sender, RoutedEventArgs e)
         {
             this.ShowBorders = false;
+            this.GridsToolBar.Visibility = Visibility.Collapsed;
         }
 
         private void GridElement_MouseEnter(object sender, MouseEventArgs e)
@@ -442,6 +444,7 @@ namespace WorldEditor
         }
         #endregion
 
+        #region Viewport panning and zooming
         private bool Panning = false;
         private Point LastMouse = new Point();
         private void WorldViewport_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -501,6 +504,7 @@ namespace WorldEditor
             }
             e.Handled = true;
         }
+        #endregion
 
         #region Grid moving and resizing
         private Point MoveReferencePoint;
@@ -554,7 +558,6 @@ namespace WorldEditor
         }
 
         private GridResizeConfig CurrentResize = null;
-        #endregion
 
         private void GridTopRightCorner_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -635,6 +638,12 @@ namespace WorldEditor
                 }
             }
             this.CurrentResize = null;
+        }
+        #endregion
+
+        private void AddGridButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.CurrentWorld.Grids.Add(new Models.Grid(0, 0, SelectedGrid?.PalettePath ?? "", 5, 5));
         }
     }
 }

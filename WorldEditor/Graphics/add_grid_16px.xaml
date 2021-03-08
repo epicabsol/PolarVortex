@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This file is compatible with Silverlight-->
+<Canvas xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" Name="svg8" Width="16" Height="16">
+  <Canvas.Resources/>
+  <!--Unknown tag: metadata-->
+  <!--Unknown tag: sodipodi:namedview-->
+  <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="rect857" Fill="#FF2D2D30" StrokeThickness="2" StrokeMiterLimit="4" StrokeLineJoin="Miter" StrokeStartLineCap="Square" StrokeEndLineCap="Square" Data="M 2 0 L 2 2 L 0 2 L 0 6 L 2 6 L 2 8 L 2 14 L 14 14 L 14 2 L 8 2 L 6 2 L 6 0 L 2 0 z "/>
+  <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="rect859" Fill="#FFF1F1F1" StrokeThickness="2" StrokeMiterLimit="4" StrokeLineJoin="Miter" StrokeStartLineCap="Square" StrokeEndLineCap="Square" Data="M 8 3 L 8 4 L 9 4 L 9 6 L 8 6 L 7 6 L 6 6 L 6 7 L 6 8 L 6 9 L 4 9 L 4 8 L 3 8 L 3 13 L 13 13 L 13 3 L 8 3 z M 10 4 L 12 4 L 12 6 L 10 6 L 10 4 z M 7 7 L 9 7 L 9 9 L 7 9 L 7 7 z M 10 7 L 12 7 L 12 9 L 10 9 L 10 7 z M 4 10 L 6 10 L 6 12 L 4 12 L 4 10 z M 7 10 L 9 10 L 9 12 L 7 12 L 7 10 z M 10 10 L 12 10 L 12 12 L 10 12 L 10 10 z "/>
+  <Path xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="iconFg" Fill="#FF8DD28A" Data="M7 5h-2v2h-1.981v-2h-2.019v-1.982h2.019v-2.018h1.981v2.018h2v1.982z"/>
+</Canvas>

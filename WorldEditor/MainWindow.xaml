@@ -90,18 +90,26 @@
             <MenuItem Header="Help" />
         </Menu>
 
-        <ToolBar Grid.Row="1" Grid.ColumnSpan="5" Background="{StaticResource BackgroundBrush}" Padding="2 0">
-            <Button Command="ApplicationCommands.Save" ToolTip="Save (Ctrl+S)">
-                <Image Source="{StaticResource Save16px}" Width="16" Height="16" />
-            </Button>
-            <Button Command="ApplicationCommands.Undo" ToolTip="Undo (Ctrl+Z)">
-                <Image Source="{StaticResource Undo16px}" Width="16" Height="16" />
-            </Button>
-            <Button Command="ApplicationCommands.Redo" ToolTip="Redo (Ctrl+Shift+Z)">
-                <Image Source="{StaticResource Redo16px}" Width="16" Height="16" />
-            </Button>
-        </ToolBar>
-
+        <Border Grid.Row="1" Grid.ColumnSpan="5" Background="{StaticResource BackgroundBrush}" Padding="2 0">
+            <StackPanel Orientation="Horizontal">
+                <ToolBar>
+                    <Button Command="ApplicationCommands.Save" ToolTip="Save (Ctrl+S)">
+                        <Image Source="{StaticResource Save16px}" Width="16" Height="16" />
+                    </Button>
+                    <Button Command="ApplicationCommands.Undo" ToolTip="Undo (Ctrl+Z)">
+                        <Image Source="{StaticResource Undo16px}" Width="16" Height="16" />
+                    </Button>
+                    <Button Command="ApplicationCommands.Redo" ToolTip="Redo (Ctrl+Shift+Z)">
+                        <Image Source="{StaticResource Redo16px}" Width="16" Height="16" />
+                    </Button>
+                </ToolBar>
+                <ToolBar x:Name="GridsToolBar" Margin="10 0 0 0" Visibility="Collapsed">
+                    <Button ToolTip="Add New Grid" Click="AddGridButton_Click">
+                        <Image Source="{StaticResource AddGrid16px}" Width="16" Height="16" />
+                    </Button>
+                </ToolBar>
+            </StackPanel>
+        </Border>
         <Border Grid.Row="3" Background="{StaticResource BackgroundBrush}" />
 
         <StackPanel Grid.Row="3" Orientation="Vertical">

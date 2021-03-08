@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
 using Newtonsoft.Json;
@@ -10,11 +11,11 @@ namespace WorldEditor.Models
     {
         public const string DialogFilter = "Polar Vortex Worlds (*.pvw)|*.pvw";
 
-        public List<Grid> Grids { get; }
+        public ObservableCollection<Grid> Grids { get; }
 
         public World(IEnumerable<Grid> grids)
         {
-            this.Grids = new List<Grid>(grids);
+            this.Grids = new ObservableCollection<Grid>(grids);
         }
 
         public void WriteToFile(string filename)

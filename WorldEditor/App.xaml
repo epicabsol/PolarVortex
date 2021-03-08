@@ -14,6 +14,7 @@
         <Color x:Key="Collision">#B0CC3322</Color>
         <Color x:Key="ForegroundPrimary">#F1F1F1</Color>
         <Color x:Key="ForegroundSecondary">#C3C3C3</Color>
+        <Color x:Key="Green">#FF8dd28a</Color>
 
         <!-- Brushes -->
         <SolidColorBrush x:Key="HoverBrush" Color="{StaticResource Hover}" />
@@ -24,6 +25,7 @@
         <SolidColorBrush x:Key="CollisionBrush" Color="{StaticResource Collision}" />
         <SolidColorBrush x:Key="ForegroundPrimaryBrush" Color="{StaticResource ForegroundPrimary}" />
         <SolidColorBrush x:Key="ForegroundSecondaryBrush" Color="{StaticResource ForegroundSecondary}" />
+        <SolidColorBrush x:Key="GreenBrish" Color="{StaticResource Green}" />
 
         <!-- Icons -->
         <DrawingImage x:Key="ToolBrush32px">
@@ -120,6 +122,15 @@
                 <DrawingGroup>
                     <GeometryDrawing Brush="#FF2D2D30" Geometry="F1M2.8955,1.7363C4.0135,0.6173 5.5015,0.00229999999999997 7.0875,0.00229999999999997 8.5435,0.00229999999999997 9.9185,0.5223 10.9995,1.4743L10.9995,0.000299999999999967 14.9995,0.000299999999999967 14.9995,8.0003 6.9995,8.0003 6.9995,4.0103C6.5055,4.0383 6.0365,4.2523 5.6675,4.6203 5.3035,4.9853 5.1035,5.4693 5.1035,5.9843 5.1035,6.4993 5.3035,6.9833 5.6675,7.3473L11.6135,13.2933 8.9065,16.0003 8.6645,16.0003 2.8395,10.1753C1.7165,9.0533 1.1035,7.5603 1.1125,5.9713 1.1215,4.3813 1.7535,2.8773 2.8955,1.7363" />
                     <GeometryDrawing Brush="#FFF1F1F1" Geometry="F1M3.6025,2.4434C5.5245,0.521400000000001,8.6515,0.5224,10.5725,2.4434L11.9995,3.8714 11.9995,1.0004 13.9995,1.0004 13.9995,7.0004 7.9995,7.0004 7.9995,5.0004 10.2995,5.0004 9.1575,3.8574C8.0165,2.7154 6.1595,2.7154 4.9605,3.9134 4.4085,4.4664 4.1035,5.2024 4.1035,5.9844 4.1035,6.7664 4.4085,7.5014 4.9605,8.0544L10.1995,13.2934 8.7855,14.7074 3.5465,9.4684C1.6245,7.5474,1.6245,4.4214,3.6025,2.4434" />
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
+        <DrawingImage x:Key="AddGrid16px">
+            <DrawingImage.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="#FF2D2D30" Geometry="M 2 0 L 2 2 L 0 2 L 0 6 L 2 6 L 2 8 L 2 14 L 14 14 L 14 2 L 8 2 L 6 2 L 6 0 L 2 0 z" />
+                    <GeometryDrawing Brush="#FFF1F1F1" Geometry="M 8 3 L 8 4 L 9 4 L 9 6 L 8 6 L 7 6 L 6 6 L 6 7 L 6 8 L 6 9 L 4 9 L 4 8 L 3 8 L 3 13 L 13 13 L 13 3 L 8 3 z M 10 4 L 12 4 L 12 6 L 10 6 L 10 4 z M 7 7 L 9 7 L 9 9 L 7 9 L 7 7 z M 10 7 L 12 7 L 12 9 L 10 9 L 10 7 z M 4 10 L 6 10 L 6 12 L 4 12 L 4 10 z M 7 10 L 9 10 L 9 12 L 7 12 L 7 10 z M 10 10 L 12 10 L 12 12 L 10 12 L 10 10 z " />
+                    <GeometryDrawing Brush="#FF8DD28A" Geometry="M7 5h-2v2h-1.981v-2h-2.019v-1.982h2.019v-2.018h1.981v2.018h2v1.982z" />
                 </DrawingGroup>
             </DrawingImage.Drawing>
         </DrawingImage>
