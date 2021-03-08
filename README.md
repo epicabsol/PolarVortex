@@ -3,7 +3,8 @@ Polar Vortex is a small game for me to practice developing the internals of a sm
 
 My goal is to write minimalistic, straightforward code.
 
-![Screenshot](screenshot.png)
+![Game screenshot](screenshot.png)
+![Editor screenshot](editor_screenshot.png)
 
 Prerequisites
 -------------
