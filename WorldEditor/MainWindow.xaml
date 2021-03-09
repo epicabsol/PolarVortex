@@ -274,38 +274,43 @@
                 <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20px" />
-                    <RowDefinition Height="18px" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
+            <TabControl>
+                <TabItem Header="Palette">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="1*" />
+                        </Grid.RowDefinitions>
 
-                <Border Grid.RowSpan="2" Background="{StaticResource BackgroundBrush}" />
-                <Border Grid.Row="2" Background="{StaticResource BackgroundHeadingBrush}">
-                    <local:TilePicker PalettePath="{Binding SelectedGrid.PalettePath}" BaseDirectory="{Binding BaseDirectory}" SelectedIndex="{Binding SelectedTileIndex, Mode=TwoWay}" />
-                </Border>
+                        <Border Grid.Row="1">
+                            <local:TilePicker PalettePath="{Binding SelectedGrid.PalettePath}" BaseDirectory="{Binding BaseDirectory}" SelectedIndex="{Binding SelectedTileIndex, Mode=TwoWay}" />
+                        </Border>
 
-                <TextBlock Text="Palette" VerticalAlignment="Center" Margin="5 0" FontSize="14" />
-                <TextBlock Grid.Row="1" Text="{Binding SelectedGrid.PalettePath}" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrush}" />
-            </Grid>
+                        <TextBlock Grid.Row="0" Text="{Binding SelectedGrid.PalettePath}" VerticalAlignment="Center" Margin="5 3" Foreground="{StaticResource ForegroundSecondaryBrush}" />
+                    </Grid>
+                </TabItem>
+                <TabItem Header="World">
+                    
+                </TabItem>
+            </TabControl>
 
             <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" Height="4" />
 
-            <Grid Grid.Row="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="20px" />
-                    <RowDefinition Height="18px" />
-                    <RowDefinition Height="1*" />
-                </Grid.RowDefinitions>
+            <TabControl Grid.Row="2">
+                <TabItem Header="Properties">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="1*" />
+                        </Grid.RowDefinitions>
 
-                <Border Grid.RowSpan="2" Background="{StaticResource BackgroundBrush}" />
-                <Border Grid.Row="2" Background="{StaticResource BackgroundHeadingBrush}" />
+                        <!--<Border Grid.Row="1" Background="{StaticResource BackgroundHeadingBrush}" />-->
 
-                <TextBlock Text="Properties" VerticalAlignment="Center" Margin="5 0" FontSize="14" />
-                <TextBlock Grid.Row="1" Text="No selection" VerticalAlignment="Center" Margin="5 0" Foreground="{StaticResource ForegroundSecondaryBrush}" />
+                        <TextBlock Text="No selection" VerticalAlignment="Center" Margin="5 3" Foreground="{StaticResource ForegroundSecondaryBrush}" />
+                    </Grid>
+                </TabItem>
 
-            </Grid>
+            </TabControl>
         </Grid>
     </Grid>
 </Window>
