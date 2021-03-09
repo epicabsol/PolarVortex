@@ -8,7 +8,7 @@
 #define JSON_BUFFER_LENGTH (1024 * 32)
 
 SpriteFont::SpriteFont(Allocator& allocator, const char* data, size_t dataLength) : _Allocator(allocator) {
-    void* parseBuffer = allocator.Allocate(JSON_BUFFER_LENGTH);
+    void* parseBuffer = ThreadAllocator.Allocate(JSON_BUFFER_LENGTH);
 
     const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, JSON_BUFFER_LENGTH), sajson::mutable_string_view(dataLength, (char*)data));
 
@@ -41,7 +41,7 @@ SpriteFont::SpriteFont(Allocator& allocator, const char* data, size_t dataLength
         this->_Glyphs[i].Advance = glyphObject.get_value_of_key(sajson::literal("advance")).get_number_value();
     }
 
-    allocator.Free(parseBuffer);
+    ThreadAllocator.Free(parseBuffer);
 }
 
 SpriteFont::~SpriteFont() {

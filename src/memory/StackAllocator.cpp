@@ -13,7 +13,7 @@ void* StackAllocator::Allocate(size_t length) {
 }
 
 void StackAllocator::Free(void* allocation) {
-    // Freeing individual allocations does nothing - use the `Pop()` method to deallocate allocated memory.
+    this->Pop(allocation);
 }
 
 void StackAllocator::Pop(const void* newTop) {

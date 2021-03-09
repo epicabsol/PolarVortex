@@ -11,7 +11,7 @@
 #define JSON_BUFFER_LENGTH (1024 * 32)
 
 SpriteAnimation::SpriteAnimation(Allocator& allocator, const char* data, size_t dataLength) : _Allocator(allocator), _Frames(nullptr), _FrameCount(0) {
-    void* parseBuffer = FrameAllocator.Allocate(JSON_BUFFER_LENGTH);
+    void* parseBuffer = ThreadAllocator.Allocate(JSON_BUFFER_LENGTH);
 
     const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, JSON_BUFFER_LENGTH), sajson::mutable_string_view(dataLength, (char*)data));
 
@@ -43,7 +43,7 @@ SpriteAnimation::SpriteAnimation(Allocator& allocator, const char* data, size_t 
         this->_Frames[frameIndex].Sprite.VSize = height / texture->GetHeight();
     }
 
-    FrameAllocator.Free(parseBuffer);
+    ThreadAllocator.Free(parseBuffer);
 }
 
 SpriteAnimation::~SpriteAnimation() {

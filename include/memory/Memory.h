@@ -42,6 +42,7 @@ extern StackAllocator RootAllocator;
 extern StackAllocator AssetsAllocator;
 extern StackAllocator ScreenAllocator;
 extern StackAllocator FrameAllocator;
+extern thread_local StackAllocator ThreadAllocator;
 extern const Allocator* const AllAllocators[];
 extern const size_t AllAllocatorsCount;
 

@@ -10,7 +10,7 @@
 #define JSON_BUFFER_LENGTH(inputLength) (inputLength * 4)
 
 WorldBlueprint::WorldBlueprint(Allocator& allocator, const char* data, size_t dataLength) : _Allocator(allocator) {
-    void* parseBuffer = allocator.Allocate(JSON_BUFFER_LENGTH(dataLength));
+    void* parseBuffer = ThreadAllocator.Allocate(JSON_BUFFER_LENGTH(dataLength));
 
     const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, dataLength), sajson::mutable_string_view(dataLength, (char*)data));
 
@@ -44,7 +44,7 @@ WorldBlueprint::WorldBlueprint(Allocator& allocator, const char* data, size_t da
         new (&this->_Grids[j]) GridBlueprint(allocator, Vector2(x, y), palette, width, height, tiles);
     }
 
-    allocator.Free(parseBuffer);
+    ThreadAllocator.Free(parseBuffer);
 }
 
 WorldBlueprint::~WorldBlueprint() {

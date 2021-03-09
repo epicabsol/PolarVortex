@@ -7,7 +7,7 @@
 #define JSON_BUFFER_LENGTH (1024 * 4)
 
 TilePalette::TilePalette(Allocator& allocator, const char* data, size_t dataLength) : _Allocator(allocator) {
-    void* parseBuffer = allocator.Allocate(JSON_BUFFER_LENGTH);
+    void* parseBuffer = ThreadAllocator.Allocate(JSON_BUFFER_LENGTH);
 
     const sajson::document doc = sajson::parse<sajson::single_allocation, sajson::mutable_string_view>(sajson::single_allocation((size_t*)parseBuffer, JSON_BUFFER_LENGTH / 4), sajson::mutable_string_view(dataLength, (char*)data));
 
@@ -22,5 +22,5 @@ TilePalette::TilePalette(Allocator& allocator, const char* data, size_t dataLeng
 
     this->_Stride = this->_Texture->GetWidth() / tileSize;
 
-    allocator.Free(parseBuffer);
+    ThreadAllocator.Free(parseBuffer);
 }

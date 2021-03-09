@@ -73,9 +73,9 @@ void WorldScreen::RebuildTileMesh() {
 
         const Grid* grid = &this->_World->GetGrids()[i];
         // Allocate the vertices and indices (allocates for worst-case, usually there will be some memory unused)
-        SpriteVertex* vertices = (SpriteVertex*)this->_Allocator.Allocate(sizeof(SpriteVertex) * grid->GetWidth() * grid->GetHeight() * 4);
+        SpriteVertex* vertices = (SpriteVertex*)ThreadAllocator.Allocate(sizeof(SpriteVertex) * grid->GetWidth() * grid->GetHeight() * 4);
         size_t vertexCount = 0;
-        uint16_t* indices = (uint16_t*)this->_Allocator.Allocate(sizeof(uint16_t) * grid->GetWidth() * grid->GetHeight() * 6);
+        uint16_t* indices = (uint16_t*)ThreadAllocator.Allocate(sizeof(uint16_t) * grid->GetWidth() * grid->GetHeight() * 6);
         size_t indexCount = 0;
 
         // Generate the vertices and indices
@@ -105,7 +105,8 @@ void WorldScreen::RebuildTileMesh() {
 
         this->_GridModels[i].Mesh = this->_Allocator.New<GLMesh>(SpriteVertexAttributes, SpriteVertexAttributeCount, vertices, vertexCount, indices, sizeof(indices[0]), indexCount);
         this->_GridModels[i].Texture = grid->GetTilePalette()->GetTexture();
-        this->_Allocator.Free(vertices);
+        ThreadAllocator.Free(indices);
+        ThreadAllocator.Free(vertices);
     }
 
 }

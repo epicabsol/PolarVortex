@@ -45,6 +45,11 @@ StackAllocator ScreenAllocator("Screen", ScreenAllocatorBuffer, sizeof(ScreenAll
 char FrameAllocatorBuffer[FRAME_ALLOCATOR_SIZE];
 StackAllocator FrameAllocator("Frame", FrameAllocatorBuffer, sizeof(FrameAllocatorBuffer));
 
+// Thread allocator (64MB)
+#define THREAD_ALLOCATOR_SIZE (1024 * 1024 * 64)
+thread_local char ThreadAllocatorBuffer[THREAD_ALLOCATOR_SIZE];
+thread_local StackAllocator ThreadAllocator("Thread", ThreadAllocatorBuffer, sizeof(ThreadAllocatorBuffer));
+
 // All allocators
 const Allocator* const AllAllocators[] = {
     &RootAllocator,
