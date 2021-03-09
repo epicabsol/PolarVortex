@@ -290,7 +290,28 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="World">
-                    
+                    <TreeView>
+                        <TreeViewItem Header="World" IsExpanded="True">
+                            <TreeViewItem Header="Grids" IsExpanded="True">
+                                <TreeViewItem Header="Grid 1" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="Entities">
+                                <TreeViewItem Header="Player Start 0" />
+                                <TreeViewItem Header="End Warp" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="Decor">
+                                <TreeViewItem Header="plant" />
+                                <TreeViewItem Header="plant" />
+                                <TreeViewItem Header="plant" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="Background" IsExpanded="True">
+                                <TreeViewItem Header="Hills" />
+                                <TreeViewItem Header="Hills" />
+                                <TreeViewItem Header="Underground" />
+                                <TreeViewItem Header="Sun" />
+                            </TreeViewItem>
+                        </TreeViewItem>
+                    </TreeView>
                 </TabItem>
             </TabControl>
 
