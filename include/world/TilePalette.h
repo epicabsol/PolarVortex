@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 class Allocator;
 class GLTexture;
 

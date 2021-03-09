@@ -17,7 +17,7 @@ Vector2 UITextBlock::MeasureContent() const {
 void UITextBlock::SetText(const char* text) {
     size_t length = strlen(text);
     assert(length < 255);
-    strncpy_s(this->_Text, 255, text, 255);
+    strncpy(this->_Text, text, 255);
     this->InvalidateContentSize();
 }
 

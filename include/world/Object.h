@@ -1,6 +1,7 @@
 #pragma once
 
 class Allocator;
+class World;
 
 /**
  * @brief Object is the base class for misc. things that are part of a world, and can update and render.
