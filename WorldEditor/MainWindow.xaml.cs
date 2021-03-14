@@ -643,7 +643,7 @@ namespace WorldEditor
 
         private void AddGridButton_Click(object sender, RoutedEventArgs e)
         {
-            this.CurrentWorld.Grids.Add(new Models.Grid(0, 0, SelectedGrid?.PalettePath ?? "", 5, 5));
+            this.UndoContext.DoAction(new Actions.AddGridAction(0, 0, 5, 5, SelectedGrid?.PalettePath ?? ""));
         }
     }
 }
