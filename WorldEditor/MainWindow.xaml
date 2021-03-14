@@ -208,10 +208,7 @@
                                                     </Canvas.Style>
                                                     <Border Canvas.Left="-0.0625" Canvas.Top="-0.95" SnapsToDevicePixels="True" Background="{StaticResource BackgroundWellBrush}" Padding="0.125 0" Height="0.95">
                                                         <StackPanel Orientation="Horizontal" TextBlock.FontSize="0.4">
-                                                            <TextBlock Text="Grid " />
-                                                            <TextBlock Text="{Binding Width}" />
-                                                            <TextBlock Text="×" />
-                                                            <TextBlock Text="{Binding Height}" />
+                                                            <TextBlock Text="{Binding}" />
                                                         </StackPanel>
                                                     </Border>
                                                     <Rectangle Cursor="SizeAll" Width="{Binding Width}" Height="{Binding Height}" MouseDown="MoveRectangle_MouseDown" MouseMove="MoveRectangle_MouseMove" MouseUp="MoveRectangle_MouseUp">
@@ -282,11 +279,11 @@
                             <RowDefinition Height="1*" />
                         </Grid.RowDefinitions>
 
-                        <Border Grid.Row="1">
+                        <Border Grid.Row="1" Margin="7 0">
                             <local:TilePicker PalettePath="{Binding SelectedGrid.PalettePath}" BaseDirectory="{Binding BaseDirectory}" SelectedIndex="{Binding SelectedTileIndex, Mode=TwoWay}" />
                         </Border>
 
-                        <TextBlock Grid.Row="0" Text="{Binding SelectedGrid.PalettePath}" VerticalAlignment="Center" Margin="5 3" Foreground="{StaticResource ForegroundSecondaryBrush}" />
+                        <TextBlock Grid.Row="0" Text="{Binding SelectedGrid.PalettePath}" VerticalAlignment="Center" Margin="7 3" Foreground="{StaticResource ForegroundSecondaryBrush}" />
                     </Grid>
                 </TabItem>
                 <TabItem Header="World">
@@ -312,6 +309,17 @@
                             </TreeViewItem>
                         </TreeViewItem>
                     </TreeView>
+                </TabItem>
+                <TabItem Header="Grids">
+                    <ListBox ItemsSource="{Binding CurrentWorld.Grids}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="models:Grid">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </TabItem>
             </TabControl>
 

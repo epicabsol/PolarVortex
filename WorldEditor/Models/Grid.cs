@@ -176,6 +176,11 @@ namespace WorldEditor.Models
             this.EndBatchChanges();
         }
 
+        public override string ToString()
+        {
+            return $"Grid {this.Width} × {this.Height}";
+        }
+
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string propertyName)

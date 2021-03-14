@@ -563,21 +563,36 @@
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="{x:Type TabItem}">
-                                    <Border x:Name="Border" Padding="8 4">
+                                    <Border x:Name="Border" Padding="8 3 8 4" BorderThickness="0 2 0 0">
                                         <ContentPresenter Content="{Binding Header, RelativeSource={RelativeSource AncestorType={x:Type TabItem}}}" />
+                                        <Border.Style>
+                                            <Style TargetType="{x:Type Border}">
+                                                <Setter Property="BorderBrush" Value="{StaticResource BackgroundBrush}" />
+                                            </Style>
+                                        </Border.Style>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsSelected" Value="False">
                                             <Setter TargetName="Border" Property="Background" Value="Transparent" />
                                             <Setter TargetName="Border" Property="TextBlock.Foreground" Value="{StaticResource ForegroundSecondaryBrush}" />
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="Transparent" />
                                         </Trigger>
                                         <Trigger Property="IsMouseOver" Value="True">
                                             <Setter TargetName="Border" Property="Background" Value="{StaticResource BackgroundBrush}" />
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource BackgroundBrush}" />
                                         </Trigger>
                                         <Trigger Property="IsSelected" Value="True">
                                             <Setter TargetName="Border" Property="Background" Value="{StaticResource BackgroundBrush}" />
                                             <Setter TargetName="Border" Property="TextBlock.Foreground" Value="{StaticResource ForegroundPrimaryBrush}" />
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource HoverBrush}" />
                                         </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="True" />
+                                                <Condition Property="IsKeyboardFocusWithin" Value="True" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+                                        </MultiTrigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </Setter.Value>
@@ -691,6 +706,47 @@
                     </Setter>
                 </Style>
             </Style.Resources>
+        </Style>
+        <Style TargetType="{x:Type ListBox}">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="TextBlock.Foreground" Value="{StaticResource ForegroundPrimaryBrush}" />
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                    <Border x:Name="Background">
+                                        <ContentPresenter Margin="7 2" />
+                                        <Border.Style>
+                                            <Style TargetType="{x:Type Border}">
+                                                <Setter Property="Background" Value="Transparent" />
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Background" Property="Background" Value="{StaticResource HoverBrush}" />
+                                        </Trigger>
+                                        <Trigger SourceName="Background" Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Background" Property="Background" Value="{StaticResource HoverBrush}" />
+                                        </Trigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="True" />
+                                                <Condition Property="IsKeyboardFocusWithin" Value="True" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter TargetName="Background" Property="Background" Value="{StaticResource AccentBrush}" />
+                                        </MultiTrigger>
+
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Application.Resources>
 </Application>
