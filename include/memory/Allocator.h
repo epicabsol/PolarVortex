@@ -98,6 +98,6 @@ public:
     template <typename T>
     inline void Delete(T* instance) {
         instance->~T();
-        this->Free(instance);
+        this->Free((void*)instance);
     }
 };
